@@ -2,7 +2,7 @@ package com.github.uiautomator.stub;
 
 /**
  * Created with IntelliJ IDEA.
- * User: b036
+ * User: xiaocong@gmail.com
  * Date: 8/13/13
  * Time: 10:13 AM
  * To change this template use File | Settings | File Templates.

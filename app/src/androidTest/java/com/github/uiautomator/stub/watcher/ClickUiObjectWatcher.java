@@ -9,7 +9,7 @@ import com.github.uiautomator.stub.Log;
 
 /**
  * Created with IntelliJ IDEA.
- * User: b036
+ * User: xiaocong@gmail.com
  * Date: 8/21/13
  * Time: 4:18 PM
  * To change this template use File | Settings | File Templates.

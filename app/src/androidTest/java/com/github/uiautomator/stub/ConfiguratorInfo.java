@@ -3,7 +3,7 @@ package com.github.uiautomator.stub;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Created by b036 on 12/26/13.
+ * Created by xiaocong@gmail.com on 12/26/13.
  */
 public class ConfiguratorInfo {
 

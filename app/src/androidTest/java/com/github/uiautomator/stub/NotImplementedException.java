@@ -4,7 +4,7 @@ import android.os.Build;
 
 /**
  * Created with IntelliJ IDEA.
- * User: b036
+ * User: xiaocong@gmail.com
  * Date: 8/13/13
  * Time: 10:45 AM
  * To change this template use File | Settings | File Templates.

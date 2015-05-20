@@ -1,7 +1,6 @@
 package com.github.uiautomator.stub;
 
 import android.os.Build;
-import android.os.Environment;
 import android.os.RemoteException;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.UiCollection;
@@ -15,9 +14,9 @@ import android.view.KeyEvent;
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
 import com.github.uiautomator.stub.watcher.PressKeysWatcher;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -106,54 +105,24 @@ public class AutomatorServiceImpl implements AutomatorService {
      * Helper method used for debugging to dump the current window's layout hierarchy. The file root location is /data/local/tmp
      *
      * @param compressed use compressed layout hierarchy or not using setCompressedLayoutHeirarchy method. Ignore the parameter in case the API level lt 18.
-     * @param filename   the filename to be stored.
+     * @param filename   the filename to be stored. @deprecated
      * @return the absolute path name of dumped file.
      */
     @Override
     public String dumpWindowHierarchy(boolean compressed, String filename) {
         device.setCompressedLayoutHeirarchy(compressed);
-        File parent = new File(Environment.getDataDirectory(), "local/tmp"); // Environment.getDataDirectory() return /data/local/tmp in android 4.3 but not expected /data
-        if (!parent.exists())
-            parent.mkdirs();
-        boolean return_value = false;
-        if (filename == null || filename == "") {
-            filename = "dump.xml";
-            return_value = true;
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            device.dumpWindowHierarchy(os);
+            os.close();
+            return os.toString("UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        File dumpFile = new File(parent, filename).getAbsoluteFile();
-        device.dumpWindowHierarchy(filename);
-        File f = new File(STORAGE_PATH, filename); // It should be this one, but in Android4.3, it is "/data/local/tmp/local/tmp"......
-        if (!f.exists()) f = dumpFile;
-        if (f.exists()) {
-            if (return_value) {
-                BufferedReader reader = null;
-                try {
-                    StringBuilder sb = new StringBuilder();
-                    reader = new BufferedReader(new FileReader(f));
-                    char[] buffer = new char[4096];
-                    int len = 0;
-                    while ((len = reader.read(buffer)) != -1) {
-                        sb.append(new String(buffer, 0, len));
-                    }
-                    reader.close();
-                    reader = null;
-                    return sb.toString();
-                } catch (IOException e) {
-                    Log.e(e.toString());
-                } finally {
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                            reader = null;
-                        } catch (IOException e1) {
-                        }
-                    }
-                }
-                return null;
-            } else
-                return f.getAbsolutePath();
-        } else
-            return null;
+
+        return null;
     }
 
     /**

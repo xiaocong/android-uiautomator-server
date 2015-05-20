@@ -1,7 +1,9 @@
 package com.github.uiautomator.stub;
 
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.SdkSuppress;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.UiDevice;
 import android.test.FlakyTest;
 import android.test.suitebuilder.annotation.LargeTest;
 
@@ -32,6 +34,7 @@ public class Stub {
 		server.route("/jsonrpc/0", new JsonRpcServer(new ObjectMapper(),
 				new AutomatorServiceImpl(), AutomatorService.class));
 		server.start();
+		UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).wakeUp();
 	}
 
 	@After
