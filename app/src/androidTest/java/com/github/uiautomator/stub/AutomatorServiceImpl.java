@@ -108,8 +108,20 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param filename   the filename to be stored. @deprecated
      * @return the absolute path name of dumped file.
      */
+    @Deprecated
     @Override
     public String dumpWindowHierarchy(boolean compressed, String filename) {
+        return dumpWindowHierarchy(compressed);
+    }
+
+    /**
+     * Helper method used for debugging to dump the current window's layout hierarchy.
+     *
+     * @param compressed use compressed layout hierarchy or not using setCompressedLayoutHeirarchy method. Ignore the parameter in case the API level lt 18.
+     * @return the absolute path name of dumped file.
+     */
+    @Override
+    public String dumpWindowHierarchy(boolean compressed) {
         device.setCompressedLayoutHeirarchy(compressed);
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -136,9 +148,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public String takeScreenshot(String filename, float scale, int quality) throws NotImplementedException {
-        if (Build.VERSION.SDK_INT < 17)
-            throw new NotImplementedException("takeScreenshot");
-        File f = new File(STORAGE_PATH, filename);
+        File f = new File(InstrumentationRegistry.getTargetContext().getFilesDir(), filename);
         device.takeScreenshot(f, scale, quality);
         if (f.exists())
             return f.getAbsolutePath();

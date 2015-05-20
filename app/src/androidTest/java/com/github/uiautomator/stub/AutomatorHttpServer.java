@@ -38,7 +38,6 @@ public class AutomatorHttpServer extends NanoHTTPD {
             stop();
             return new Response("Server stopped!!!");
         } else if ("/0/screenshot".equals(uri)) {
-            File f = new File(AutomatorServiceImpl.STORAGE_PATH, "screenshot.png");
             float scale = 1.0f;
             if (params.containsKey("scale")) {
                 try {
@@ -53,6 +52,7 @@ public class AutomatorHttpServer extends NanoHTTPD {
                 } catch (NumberFormatException e) {
                 }
             }
+            File f = new File(InstrumentationRegistry.getTargetContext().getFilesDir(), "screenshot.png");
             UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).takeScreenshot(f, scale, quality);
             try {
                 return new Response(Response.Status.OK, "image/png", new FileInputStream(f));

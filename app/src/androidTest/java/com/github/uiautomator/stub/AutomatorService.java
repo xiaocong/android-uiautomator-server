@@ -62,7 +62,15 @@ public interface AutomatorService {
      * @param filename the filename to be stored.
      * @return the absolute path name of dumped file.
      */
+    @Deprecated
     String dumpWindowHierarchy(boolean compressed, String filename);
+
+    /**
+     * Helper method used for debugging to dump the current window's layout hierarchy.
+     * @param compressed use compressed layout hierarchy or not using setCompressedLayoutHeirarchy method. Ignore the parameter in case the API level lt 18.
+     * @return the absolute path name of dumped file.
+     */
+    String dumpWindowHierarchy(boolean compressed);
 
     /**
      * Take a screenshot of current window and store it as PNG The screenshot is adjusted per screen rotation
