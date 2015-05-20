@@ -1,6 +1,6 @@
 package com.github.uiautomator.stub;
 
-import android.os.Build;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.UiDevice;
 
 import com.googlecode.jsonrpc4j.JsonRpcServer;
@@ -38,8 +38,6 @@ public class AutomatorHttpServer extends NanoHTTPD {
             stop();
             return new Response("Server stopped!!!");
         } else if ("/0/screenshot".equals(uri)) {
-            if (Build.VERSION.SDK_INT < 17)
-                return new Response(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "API level less than 17.");
             File f = new File(AutomatorServiceImpl.STORAGE_PATH, "screenshot.png");
             float scale = 1.0f;
             if (params.containsKey("scale")) {
@@ -55,7 +53,7 @@ public class AutomatorHttpServer extends NanoHTTPD {
                 } catch (NumberFormatException e) {
                 }
             }
-            UiDevice.getInstance().takeScreenshot(f, scale, quality);
+            UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).takeScreenshot(f, scale, quality);
             try {
                 return new Response(Response.Status.OK, "image/png", new FileInputStream(f));
             } catch (FileNotFoundException e) {

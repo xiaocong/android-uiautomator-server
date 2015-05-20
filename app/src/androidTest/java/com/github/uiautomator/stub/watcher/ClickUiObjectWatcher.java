@@ -1,8 +1,10 @@
 package com.github.uiautomator.stub.watcher;
 
-import android.support.test.uiautomator.UiObject;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
+
 import com.github.uiautomator.stub.Log;
 
 /**
@@ -26,7 +28,7 @@ public class ClickUiObjectWatcher extends SelectorWatcher {
         Log.d("ClickUiObjectWatcher triggered!");
         if (target != null) {
             try {
-                new UiObject(target).click();
+                UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).findObject(target).click();
             } catch (UiObjectNotFoundException e) {
                 Log.d(e.getMessage());
             }

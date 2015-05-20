@@ -1,6 +1,7 @@
 package com.github.uiautomator.stub.watcher;
 
 import android.os.RemoteException;
+import android.support.test.InstrumentationRegistry;
 import android.view.KeyEvent;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiSelector;
@@ -15,10 +16,12 @@ import com.github.uiautomator.stub.Log;
  */
 public class PressKeysWatcher extends SelectorWatcher{
     private String[] keys = new String[]{};
+    private UiDevice device = null;
 
     public PressKeysWatcher(UiSelector[] conditions, String[] keys) {
         super(conditions);
         this.keys = keys;
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
     }
 
     @Override
@@ -27,43 +30,43 @@ public class PressKeysWatcher extends SelectorWatcher{
         for (String key: keys) {
             key = key.toLowerCase();
             if ("home".equals(key))
-                UiDevice.getInstance().pressHome();
+                device.pressHome();
             else if ("back".equals(key))
-                UiDevice.getInstance().pressBack();
+                device.pressBack();
             else if ("left".equals(key))
-                UiDevice.getInstance().pressDPadLeft();
+                device.pressDPadLeft();
             else if ("right".equals(key))
-                UiDevice.getInstance().pressDPadRight();
+                device.pressDPadRight();
             else if ("up".equals(key))
-                UiDevice.getInstance().pressDPadUp();
+                device.pressDPadUp();
             else if ("down".equals(key))
-                UiDevice.getInstance().pressDPadDown();
+                device.pressDPadDown();
             else if ("center".equals(key))
-                UiDevice.getInstance().pressDPadCenter();
+                device.pressDPadCenter();
             else if ("menu".equals(key))
-                UiDevice.getInstance().pressMenu();
+                device.pressMenu();
             else if ("search".equals(key))
-                UiDevice.getInstance().pressSearch();
+                device.pressSearch();
             else if ("enter".equals(key))
-                UiDevice.getInstance().pressEnter();
+                device.pressEnter();
             else if ("delete".equals(key) || "del".equals(key))
-                UiDevice.getInstance().pressDelete();
+                device.pressDelete();
             else if ("recent".equals(key))
                 try {
-                    UiDevice.getInstance().pressRecentApps();
+                    device.pressRecentApps();
                 } catch (RemoteException e) {
                     Log.d(e.getMessage());
                 }
             else if ("volume_up".equals(key))
-                UiDevice.getInstance().pressKeyCode(KeyEvent.KEYCODE_VOLUME_UP);
+                device.pressKeyCode(KeyEvent.KEYCODE_VOLUME_UP);
             else if ("volume_down".equals(key))
-                UiDevice.getInstance().pressKeyCode(KeyEvent.KEYCODE_VOLUME_DOWN);
+                device.pressKeyCode(KeyEvent.KEYCODE_VOLUME_DOWN);
             else if ("volume_mute".equals(key))
-                UiDevice.getInstance().pressKeyCode(KeyEvent.KEYCODE_VOLUME_MUTE);
+                device.pressKeyCode(KeyEvent.KEYCODE_VOLUME_MUTE);
             else if ("camera".equals(key))
-                UiDevice.getInstance().pressKeyCode(KeyEvent.KEYCODE_CAMERA);
+                device.pressKeyCode(KeyEvent.KEYCODE_CAMERA);
             else if ("power".equals(key))
-                UiDevice.getInstance().pressKeyCode(KeyEvent.KEYCODE_POWER);
+                device.pressKeyCode(KeyEvent.KEYCODE_POWER);
         }
     }
 }

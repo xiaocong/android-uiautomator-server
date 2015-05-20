@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -36,46 +35,8 @@ public class AutomatorServiceImpl implements AutomatorService {
 
     private UiDevice device;
 
-	public AutomatorServiceImpl() {
+    public AutomatorServiceImpl() {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-	}
-
-    /**
-     * Walk around to avoid backforward compatibility issue on uiautomator between api level 16/17.
-     */
-    static void setAsHorizontalList(UiScrollable obj) {
-        Class noparams[] = {};
-        Object nullparmas[] = {};
-        try {
-            Class.forName("android.support.test.uiautomator.UiScrollable").getDeclaredMethod("setAsHorizontalList", noparams).invoke(obj, nullparmas);
-        } catch (NoSuchMethodException e) {
-            Log.d(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            Log.d(e.getMessage());
-        } catch (InvocationTargetException e) {
-            Log.d(e.getMessage());
-        } catch (IllegalAccessException e) {
-            Log.d(e.getMessage());
-        }
-    }
-
-    /**
-     * Walk around to avoid backforward compatibility issue on uiautomator between api level 16/17.
-     */
-    static void setAsVerticalList(UiScrollable obj) {
-        Class noparams[] = {};
-        Object nullparmas[] = {};
-        try {
-            Class.forName("android.support.test.uiautomator.UiScrollable").getDeclaredMethod("setAsVerticalList", noparams).invoke(obj, nullparmas);
-        } catch (NoSuchMethodException e) {
-            Log.d(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            Log.d(e.getMessage());
-        } catch (InvocationTargetException e) {
-            Log.d(e.getMessage());
-        } catch (IllegalAccessException e) {
-            Log.d(e.getMessage());
-        }
     }
 
     /**
@@ -85,7 +46,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public String ping() {
-        //new UiObject(new UiSelector()).exists();  // here we call the method just for checking if the UiAutomationService is ok, else it will throw IllegalStateException.
         return "pong";
     }
 
@@ -121,13 +81,9 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps  is the number of steps for the swipe action
      * @return true if swipe is performed, false if the operation fails or the coordinates are invalid
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean drag(int startX, int startY, int endX, int endY, int steps) throws NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException();
-
         return device.drag(startX, startY, endX, endY, steps);
     }
 
@@ -143,19 +99,19 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean swipe(int startX, int startY, int endX, int endY, int steps) {
-        return device.swipe(startX,startY, endX, endY, steps);
+        return device.swipe(startX, startY, endX, endY, steps);
     }
 
     /**
      * Helper method used for debugging to dump the current window's layout hierarchy. The file root location is /data/local/tmp
+     *
      * @param compressed use compressed layout hierarchy or not using setCompressedLayoutHeirarchy method. Ignore the parameter in case the API level lt 18.
      * @param filename   the filename to be stored.
      * @return the absolute path name of dumped file.
      */
     @Override
     public String dumpWindowHierarchy(boolean compressed, String filename) {
-        if (Build.VERSION.SDK_INT >= 18)
-            device.setCompressedLayoutHeirarchy(compressed);
+        device.setCompressedLayoutHeirarchy(compressed);
         File parent = new File(Environment.getDataDirectory(), "local/tmp"); // Environment.getDataDirectory() return /data/local/tmp in android 4.3 but not expected /data
         if (!parent.exists())
             parent.mkdirs();
@@ -203,12 +159,11 @@ public class AutomatorServiceImpl implements AutomatorService {
     /**
      * Take a screenshot of current window and store it as PNG The screenshot is adjusted per screen rotation
      *
-     * @param filename  where the PNG should be written to
-     * @param scale     scale the screenshot down if needed; 1.0f for original size
-     * @param quality   quality of the PNG compression; range: 0-100
+     * @param filename where the PNG should be written to
+     * @param scale    scale the screenshot down if needed; 1.0f for original size
+     * @param quality  quality of the PNG compression; range: 0-100
      * @return the file name of the screenshot. null if failed.
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public String takeScreenshot(String filename, float scale, int quality) throws NotImplementedException {
@@ -241,7 +196,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param dir Left or l, Right or r, Natural or n, case insensitive
      * @throws android.os.RemoteException
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public void setOrientation(String dir) throws RemoteException, NotImplementedException {
@@ -279,12 +233,9 @@ public class AutomatorServiceImpl implements AutomatorService {
      *
      * @return true if successful, else return false
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean openNotification() throws NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException("openNotification");
         return device.openNotification();
     }
 
@@ -293,12 +244,9 @@ public class AutomatorServiceImpl implements AutomatorService {
      *
      * @return true if successful, else return false
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean openQuickSettings() throws NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException("openQuickSettings");
         return device.openQuickSettings();
     }
 
@@ -543,11 +491,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      *
      * @param obj the selector of the UiObject.
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public void clearTextField(Selector obj) throws UiObjectNotFoundException {
-        new UiObject(obj.toUiSelector()).clearTextField();
+        device.findObject(obj.toUiSelector()).clearTextField();
     }
 
     /**
@@ -556,11 +503,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param obj the selector of the UiObject.
      * @return text value of the current node represented by this UiObject
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public String getText(Selector obj) throws UiObjectNotFoundException {
-        return new UiObject(obj.toUiSelector()).getText();
+        return device.findObject(obj.toUiSelector()).getText();
     }
 
     /**
@@ -570,11 +516,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param text string to set
      * @return true if operation is successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean setText(Selector obj, String text) throws UiObjectNotFoundException {
-        return new UiObject(obj.toUiSelector()).setText(text);
+        return device.findObject(obj.toUiSelector()).setText(text);
     }
 
     /**
@@ -583,11 +528,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param obj the target ui object.
      * @return true id successful else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean click(Selector obj) throws UiObjectNotFoundException {
-        return new UiObject(obj.toUiSelector()).click();
+        return device.findObject(obj.toUiSelector()).click();
     }
 
     /**
@@ -597,11 +541,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param corner "br"/"bottomright" means BottomRight, "tl"/"topleft" means TopLeft, "center" means Center.
      * @return true on success
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean click(Selector obj, String corner) throws UiObjectNotFoundException {
-        return click(new UiObject(obj.toUiSelector()), corner);
+        return click(device.findObject(obj.toUiSelector()), corner);
     }
 
     private boolean click(UiObject obj, String corner) throws UiObjectNotFoundException {
@@ -612,7 +555,7 @@ public class AutomatorServiceImpl implements AutomatorService {
             return obj.clickBottomRight();
         else if ("tl".equals(corner) || "topleft".equals(corner))
             return obj.clickTopLeft();
-        else  if ("c".equals(corner) || "center".equals(corner))
+        else if ("c".equals(corner) || "center".equals(corner))
             return obj.click();
         return false;
     }
@@ -627,11 +570,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param timeout timeout before giving up on waiting for a new window
      * @return true if the event was triggered, else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean clickAndWaitForNewWindow(Selector obj, long timeout) throws UiObjectNotFoundException {
-        return new UiObject(obj.toUiSelector()).clickAndWaitForNewWindow(timeout);
+        return device.findObject(obj.toUiSelector()).clickAndWaitForNewWindow(timeout);
     }
 
     /**
@@ -640,11 +582,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param obj the target ui object.
      * @return true if operation was successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean longClick(Selector obj) throws UiObjectNotFoundException {
-        return new UiObject(obj.toUiSelector()).longClick();
+        return device.findObject(obj.toUiSelector()).longClick();
     }
 
     /**
@@ -654,11 +595,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param corner "br"/"bottomright" means BottomRight, "tl"/"topleft" means TopLeft, "center" means Center.
      * @return true if operation was successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean longClick(Selector obj, String corner) throws UiObjectNotFoundException {
-        return longClick(new UiObject(obj.toUiSelector()), corner);
+        return longClick(device.findObject(obj.toUiSelector()), corner);
     }
 
     private boolean longClick(UiObject obj, String corner) throws UiObjectNotFoundException {
@@ -684,19 +624,15 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps   usually 40 steps. You can increase or decrease the steps to change the speed.
      * @return true if successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean dragTo(Selector obj, Selector destObj, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return dragTo(new UiObject(obj.toUiSelector()), destObj, steps);
+        return dragTo(device.findObject(obj.toUiSelector()), destObj, steps);
     }
 
     private boolean dragTo(UiObject obj, Selector destObj, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException("dragTo");
-        return obj.dragTo(new UiObject(destObj.toUiSelector()), steps);
+        return obj.dragTo(device.findObject(destObj.toUiSelector()), steps);
     }
 
     /**
@@ -708,20 +644,17 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps usually 40 steps. You can increase or decrease the steps to change the speed.
      * @return true if successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean dragTo(Selector obj, int destX, int destY, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return dragTo(new UiObject(obj.toUiSelector()), destX, destY, steps);
+        return dragTo(device.findObject(obj.toUiSelector()), destX, destY, steps);
     }
 
     private boolean dragTo(UiObject obj, int destX, int destY, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException("dragTo");
         return obj.dragTo(destX, destY, steps);
     }
+
     /**
      * Check if view exists. This methods performs a waitForExists(long) with zero timeout. This basically returns immediately whether the view represented by this UiObject exists or not.
      *
@@ -730,7 +663,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean exist(Selector obj) {
-        return new UiObject(obj.toUiSelector()).exists();
+        return device.findObject(obj.toUiSelector()).exists();
     }
 
     /**
@@ -739,7 +672,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param obj the target ui object.
      * @return object info.
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public ObjInfo objInfo(Selector obj) throws UiObjectNotFoundException {
@@ -755,26 +687,26 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public int count(Selector obj) {
         if ((obj.getMask() & Selector.MASK_INSTANCE) > 0) {
-            if (new UiObject(obj.toUiSelector()).exists())
+            if (device.findObject(obj.toUiSelector()).exists())
                 return 1;
             else
                 return 0;
         } else {
             UiSelector sel = obj.toUiSelector();
-            if (! new UiObject(sel).exists())
+            if (!device.findObject(sel).exists())
                 return 0;
             int low = 1;
             int high = 2;
             sel = sel.instance(high - 1);
-            while (new UiObject(sel).exists()) {
+            while (device.findObject(sel).exists()) {
                 low = high;
                 high = high * 2;
                 sel = sel.instance(high - 1);
             }
             while (high > low + 1) {
-                int mid = (low + high)/2;
+                int mid = (low + high) / 2;
                 sel = sel.instance(mid - 1);
-                if (new UiObject(sel).exists())
+                if (device.findObject(sel).exists())
                     low = mid;
                 else
                     high = mid;
@@ -788,12 +720,11 @@ public class AutomatorServiceImpl implements AutomatorService {
      *
      * @param obj the selector of ui object.
      * @return array of object info.
-     *
      */
     @Override
     public ObjInfo[] objInfoOfAllInstances(Selector obj) {
         int total = count(obj);
-        ObjInfo objs [] = new ObjInfo[total];
+        ObjInfo objs[] = new ObjInfo[total];
         if ((obj.getMask() & Selector.MASK_INSTANCE) > 0 && total > 0) {
             try {
                 objs[0] = objInfo(obj);
@@ -822,18 +753,15 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps       the number of steps for the gesture. Steps are injected about 5 milliseconds apart, so 100 steps may take around 0.5 seconds to complete.
      * @return true if all touch events for this gesture are injected successfully, false otherwise
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean gesture(Selector obj, Point startPoint1, Point startPoint2, Point endPoint1, Point endPoint2, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return gesture(new UiObject(obj.toUiSelector()),
+        return gesture(device.findObject(obj.toUiSelector()),
                 startPoint1, startPoint2,
                 endPoint1, endPoint2, steps);
     }
 
     private boolean gesture(UiObject obj, Point startPoint1, Point startPoint2, Point endPoint1, Point endPoint2, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException("gesture(performTwoPointerGesture)");
         return obj.performTwoPointerGesture(
                 startPoint1.toPoint(), startPoint2.toPoint(),
                 endPoint1.toPoint(), endPoint2.toPoint(), steps);
@@ -847,18 +775,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps   the number of steps for the gesture. Steps are injected about 5 milliseconds apart, so 100 steps may take around 0.5 seconds to complete.
      * @return true if all touch events for this gesture are injected successfully, false otherwise
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean pinchIn(Selector obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return pinchIn(new UiObject(obj.toUiSelector()), percent, steps);
+        return pinchIn(device.findObject(obj.toUiSelector()), percent, steps);
     }
 
     private boolean pinchIn(UiObject obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException("pinchIn");
         return obj.pinchIn(percent, steps);
     }
 
@@ -870,18 +794,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps   the number of steps for the gesture. Steps are injected about 5 milliseconds apart, so 100 steps may take around 0.5 seconds to complete.
      * @return true if all touch events for this gesture are injected successfully, false otherwise
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean pinchOut(Selector obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return pinchOut(new UiObject(obj.toUiSelector()), percent, steps);
+        return pinchOut(device.findObject(obj.toUiSelector()), percent, steps);
     }
 
     private boolean pinchOut(UiObject obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException("pinchOut");
         return obj.pinchOut(percent, steps);
     }
 
@@ -893,11 +813,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps indicates the number of injected move steps into the system. Steps are injected about 5ms apart. So a 100 steps may take about 1/2 second to complete.
      * @return true of successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean swipe(Selector obj, String dir, int steps) throws UiObjectNotFoundException {
-        return swipe(new UiObject(obj.toUiSelector()), dir, steps);
+        return swipe(device.findObject(obj.toUiSelector()), dir, steps);
     }
 
     private boolean swipe(UiObject item, String dir, int steps) throws UiObjectNotFoundException {
@@ -923,7 +842,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitForExists(Selector obj, long timeout) {
-        return new UiObject(obj.toUiSelector()).waitForExists(timeout);
+        return device.findObject(obj.toUiSelector()).waitForExists(timeout);
     }
 
     /**
@@ -935,42 +854,42 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitUntilGone(Selector obj, long timeout) {
-        return new UiObject(obj.toUiSelector()).waitUntilGone(timeout);
+        return device.findObject(obj.toUiSelector()).waitUntilGone(timeout);
     }
 
     /**
      * Performs a backwards fling action with the default number of fling steps (5). If the swipe direction is set to vertical, then the swipe will be performed from top to bottom. If the swipe direction is set to horizontal, then the swipes will be performed from left to right. Make sure to take into account devices configured with right-to-left languages like Arabic and Hebrew.
+     *
      * @param obj        the selector of the scrollable object
      * @param isVertical vertical or horizontal
      * @return true if scrolled, and false if can't scroll anymore
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean flingBackward(Selector obj, boolean isVertical) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.flingBackward();
     }
 
     /**
      * Performs a forward fling with the default number of fling steps (5). If the swipe direction is set to vertical, then the swipes will be performed from bottom to top. If the swipe direction is set to horizontal, then the swipes will be performed from right to left. Make sure to take into account devices configured with right-to-left languages like Arabic and Hebrew.
+     *
      * @param obj        the selector of the scrollable object
      * @param isVertical vertical or horizontal
      * @return true if scrolled, and false if can't scroll anymore
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean flingForward(Selector obj, boolean isVertical) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.flingForward();
     }
 
@@ -982,15 +901,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param maxSwipes  max swipes to achieve beginning.
      * @return true on scrolled, else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean flingToBeginning(Selector obj, boolean isVertical, int maxSwipes) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.flingToBeginning(maxSwipes);
     }
 
@@ -1002,15 +920,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param maxSwipes  max swipes to achieve end.
      * @return true on scrolled, else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean flingToEnd(Selector obj, boolean isVertical, int maxSwipes) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.flingToEnd(maxSwipes);
     }
 
@@ -1022,15 +939,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps      number of steps. Use this to control the speed of the scroll action.
      * @return true if scrolled, false if can't scroll anymore
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean scrollBackward(Selector obj, boolean isVertical, int steps) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.scrollBackward(steps);
     }
 
@@ -1042,15 +958,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps      number of steps. Use this to control the speed of the scroll action.
      * @return true on scrolled, else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean scrollForward(Selector obj, boolean isVertical, int steps) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.scrollForward(steps);
     }
 
@@ -1063,15 +978,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps      use steps to control the speed, so that it may be a scroll, or fling
      * @return true on scrolled else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean scrollToBeginning(Selector obj, boolean isVertical, int maxSwipes, int steps) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.scrollToBeginning(maxSwipes, steps);
     }
 
@@ -1084,15 +998,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps      use steps to control the speed, so that it may be a scroll, or fling
      * @return true on scrolled, else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean scrollToEnd(Selector obj, boolean isVertical, int maxSwipes, int steps) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.scrollToEnd(maxSwipes, steps);
     }
 
@@ -1104,21 +1017,21 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param isVertical vertical or horizontal
      * @return true on scrolled, else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean scrollTo(Selector obj, Selector targetObj, boolean isVertical) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
         if (isVertical)
-            setAsVerticalList(scrollable);
+            scrollable.setAsVerticalList();
         else
-            setAsHorizontalList(scrollable);
+            scrollable.setAsHorizontalList();
         return scrollable.scrollIntoView(targetObj.toUiSelector());
     }
 
 
     /**
      * Name an UiObject and cache it.
+     *
      * @param obj UiObject
      * @return the name of the UiObject
      */
@@ -1142,6 +1055,7 @@ public class AutomatorServiceImpl implements AutomatorService {
             uiObjects.remove(name);
         }
     }
+
     /**
      * Searches for child UI element within the constraints of this UiSelector selector. It looks for any child matching the childPattern argument that has a child UI element anywhere within its sub hierarchy that has a text attribute equal to text. The returned UiObject will point at the childPattern instance that matched the search and not at the identifying child element that matched the text attribute.
      *
@@ -1151,7 +1065,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @return A string ID represent the returned UiObject.
      */
     @Override
-    public String childByText(Selector collection, Selector child, String text) throws UiObjectNotFoundException{
+    public String childByText(Selector collection, Selector child, String text) throws UiObjectNotFoundException {
         UiObject obj;
         if (exist(collection) && objInfo(collection).isScrollable()) {
             obj = new UiScrollable(collection.toUiSelector()).getChildByText(child.toUiSelector(), text);
@@ -1249,11 +1163,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param selector Selector of the UiObject
      * @return A string ID represent the returned UiObject.
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public String getUiObject(Selector selector) throws UiObjectNotFoundException {
-        return addUiObject(new UiObject(selector.toUiSelector()));
+        return addUiObject(device.findObject(selector.toUiSelector()));
     }
 
     /**
@@ -1275,7 +1188,7 @@ public class AutomatorServiceImpl implements AutomatorService {
         return strings.toArray(new String[strings.size()]);
     }
 
-    private UiObject getUiObject(String name) throws UiObjectNotFoundException{
+    private UiObject getUiObject(String name) throws UiObjectNotFoundException {
         if (uiObjects.containsKey(name)) {
             return uiObjects.get(name);
         } else {
@@ -1288,7 +1201,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      *
      * @param obj the id of the UiObject.
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public void clearTextField(String obj) throws UiObjectNotFoundException {
@@ -1301,7 +1213,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param obj the id of the UiObject.
      * @return text value of the current node represented by this UiObject
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public String getText(String obj) throws UiObjectNotFoundException {
@@ -1315,7 +1226,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param text string to set
      * @return true if operation is successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean setText(String obj, String text) throws UiObjectNotFoundException {
@@ -1328,7 +1238,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param obj the id of target ui object.
      * @return true id successful else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean click(String obj) throws UiObjectNotFoundException {
@@ -1342,7 +1251,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param corner "br"/"bottomright" means BottomRight, "tl"/"topleft" means TopLeft, "center" means Center.
      * @return true on success
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean click(String obj, String corner) throws UiObjectNotFoundException {
@@ -1359,7 +1267,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param timeout timeout before giving up on waiting for a new window
      * @return true if the event was triggered, else false
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean clickAndWaitForNewWindow(String obj, long timeout) throws UiObjectNotFoundException {
@@ -1372,7 +1279,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param obj the id of target ui object.
      * @return true if operation was successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean longClick(String obj) throws UiObjectNotFoundException {
@@ -1386,7 +1292,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param corner "br"/"bottomright" means BottomRight, "tl"/"topleft" means TopLeft, "center" means Center.
      * @return true if operation was successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean longClick(String obj, String corner) throws UiObjectNotFoundException {
@@ -1401,9 +1306,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps   usually 40 steps. You can increase or decrease the steps to change the speed.
      * @return true if successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean dragTo(String obj, Selector destObj, int steps) throws UiObjectNotFoundException, NotImplementedException {
@@ -1419,9 +1322,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps usually 40 steps. You can increase or decrease the steps to change the speed.
      * @return true if successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean dragTo(String obj, int destX, int destY, int steps) throws UiObjectNotFoundException, NotImplementedException {
@@ -1449,7 +1350,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param obj the id of target ui object.
      * @return object info.
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public ObjInfo objInfo(String obj) throws UiObjectNotFoundException {
@@ -1467,7 +1367,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps       the number of steps for the gesture. Steps are injected about 5 milliseconds apart, so 100 steps may take around 0.5 seconds to complete.
      * @return true if all touch events for this gesture are injected successfully, false otherwise
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean gesture(String obj, Point startPoint1, Point startPoint2, Point endPoint1, Point endPoint2, int steps) throws UiObjectNotFoundException, NotImplementedException {
@@ -1482,9 +1381,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps   the number of steps for the gesture. Steps are injected about 5 milliseconds apart, so 100 steps may take around 0.5 seconds to complete.
      * @return true if all touch events for this gesture are injected successfully, false otherwise
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean pinchIn(String obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
@@ -1499,9 +1396,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps   the number of steps for the gesture. Steps are injected about 5 milliseconds apart, so 100 steps may take around 0.5 seconds to complete.
      * @return true if all touch events for this gesture are injected successfully, false otherwise
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      * @throws com.github.uiautomator.stub.NotImplementedException
-     *
      */
     @Override
     public boolean pinchOut(String obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
@@ -1516,7 +1411,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param steps indicates the number of injected move steps into the system. Steps are injected about 5ms apart. So a 100 steps may take about 1/2 second to complete.
      * @return true of successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     *
      */
     @Override
     public boolean swipe(String obj, String dir, int steps) throws UiObjectNotFoundException {
@@ -1555,9 +1449,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public ConfiguratorInfo getConfigurator() throws NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException();
-
         return new ConfiguratorInfo();
     }
 
@@ -1569,9 +1460,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public ConfiguratorInfo setConfigurator(ConfiguratorInfo info) throws NotImplementedException {
-        if (Build.VERSION.SDK_INT < 18)
-            throw new NotImplementedException();
-
         ConfiguratorInfo.setConfigurator(info);
         return new ConfiguratorInfo();
     }
