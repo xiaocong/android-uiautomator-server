@@ -16,42 +16,36 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * A working example of a ui automator test.
-
- * @author SNI
+ * Use JUnit test to start the uiautomator jsonrpc server.
+ * @author xiaocong@gmail.com
  */
 RunWith(javaClass<AndroidJUnit4>())
 SdkSuppress(minSdkVersion = 18)
 public class Stub {
-    private var server: AutomatorHttpServer? = null
+    val PORT = 9008
+    val server = AutomatorHttpServer(PORT)
 
     Before
     throws(javaClass<Exception>())
     public fun setUp() {
-        server = AutomatorHttpServer(PORT)
-        server!!.route("/jsonrpc/0", JsonRpcServer(ObjectMapper(), AutomatorServiceImpl(), javaClass<AutomatorService>()))
-        server!!.start()
+        server.route("/jsonrpc/0", JsonRpcServer(ObjectMapper(), AutomatorServiceImpl(), javaClass<AutomatorService>()))
+        server.start()
         UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).wakeUp()
     }
 
     After
     throws(javaClass<Exception>())
     public fun tearDown() {
-        server!!.stop()
-        server = null
+        server.stop()
     }
 
     Test
     LargeTest
-    FlakyTest(tolerance = TEST_TOLERANCE)
+    FlakyTest(tolerance = 3)
     throws(javaClass<InterruptedException>())
     public fun testUIAutomatorStub() {
-        while (server!!.isAlive())
+        while (server.isAlive())
             Thread.sleep(100)
     }
 
-    companion object {
-        private val TEST_TOLERANCE = 3
-        private val PORT = 9008
-    }
 }
