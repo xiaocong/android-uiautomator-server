@@ -1,6 +1,6 @@
 package com.github.uiautomator.stub;
 
-import java.lang.reflect.InvocationTargetException;
+import android.support.test.uiautomator.Configurator;
 
 /**
  * Created by xiaocong@gmail.com on 12/26/13.
@@ -8,23 +8,12 @@ import java.lang.reflect.InvocationTargetException;
 public class ConfiguratorInfo {
 
     public ConfiguratorInfo() {
-        try {
-            Class clz = Class.forName("android.support.test.uiautomator.Configurator");
-            Object conf = clz.getMethod("getInstance").invoke(null);
-            this._actionAcknowledgmentTimeout = (Long)clz.getMethod("getActionAcknowledgmentTimeout").invoke(conf);
-            this._keyInjectionDelay = (Long)clz.getMethod("getKeyInjectionDelay").invoke(conf);
-            this._scrollAcknowledgmentTimeout = (Long)clz.getMethod("getScrollAcknowledgmentTimeout").invoke(conf);
-            this._waitForIdleTimeout = (Long)clz.getMethod("getWaitForIdleTimeout").invoke(conf);
-            this._waitForSelectorTimeout = (Long)clz.getMethod("getWaitForSelectorTimeout").invoke(conf);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        Configurator config = Configurator.getInstance();
+        this._actionAcknowledgmentTimeout = config.getActionAcknowledgmentTimeout();
+        this._keyInjectionDelay = config.getKeyInjectionDelay();
+        this._scrollAcknowledgmentTimeout = config.getScrollAcknowledgmentTimeout();
+        this._waitForIdleTimeout = config.getWaitForIdleTimeout();
+        this._waitForSelectorTimeout = config.getWaitForSelectorTimeout();
     }
 
     public long getActionAcknowledgmentTimeout() {
@@ -68,23 +57,12 @@ public class ConfiguratorInfo {
     }
 
     public static void setConfigurator(ConfiguratorInfo info) {
-        try {
-            Class clz = Class.forName("android.support.test.uiautomator.Configurator");
-            Object conf = clz.getMethod("getInstance").invoke(null);
-            clz.getMethod("setActionAcknowledgmentTimeout", Long.TYPE).invoke(conf, info.getActionAcknowledgmentTimeout());
-            clz.getMethod("setKeyInjectionDelay", Long.TYPE).invoke(conf, info.getKeyInjectionDelay());
-            clz.getMethod("setScrollAcknowledgmentTimeout", Long.TYPE).invoke(conf, info.getScrollAcknowledgmentTimeout());
-            clz.getMethod("setWaitForIdleTimeout", Long.TYPE).invoke(conf, info.getWaitForIdleTimeout());
-            clz.getMethod("setWaitForSelectorTimeout", Long.TYPE).invoke(conf, info.getWaitForSelectorTimeout());
-        } catch (IllegalAccessException e) {
-            Log.d(e.getMessage());
-        } catch (InvocationTargetException e) {
-            Log.d(e.getMessage());
-        } catch (NoSuchMethodException e) {
-            Log.d(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            Log.d(e.getMessage());
-        }
+        Configurator config = Configurator.getInstance();
+        config.setActionAcknowledgmentTimeout(info.getActionAcknowledgmentTimeout());
+        config.setKeyInjectionDelay(info.getKeyInjectionDelay());
+        config.setScrollAcknowledgmentTimeout(info.getScrollAcknowledgmentTimeout());
+        config.setWaitForIdleTimeout(info.getWaitForIdleTimeout());
+        config.setWaitForSelectorTimeout(info.getWaitForSelectorTimeout());
     }
 
     private long _actionAcknowledgmentTimeout;

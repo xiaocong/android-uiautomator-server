@@ -26,15 +26,11 @@ public class DeviceInfo {
 		this._currentPackageName = ud.getCurrentPackageName();
 		this._displayWidth = ud.getDisplayWidth();
 		this._displayHeight = ud.getDisplayHeight();
-		if (_sdkInt >= 17) {
-			this._displayRotation = ud.getDisplayRotation();
-			this._productName = ud.getProductName();
-			this._naturalOrientation = ud.isNaturalOrientation();
-		}
-		if (_sdkInt >= 18) {
-			this._displaySizeDpX = ud.getDisplaySizeDp().x;
-			this._displaySizeDpY = ud.getDisplaySizeDp().y;
-		}
+		this._displayRotation = ud.getDisplayRotation();
+		this._productName = ud.getProductName();
+		this._naturalOrientation = ud.isNaturalOrientation();
+		this._displaySizeDpX = ud.getDisplaySizeDp().x;
+		this._displaySizeDpY = ud.getDisplaySizeDp().y;
 	}
 	
 	public String getCurrentPackageName() {

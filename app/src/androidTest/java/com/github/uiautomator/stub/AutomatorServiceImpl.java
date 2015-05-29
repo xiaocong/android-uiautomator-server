@@ -1,6 +1,5 @@
 package com.github.uiautomator.stub;
 
-import android.os.Build;
 import android.os.RemoteException;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.UiCollection;
@@ -28,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class AutomatorServiceImpl implements AutomatorService {
 
-    final public static String STORAGE_PATH = "/data/local/tmp/";
     private final HashSet<String> watchers = new HashSet<String>();
     private final ConcurrentHashMap<String, UiObject> uiObjects = new ConcurrentHashMap<String, UiObject>();
 
@@ -178,8 +176,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public void setOrientation(String dir) throws RemoteException, NotImplementedException {
-        if (Build.VERSION.SDK_INT < 17)
-            throw new NotImplementedException("setOrientation");
         dir = dir.toLowerCase();
         if ("left".equals(dir) || "l".equals(dir))
             device.setOrientationLeft();
