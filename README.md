@@ -15,12 +15,20 @@ that we can just write PC side script to write UIAutomator tests.
         $ ./gradlew build
         $ ./gradlew packageDebugAndroidTest
 
-# Run the jsonrcp server on Android device
+- Run the jsonrcp server on Android device
 
-    $ ./gradlew cC
-    $ adb forward tcp:9008 tcp:9008 # tcp forward
+        $ ./gradlew cC
+        $ adb forward tcp:9008 tcp:9008 # tcp forward
 
 # How to use
+
+```python
+from uiautomator import device as d
+
+d.screen.on()
+d(text="Settings").click()
+d(scrollable=True).scroll.vert.forward()
+```
 
 Refer to python wrapper library [uiautomator](https://github.com/xiaocong/uiautomator).
 
@@ -36,5 +44,5 @@ If you have any idea, please email xiaocong@gmail.com or [submit tickets](https:
 
 # TODO
 
-- [] move from java to kotlin
-- [] support unicode input
+- move from java to kotlin
+- support unicode input
