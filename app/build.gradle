@@ -35,10 +35,21 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("../release.keystore")
+            storePassword "uiautomator-release-2015"
+            keyAlias "uiautomator"
+            keyPassword "uiautomator"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     sourceSets {
@@ -76,7 +87,7 @@ dependencies {
 }
 
 buildscript {
-    ext.kotlin_version = '0.11.91.4'
+    ext.kotlin_version = '0.12.200'
     repositories {
         mavenCentral()
     }

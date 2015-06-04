@@ -23,6 +23,8 @@
 
 package com.github.uiautomator.stub;
 
+import android.support.test.InstrumentationRegistry;
+import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
@@ -34,7 +36,7 @@ public class ObjInfo {
     }
 
     public static final ObjInfo getObjInfo(UiSelector selector) throws UiObjectNotFoundException {
-        return new ObjInfo(new UiObject(selector));
+        return new ObjInfo(UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).findObject(selector));
     }
 
 	private ObjInfo(UiObject obj) throws UiObjectNotFoundException {
@@ -52,12 +54,8 @@ public class ObjInfo {
 		this._scrollable = obj.isScrollable();
 		this._selected = obj.isSelected();
 		this._text = obj.getText();
-		if (android.os.Build.VERSION.SDK_INT >= 17) {
-			this._visibleBounds = Rect.from(obj.getVisibleBounds());
-		}
-		if (android.os.Build.VERSION.SDK_INT >= 18) {
-			this._className = obj.getClassName();
-		}
+        this._visibleBounds = Rect.from(obj.getVisibleBounds());
+        this._className = obj.getClassName();
 	}
 
 	private Rect _bounds;
