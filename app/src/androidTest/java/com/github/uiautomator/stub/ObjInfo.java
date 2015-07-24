@@ -26,6 +26,7 @@ package com.github.uiautomator.stub;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
 
@@ -38,6 +39,10 @@ public class ObjInfo {
     public static final ObjInfo getObjInfo(UiSelector selector) throws UiObjectNotFoundException {
         return new ObjInfo(UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).findObject(selector));
     }
+
+	public static final ObjInfo getObjInfo(UiObject2 obj) throws UiObjectNotFoundException {
+		return new ObjInfo(obj);
+	}
 
 	private ObjInfo(UiObject obj) throws UiObjectNotFoundException {
 		this._bounds = Rect.from(obj.getBounds());
@@ -58,6 +63,26 @@ public class ObjInfo {
         this._className = obj.getClassName();
 	}
 
+	private ObjInfo(UiObject2 obj) throws UiObjectNotFoundException {
+		this._bounds = Rect.from(obj.getVisibleBounds());
+		this._checkable = obj.isCheckable();
+		this._checked = obj.isChecked();
+		this._childCount = obj.getChildCount();
+		this._clickable = obj.isClickable();
+		this._contentDescription = obj.getContentDescription();
+		this._enabled = obj.isEnabled();
+		this._focusable = obj.isFocusable();
+		this._focused = obj.isFocused();
+		this._longClickable = obj.isLongClickable();
+		this._packageName = obj.getApplicationPackage();
+		this._scrollable = obj.isScrollable();
+		this._selected = obj.isSelected();
+		this._text = obj.getText();
+		this._visibleBounds = Rect.from(obj.getVisibleBounds());
+		this._className = obj.getClassName();
+		this._resourceName=obj.getResourceName();
+	}
+
 	private Rect _bounds;
 	private Rect _visibleBounds;
 	private int _childCount;
@@ -74,6 +99,7 @@ public class ObjInfo {
 	private boolean _longClickable;
 	private boolean _scrollable;
 	private boolean _selected;
+	private String _resourceName;
 
 	public Rect getBounds() {
 		return _bounds;
@@ -199,7 +225,13 @@ public class ObjInfo {
 		return _selected;
 	}
 
-	public void setSelected(boolean selected) {
-		this._selected = selected;
+	public void setSelected(boolean selected) { this._selected = selected; }
+
+	public String getResourceName() {
+		return _resourceName;
+	}
+
+	public void setResourceName(String resourceName) {
+		this._resourceName = resourceName;
 	}
 }

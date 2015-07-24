@@ -1,8 +1,9 @@
 .gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
-/.idea/codeStyleSettings.xml
+local.properties
 .DS_Store
-/build
-/captures
+build
+captures
+.idea
+gradle.properties
+app/app.iml
+android-uiautomator-server.iml
