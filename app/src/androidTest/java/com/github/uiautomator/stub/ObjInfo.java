@@ -40,7 +40,7 @@ public class ObjInfo {
         return new ObjInfo(UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).findObject(selector));
     }
 
-	public static final ObjInfo getObjInfo(UiObject2 obj) throws UiObjectNotFoundException {
+	public static final ObjInfo getObjInfo(UiObject2 obj) {
 		return new ObjInfo(obj);
 	}
 
@@ -63,7 +63,7 @@ public class ObjInfo {
         this._className = obj.getClassName();
 	}
 
-	private ObjInfo(UiObject2 obj) throws UiObjectNotFoundException {
+	private ObjInfo(UiObject2 obj) {
 		this._bounds = Rect.from(obj.getVisibleBounds());
 		this._checkable = obj.isCheckable();
 		this._checked = obj.isChecked();

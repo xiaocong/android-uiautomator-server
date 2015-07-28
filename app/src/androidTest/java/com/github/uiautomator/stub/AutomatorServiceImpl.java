@@ -25,12 +25,15 @@ package com.github.uiautomator.stub;
 
 import android.os.RemoteException;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.uiautomator.Direction;
 import android.support.test.uiautomator.UiCollection;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
+import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiScrollable;
 import android.support.test.uiautomator.UiSelector;
+import android.support.test.uiautomator.Until;
 import android.view.KeyEvent;
 
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
@@ -171,8 +174,7 @@ public class AutomatorServiceImpl implements AutomatorService {
     public String takeScreenshot(String filename, float scale, int quality) throws NotImplementedException {
         File f = new File(InstrumentationRegistry.getTargetContext().getFilesDir(), filename);
         device.takeScreenshot(f, scale, quality);
-        if (f.exists())
-            return f.getAbsolutePath();
+        if (f.exists()) return f.getAbsolutePath();
         return null;
     }
 
@@ -184,10 +186,8 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public void freezeRotation(boolean freeze) throws RemoteException {
-        if (freeze)
-            device.freezeRotation();
-        else
-            device.unfreezeRotation();
+        if (freeze) device.freezeRotation();
+        else device.unfreezeRotation();
     }
 
     /**
@@ -200,12 +200,9 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public void setOrientation(String dir) throws RemoteException, NotImplementedException {
         dir = dir.toLowerCase();
-        if ("left".equals(dir) || "l".equals(dir))
-            device.setOrientationLeft();
-        else if ("right".equals(dir) || "r".equals(dir))
-            device.setOrientationRight();
-        else if ("natural".equals(dir) || "n".equals(dir))
-            device.setOrientationNatural();
+        if ("left".equals(dir) || "l".equals(dir)) device.setOrientationLeft();
+        else if ("right".equals(dir) || "r".equals(dir)) device.setOrientationRight();
+        else if ("natural".equals(dir) || "n".equals(dir)) device.setOrientationNatural();
     }
 
     /**
@@ -371,38 +368,24 @@ public class AutomatorServiceImpl implements AutomatorService {
     public boolean pressKey(String key) throws RemoteException {
         boolean result;
         key = key.toLowerCase();
-        if ("home".equals(key))
-            result = device.pressHome();
-        else if ("back".equals(key))
-            result = device.pressBack();
-        else if ("left".equals(key))
-            result = device.pressDPadLeft();
-        else if ("right".equals(key))
-            result = device.pressDPadRight();
-        else if ("up".equals(key))
-            result = device.pressDPadUp();
-        else if ("down".equals(key))
-            result = device.pressDPadDown();
-        else if ("center".equals(key))
-            result = device.pressDPadCenter();
-        else if ("menu".equals(key))
-            result = device.pressMenu();
-        else if ("search".equals(key))
-            result = device.pressSearch();
-        else if ("enter".equals(key))
-            result = device.pressEnter();
-        else if ("delete".equals(key) || "del".equals(key))
-            result = device.pressDelete();
-        else if ("recent".equals(key))
-            result = device.pressRecentApps();
-        else if ("volume_up".equals(key))
-            result = device.pressKeyCode(KeyEvent.KEYCODE_VOLUME_UP);
+        if ("home".equals(key)) result = device.pressHome();
+        else if ("back".equals(key)) result = device.pressBack();
+        else if ("left".equals(key)) result = device.pressDPadLeft();
+        else if ("right".equals(key)) result = device.pressDPadRight();
+        else if ("up".equals(key)) result = device.pressDPadUp();
+        else if ("down".equals(key)) result = device.pressDPadDown();
+        else if ("center".equals(key)) result = device.pressDPadCenter();
+        else if ("menu".equals(key)) result = device.pressMenu();
+        else if ("search".equals(key)) result = device.pressSearch();
+        else if ("enter".equals(key)) result = device.pressEnter();
+        else if ("delete".equals(key) || "del".equals(key)) result = device.pressDelete();
+        else if ("recent".equals(key)) result = device.pressRecentApps();
+        else if ("volume_up".equals(key)) result = device.pressKeyCode(KeyEvent.KEYCODE_VOLUME_UP);
         else if ("volume_down".equals(key))
             result = device.pressKeyCode(KeyEvent.KEYCODE_VOLUME_DOWN);
         else if ("volume_mute".equals(key))
             result = device.pressKeyCode(KeyEvent.KEYCODE_VOLUME_MUTE);
-        else if ("camera".equals(key))
-            result = device.pressKeyCode(KeyEvent.KEYCODE_CAMERA);
+        else if ("camera".equals(key)) result = device.pressKeyCode(KeyEvent.KEYCODE_CAMERA);
         else result = "power".equals(key) && device.pressKeyCode(KeyEvent.KEYCODE_POWER);
 
         return result;
@@ -492,7 +475,12 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public void clearTextField(Selector obj) throws UiObjectNotFoundException {
-        device.findObject(obj.toUiSelector()).clearTextField();
+        try {
+            obj.toUiObject2().clear();
+        }catch(NullPointerException e){
+            device.findObject(obj.toUiSelector()).clearTextField();
+        }
+
     }
 
     /**
@@ -504,7 +492,11 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public String getText(Selector obj) throws UiObjectNotFoundException {
-        return device.findObject(obj.toUiSelector()).getText();
+        if (obj.toUiObject2() == null) {
+            return device.findObject(obj.toUiSelector()).getText();
+        } else {
+            return obj.toUiObject2().getText();
+        }
     }
 
     /**
@@ -517,7 +509,12 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean setText(Selector obj, String text) throws UiObjectNotFoundException {
-        return device.findObject(obj.toUiSelector()).setText(text);
+        try{
+            obj.toUiObject2().setText(text);
+            return true;
+        }catch(NullPointerException e){
+            return device.findObject(obj.toUiSelector()).setText(text);
+        }
     }
 
     /**
@@ -529,7 +526,12 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean click(Selector obj) throws UiObjectNotFoundException {
-        return device.findObject(obj.toUiSelector()).click();
+        if (obj.toUiObject2() == null) {
+            return device.findObject(obj.toUiSelector()).click();
+        } else {
+            obj.toUiObject2().click();
+            return true;
+        }
     }
 
     /**
@@ -546,15 +548,11 @@ public class AutomatorServiceImpl implements AutomatorService {
     }
 
     private boolean click(UiObject obj, String corner) throws UiObjectNotFoundException {
-        if (corner == null)
-            corner = "center";
+        if (corner == null) corner = "center";
         corner = corner.toLowerCase();
-        if ("br".equals(corner) || "bottomright".equals(corner))
-            return obj.clickBottomRight();
-        else if ("tl".equals(corner) || "topleft".equals(corner))
-            return obj.clickTopLeft();
-        else if ("c".equals(corner) || "center".equals(corner))
-            return obj.click();
+        if ("br".equals(corner) || "bottomright".equals(corner)) return obj.clickBottomRight();
+        else if ("tl".equals(corner) || "topleft".equals(corner)) return obj.clickTopLeft();
+        else if ("c".equals(corner) || "center".equals(corner)) return obj.click();
         return false;
     }
 
@@ -571,7 +569,11 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean clickAndWaitForNewWindow(Selector obj, long timeout) throws UiObjectNotFoundException {
-        return device.findObject(obj.toUiSelector()).clickAndWaitForNewWindow(timeout);
+        if (obj.toUiObject2() == null) {
+            return device.findObject(obj.toUiSelector()).clickAndWaitForNewWindow(timeout);
+        } else {
+            return obj.toUiObject2().clickAndWait(Until.newWindow(), timeout);
+        }
     }
 
     /**
@@ -583,7 +585,12 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean longClick(Selector obj) throws UiObjectNotFoundException {
-        return device.findObject(obj.toUiSelector()).longClick();
+        if (obj.toUiObject2() == null) {
+            return device.findObject(obj.toUiSelector()).longClick();
+        } else {
+            obj.toUiObject2().longClick();
+            return true;
+        }
     }
 
     /**
@@ -600,16 +607,12 @@ public class AutomatorServiceImpl implements AutomatorService {
     }
 
     private boolean longClick(UiObject obj, String corner) throws UiObjectNotFoundException {
-        if (corner == null)
-            corner = "center";
+        if (corner == null) corner = "center";
 
         corner = corner.toLowerCase();
-        if ("br".equals(corner) || "bottomright".equals(corner))
-            return obj.longClickBottomRight();
-        else if ("tl".equals(corner) || "topleft".equals(corner))
-            return obj.longClickTopLeft();
-        else if ("c".equals(corner) || "center".equals(corner))
-            return obj.longClick();
+        if ("br".equals(corner) || "bottomright".equals(corner)) return obj.longClickBottomRight();
+        else if ("tl".equals(corner) || "topleft".equals(corner)) return obj.longClickTopLeft();
+        else if ("c".equals(corner) || "center".equals(corner)) return obj.longClick();
 
         return false;
     }
@@ -661,6 +664,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean exist(Selector obj) {
+        if (obj.getChildOrSibling().length==0&&obj.toBySelector()!=null) return device.wait(Until.hasObject(obj.toBySelector()),0L);
         return device.findObject(obj.toUiSelector()).exists();
     }
 
@@ -673,19 +677,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public ObjInfo objInfo(Selector obj) throws UiObjectNotFoundException {
+        if (obj.toUiObject2() == null) {
+            return ObjInfo.getObjInfo(device.findObject(obj.toUiSelector()));
+        }
         return ObjInfo.getObjInfo(obj.toUiObject2());
-    }
-
-    /**
-     * Get the object resourcename.
-     *
-     * @param obj the target ui object.
-     * @return resource name.
-     * @throws android.support.test.uiautomator.UiObjectNotFoundException
-     */
-    @Override
-    public String getResourceName(Selector obj) throws UiObjectNotFoundException {
-        return obj.toUiObject2().getResourceName();
     }
 
     /**
@@ -697,14 +692,11 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public int count(Selector obj) {
         if ((obj.getMask() & Selector.MASK_INSTANCE) > 0) {
-            if (device.findObject(obj.toUiSelector()).exists())
-                return 1;
-            else
-                return 0;
+            if (device.findObject(obj.toUiSelector()).exists()) return 1;
+            else return 0;
         } else {
             UiSelector sel = obj.toUiSelector();
-            if (!device.findObject(sel).exists())
-                return 0;
+            if (!device.findObject(sel).exists()) return 0;
             int low = 1;
             int high = 2;
             sel = sel.instance(high - 1);
@@ -716,10 +708,8 @@ public class AutomatorServiceImpl implements AutomatorService {
             while (high > low + 1) {
                 int mid = (low + high) / 2;
                 sel = sel.instance(mid - 1);
-                if (device.findObject(sel).exists())
-                    low = mid;
-                else
-                    high = mid;
+                if (device.findObject(sel).exists()) low = mid;
+                else high = mid;
             }
             return low;
         }
@@ -766,15 +756,11 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean gesture(Selector obj, Point startPoint1, Point startPoint2, Point endPoint1, Point endPoint2, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return gesture(device.findObject(obj.toUiSelector()),
-                startPoint1, startPoint2,
-                endPoint1, endPoint2, steps);
+        return gesture(device.findObject(obj.toUiSelector()), startPoint1, startPoint2, endPoint1, endPoint2, steps);
     }
 
     private boolean gesture(UiObject obj, Point startPoint1, Point startPoint2, Point endPoint1, Point endPoint2, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return obj.performTwoPointerGesture(
-                startPoint1.toPoint(), startPoint2.toPoint(),
-                endPoint1.toPoint(), endPoint2.toPoint(), steps);
+        return obj.performTwoPointerGesture(startPoint1.toPoint(), startPoint2.toPoint(), endPoint1.toPoint(), endPoint2.toPoint(), steps);
     }
 
     /**
@@ -789,6 +775,10 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean pinchIn(Selector obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
+        if(obj.toUiObject2()!=null){
+            obj.toUiObject2().pinchClose(percent,steps);
+            return true;
+        }
         return pinchIn(device.findObject(obj.toUiSelector()), percent, steps);
     }
 
@@ -808,6 +798,9 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean pinchOut(Selector obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
+        if(obj.toUiObject2()!=null){
+            obj.toUiObject2().pinchOpen(percent,steps);
+        }
         return pinchOut(device.findObject(obj.toUiSelector()), percent, steps);
     }
 
@@ -832,15 +825,38 @@ public class AutomatorServiceImpl implements AutomatorService {
     private boolean swipe(UiObject item, String dir, int steps) throws UiObjectNotFoundException {
         dir = dir.toLowerCase();
         boolean result = false;
-        if ("u".equals(dir) || "up".equals(dir))
-            result = item.swipeUp(steps);
-        else if ("d".equals(dir) || "down".equals(dir))
-            result = item.swipeDown(steps);
-        else if ("l".equals(dir) || "left".equals(dir))
-            result = item.swipeLeft(steps);
-        else if ("r".equals(dir) || "right".equals(dir))
-            result = item.swipeRight(steps);
+        if ("u".equals(dir) || "up".equals(dir)) result = item.swipeUp(steps);
+        else if ("d".equals(dir) || "down".equals(dir)) result = item.swipeDown(steps);
+        else if ("l".equals(dir) || "left".equals(dir)) result = item.swipeLeft(steps);
+        else if ("r".equals(dir) || "right".equals(dir)) result = item.swipeRight(steps);
         return result;
+    }
+
+    /**
+     * Performs the swipe up/down/left/right action on the UiObject
+     *
+     * @param obj   the target ui object.
+     * @param dir   "u"/"up", "d"/"down", "l"/"left", "r"/"right"
+     * @param percent expect value: percent >= 0.0F && percent <= 1.0F,The length of the swipe as a percentage of this object's size.
+     * @param steps indicates the number of injected move steps into the system. Steps are injected about 5ms apart. So a 100 steps may take about 1/2 second to complete.
+     * @return true of successful
+     * @throws android.support.test.uiautomator.UiObjectNotFoundException
+     */
+    @Override
+    public boolean swipe(Selector obj, String dir,float percent, int steps) throws UiObjectNotFoundException {
+        if(obj.toUiObject2()==null){
+            return swipe(device.findObject(obj.toUiSelector()), dir, steps);
+        }
+        return swipe(obj.toUiObject2(), dir, percent, steps);
+    }
+
+    private boolean swipe(UiObject2 item, String dir,float percent, int steps) throws UiObjectNotFoundException {
+        dir = dir.toLowerCase();
+        if ("u".equals(dir) || "up".equals(dir)) item.swipe(Direction.UP,percent,steps);
+        else if ("d".equals(dir) || "down".equals(dir)) item.swipe(Direction.DOWN,percent,steps);
+        else if ("l".equals(dir) || "left".equals(dir)) item.swipe(Direction.LEFT,percent,steps);
+        else if ("r".equals(dir) || "right".equals(dir)) item.swipe(Direction.RIGHT,percent,steps);
+        return true;
     }
 
     /**
@@ -852,6 +868,8 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitForExists(Selector obj, long timeout) {
+        if (obj.getChildOrSibling().length==0&&obj.toBySelector()!=null)
+            return device.wait(Until.hasObject(obj.toBySelector()),timeout);
         return device.findObject(obj.toUiSelector()).waitForExists(timeout);
     }
 
@@ -864,6 +882,8 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitUntilGone(Selector obj, long timeout) {
+        if (obj.getChildOrSibling().length==0&&obj.toBySelector()!=null)
+            return device.wait(Until.gone(obj.toBySelector()),timeout);
         return device.findObject(obj.toUiSelector()).waitUntilGone(timeout);
     }
 
@@ -878,10 +898,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean flingBackward(Selector obj, boolean isVertical) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.flingBackward();
     }
 
@@ -896,10 +914,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean flingForward(Selector obj, boolean isVertical) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.flingForward();
     }
 
@@ -915,10 +931,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean flingToBeginning(Selector obj, boolean isVertical, int maxSwipes) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.flingToBeginning(maxSwipes);
     }
 
@@ -934,10 +948,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean flingToEnd(Selector obj, boolean isVertical, int maxSwipes) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.flingToEnd(maxSwipes);
     }
 
@@ -953,10 +965,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean scrollBackward(Selector obj, boolean isVertical, int steps) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.scrollBackward(steps);
     }
 
@@ -972,10 +982,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean scrollForward(Selector obj, boolean isVertical, int steps) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.scrollForward(steps);
     }
 
@@ -992,10 +1000,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean scrollToBeginning(Selector obj, boolean isVertical, int maxSwipes, int steps) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.scrollToBeginning(maxSwipes, steps);
     }
 
@@ -1012,10 +1018,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean scrollToEnd(Selector obj, boolean isVertical, int maxSwipes, int steps) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.scrollToEnd(maxSwipes, steps);
     }
 
@@ -1031,10 +1035,8 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean scrollTo(Selector obj, Selector targetObj, boolean isVertical) throws UiObjectNotFoundException {
         UiScrollable scrollable = new UiScrollable(obj.toUiSelector());
-        if (isVertical)
-            scrollable.setAsVerticalList();
-        else
-            scrollable.setAsHorizontalList();
+        if (isVertical) scrollable.setAsVerticalList();
+        else scrollable.setAsHorizontalList();
         return scrollable.scrollIntoView(targetObj.toUiSelector());
     }
 
