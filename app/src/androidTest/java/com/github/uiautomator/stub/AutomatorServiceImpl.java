@@ -664,7 +664,8 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean exist(Selector obj) {
-        if (obj.getChildOrSibling().length==0&&obj.toBySelector()!=null) return device.wait(Until.hasObject(obj.toBySelector()),0L);
+        if (obj.getChildOrSibling().length==0&&obj.toBySelector()!=null)
+            return device.wait(Until.hasObject(obj.toBySelector()),0L);
         return device.findObject(obj.toUiSelector()).exists();
     }
 
