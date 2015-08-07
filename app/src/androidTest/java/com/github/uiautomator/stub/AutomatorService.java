@@ -449,6 +449,19 @@ public interface AutomatorService {
     boolean swipe(Selector obj, String dir, int steps) throws UiObjectNotFoundException;
 
     /**
+     * Performs the swipe up/down/left/right action on the UiObject
+     *
+     * @param obj   the target ui object.
+     * @param dir   "u"/"up", "d"/"down", "l"/"left", "r"/"right"
+     * @param percent expect value: percent >= 0.0F && percent <= 1.0F,The length of the swipe as a percentage of this object's size.
+     * @param steps indicates the number of injected move steps into the system. Steps are injected about 5ms apart. So a 100 steps may take about 1/2 second to complete.
+     * @return true of successful
+     * @throws android.support.test.uiautomator.UiObjectNotFoundException
+     */
+    @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
+    boolean swipe(Selector obj, String dir,float percent, int steps) throws UiObjectNotFoundException;
+
+    /**
      * Waits a specified length of time for a view to become visible. This method waits until the view becomes visible on the display, or until the timeout has elapsed. You can use this method in situations where the content that you want to select is not immediately displayed.
      * @param obj the target ui object
      * @param timeout time to wait (in milliseconds)
@@ -769,15 +782,6 @@ public interface AutomatorService {
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
     ObjInfo objInfo(String obj) throws UiObjectNotFoundException;
-
-    /**
-     * Get the object resource name.
-     * @param obj the id of target ui object.
-     * @return resource name.
-     * @throws UiObjectNotFoundException
-     */
-    @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    String getResourceName(Selector obj) throws UiObjectNotFoundException;
 
     /**
      * Generates a two-pointer gesture with arbitrary starting and ending points.

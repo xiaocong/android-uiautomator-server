@@ -194,7 +194,13 @@ public class Selector {
 	}
 
 	public UiObject2 toUiObject2() {
-		UiObject2 obj2 = device.findObject(this.toBySelector());
+		if((getMask() & Selector.MASK_INDEX) > 0){
+			return null;
+		}
+		if(toBySelector()==null){
+			return null;
+		}
+		UiObject2 obj2 = device.findObject(toBySelector());
 		for (int i = 0; i < this.getChildOrSibling().length && i < this.getChildOrSiblingSelector().length; i++) {
 			if (this.getChildOrSibling()[i].toLowerCase().equals("child"))
 				obj2 = obj2.findObject(getChildOrSiblingSelector()[i].toBySelector());
@@ -202,7 +208,6 @@ public class Selector {
 				obj2 = obj2.getParent().findObject(getChildOrSiblingSelector()[i].toBySelector());
 			}
 		}
-
 		return obj2;
 	}
 
