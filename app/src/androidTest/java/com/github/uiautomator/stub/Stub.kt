@@ -64,7 +64,6 @@ public class Stub {
     FlakyTest(tolerance = 3)
     throws(InterruptedException::class)
     public fun testUIAutomatorStub() {
-        UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).pressHome()
         while (server.isAlive())
             Thread.sleep(100)
     }
