@@ -771,6 +771,15 @@ public interface AutomatorService {
     ObjInfo objInfo(String obj) throws UiObjectNotFoundException;
 
     /**
+     * Get the object resource name.
+     * @param obj the id of target ui object.
+     * @return resource name.
+     * @throws UiObjectNotFoundException
+     */
+    @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
+    String getResourceName(Selector obj) throws UiObjectNotFoundException;
+
+    /**
      * Generates a two-pointer gesture with arbitrary starting and ending points.
      * @param obj the id of target ui object. ??
      * @param startPoint1	start point of pointer 1

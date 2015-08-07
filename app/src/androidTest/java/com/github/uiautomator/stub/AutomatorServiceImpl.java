@@ -673,7 +673,19 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public ObjInfo objInfo(Selector obj) throws UiObjectNotFoundException {
-        return ObjInfo.getObjInfo(obj.toUiSelector());
+        return ObjInfo.getObjInfo(obj.toUiObject2());
+    }
+
+    /**
+     * Get the object resourcename.
+     *
+     * @param obj the target ui object.
+     * @return resource name.
+     * @throws android.support.test.uiautomator.UiObjectNotFoundException
+     */
+    @Override
+    public String getResourceName(Selector obj) throws UiObjectNotFoundException {
+        return obj.toUiObject2().getResourceName();
     }
 
     /**

@@ -23,6 +23,11 @@
 
 package com.github.uiautomator.stub;
 
+import android.support.test.InstrumentationRegistry;
+import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.BySelector;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiSelector;
 
 public class Selector {
@@ -81,6 +86,8 @@ public class Selector {
 	public static final long MASK_RESOURCEIDMATCHES = 0x400000;
 	public static final long MASK_INDEX = 0x800000;
 	public static final long MASK_INSTANCE = 0x01000000;
+
+	private UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
 
 	public UiSelector toUiSelector() {
 		UiSelector s = new UiSelector();
@@ -143,6 +150,60 @@ public class Selector {
         }
 
 		return s;
+	}
+
+	public BySelector toBySelector() {
+		BySelector s = null;
+		if ((getMask() & Selector.MASK_CHECKABLE) > 0 && android.os.Build.VERSION.SDK_INT >= 18)
+			s = By.checkable(this.isCheckable());
+		if ((getMask() & Selector.MASK_CHECKED) > 0) s = By.checked(isChecked());
+		if ((getMask() & Selector.MASK_CLASSNAME) > 0)
+			s = By.clazz(getClassName()); // API level 16 should support it.... wrong in Android Java Doc
+		if ((getMask() & Selector.MASK_CLASSNAMEMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
+			s = By.clazz(getClassNameMatches());
+		if ((getMask() & Selector.MASK_CLICKABLE) > 0) s = By.clickable(isClickable());
+		if ((getMask() & Selector.MASK_DESCRIPTION) > 0) s = By.desc(getDescription());
+		if ((getMask() & Selector.MASK_DESCRIPTIONCONTAINS) > 0)
+			s = By.descContains(getDescriptionContains());
+		if ((getMask() & Selector.MASK_DESCRIPTIONMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
+			s = By.desc(getDescriptionMatches());
+		if ((getMask() & Selector.MASK_DESCRIPTIONSTARTSWITH) > 0)
+			s = By.descStartsWith(getDescriptionStartsWith());
+		if ((getMask() & Selector.MASK_ENABLED) > 0) s = By.enabled(isEnabled());
+		if ((getMask() & Selector.MASK_FOCUSABLE) > 0) s = By.focusable(isFocusable());
+		if ((getMask() & Selector.MASK_FOCUSED) > 0) s = By.focused(isFocused());
+		if ((getMask() & Selector.MASK_LONGCLICKABLE) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
+			s = By.longClickable(isLongClickable());
+		if ((getMask() & Selector.MASK_PACKAGENAME) > 0) s = By.pkg(getPackageName());
+		if ((getMask() & Selector.MASK_PACKAGENAMEMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
+			s = By.pkg(getPackageNameMatches());
+		if ((getMask() & Selector.MASK_RESOURCEID) > 0 && android.os.Build.VERSION.SDK_INT >= 18)
+			s = By.res(getResourceId());
+		if ((getMask() & Selector.MASK_RESOURCEIDMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 18)
+			s = By.res(getResourceIdMatches());
+		if ((getMask() & Selector.MASK_SCROLLABLE) > 0) s = By.scrollable(isScrollable());
+		if ((getMask() & Selector.MASK_SELECTED) > 0) s = By.selected(isSelected());
+		if ((getMask() & Selector.MASK_TEXT) > 0) s = By.text(getText());
+		if ((getMask() & Selector.MASK_TEXTCONTAINS) > 0) s = By.textContains(getTextContains());
+		if ((getMask() & Selector.MASK_TEXTSTARTSWITH) > 0)
+			s = By.textStartsWith(getTextStartsWith());
+		if ((getMask() & Selector.MASK_TEXTMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
+			s = By.text(getTextMatches());
+
+		return s;
+	}
+
+	public UiObject2 toUiObject2() {
+		UiObject2 obj2 = device.findObject(this.toBySelector());
+		for (int i = 0; i < this.getChildOrSibling().length && i < this.getChildOrSiblingSelector().length; i++) {
+			if (this.getChildOrSibling()[i].toLowerCase().equals("child"))
+				obj2 = obj2.findObject(getChildOrSiblingSelector()[i].toBySelector());
+			else if (this.getChildOrSibling()[i].toLowerCase().equals("sibling")) {
+				obj2 = obj2.getParent().findObject(getChildOrSiblingSelector()[i].toBySelector());
+			}
+		}
+
+		return obj2;
 	}
 
 	public String getText() {
