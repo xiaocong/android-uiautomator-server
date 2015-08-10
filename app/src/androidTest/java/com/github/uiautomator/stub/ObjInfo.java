@@ -80,7 +80,7 @@ public class ObjInfo {
 		this._text = obj.getText();
 		this._visibleBounds = Rect.from(obj.getVisibleBounds());
 		this._className = obj.getClassName();
-		this._resourceName=obj.getResourceName();
+		this._resourceName = obj.getResourceName();
 	}
 
 	private Rect _bounds;

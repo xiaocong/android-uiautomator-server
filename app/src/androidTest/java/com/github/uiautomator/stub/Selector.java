@@ -30,6 +30,8 @@ import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiSelector;
 
+import java.util.regex.Pattern;
+
 public class Selector {
 	private String   _text;
 	private String   _textContains;
@@ -156,39 +158,138 @@ public class Selector {
 		BySelector s = null;
 		if ((getMask() & Selector.MASK_CHECKABLE) > 0 && android.os.Build.VERSION.SDK_INT >= 18)
 			s = By.checkable(this.isCheckable());
-		if ((getMask() & Selector.MASK_CHECKED) > 0) s = By.checked(isChecked());
-		if ((getMask() & Selector.MASK_CLASSNAME) > 0)
-			s = By.clazz(getClassName()); // API level 16 should support it.... wrong in Android Java Doc
-		if ((getMask() & Selector.MASK_CLASSNAMEMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
-			s = By.clazz(getClassNameMatches());
-		if ((getMask() & Selector.MASK_CLICKABLE) > 0) s = By.clickable(isClickable());
-		if ((getMask() & Selector.MASK_DESCRIPTION) > 0) s = By.desc(getDescription());
-		if ((getMask() & Selector.MASK_DESCRIPTIONCONTAINS) > 0)
-			s = By.descContains(getDescriptionContains());
-		if ((getMask() & Selector.MASK_DESCRIPTIONMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
-			s = By.desc(getDescriptionMatches());
-		if ((getMask() & Selector.MASK_DESCRIPTIONSTARTSWITH) > 0)
-			s = By.descStartsWith(getDescriptionStartsWith());
-		if ((getMask() & Selector.MASK_ENABLED) > 0) s = By.enabled(isEnabled());
-		if ((getMask() & Selector.MASK_FOCUSABLE) > 0) s = By.focusable(isFocusable());
-		if ((getMask() & Selector.MASK_FOCUSED) > 0) s = By.focused(isFocused());
-		if ((getMask() & Selector.MASK_LONGCLICKABLE) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
-			s = By.longClickable(isLongClickable());
-		if ((getMask() & Selector.MASK_PACKAGENAME) > 0) s = By.pkg(getPackageName());
-		if ((getMask() & Selector.MASK_PACKAGENAMEMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
-			s = By.pkg(getPackageNameMatches());
-		if ((getMask() & Selector.MASK_RESOURCEID) > 0 && android.os.Build.VERSION.SDK_INT >= 18)
-			s = By.res(getResourceId());
-		if ((getMask() & Selector.MASK_RESOURCEIDMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 18)
-			s = By.res(getResourceIdMatches());
-		if ((getMask() & Selector.MASK_SCROLLABLE) > 0) s = By.scrollable(isScrollable());
-		if ((getMask() & Selector.MASK_SELECTED) > 0) s = By.selected(isSelected());
-		if ((getMask() & Selector.MASK_TEXT) > 0) s = By.text(getText());
-		if ((getMask() & Selector.MASK_TEXTCONTAINS) > 0) s = By.textContains(getTextContains());
-		if ((getMask() & Selector.MASK_TEXTSTARTSWITH) > 0)
-			s = By.textStartsWith(getTextStartsWith());
-		if ((getMask() & Selector.MASK_TEXTMATCHES) > 0 && android.os.Build.VERSION.SDK_INT >= 17)
-			s = By.text(getTextMatches());
+		if ((getMask() & Selector.MASK_CHECKED) > 0) {
+            if (s == null)
+                s = By.checked(isChecked());
+            else
+                s = s.checkable(isChecked());
+        }
+		if ((getMask() & Selector.MASK_CLASSNAME) > 0) {
+            if (s == null)
+                s = By.clazz(getClassName());
+            else
+                s = s.clazz(getClassName());
+        }
+		if ((getMask() & Selector.MASK_CLASSNAMEMATCHES) > 0) {
+            if (s == null)
+                s = By.clazz(Pattern.compile(getClassNameMatches()));
+            else
+                s = s.clazz(Pattern.compile(getClassNameMatches()));
+        }
+		if ((getMask() & Selector.MASK_CLICKABLE) > 0) {
+            if (s == null)
+                s = By.clickable(isClickable());
+            else
+                s = s.clickable(isClickable());
+        }
+		if ((getMask() & Selector.MASK_DESCRIPTION) > 0) {
+            if (s == null)
+                s = By.desc(getDescription());
+            else
+                s = s.desc(getDescription());
+        }
+		if ((getMask() & Selector.MASK_DESCRIPTIONCONTAINS) > 0) {
+            if (s == null)
+                s = By.descContains(getDescriptionContains());
+            else
+                s = s.descContains(getDescriptionContains());
+        }
+		if ((getMask() & Selector.MASK_DESCRIPTIONMATCHES) > 0) {
+            if (s == null)
+                s = By.desc(Pattern.compile(getDescriptionMatches()));
+            else
+                s = s.desc(Pattern.compile(getDescriptionMatches()));
+        }
+		if ((getMask() & Selector.MASK_DESCRIPTIONSTARTSWITH) > 0) {
+            if (s == null)
+                s = By.descStartsWith(getDescriptionStartsWith());
+            else
+                s = s.descStartsWith(getDescriptionStartsWith());
+        }
+		if ((getMask() & Selector.MASK_ENABLED) > 0) {
+            if (s == null)
+                s = By.enabled(isEnabled());
+            else
+                s = s.enabled(isEnabled());
+        }
+		if ((getMask() & Selector.MASK_FOCUSABLE) > 0) {
+            if (s == null)
+                s = By.focusable(isFocusable());
+            else
+                s = s.focusable(isFocusable());
+        }
+		if ((getMask() & Selector.MASK_FOCUSED) > 0) {
+            if (s == null)
+                s = By.focused(isFocused());
+            else
+                s = s.focused(isFocused());
+        }
+		if ((getMask() & Selector.MASK_LONGCLICKABLE) > 0) {
+            if (s == null)
+                s = By.longClickable(isLongClickable());
+            else
+                s = s.longClickable(isLongClickable());
+        }
+		if ((getMask() & Selector.MASK_PACKAGENAME) > 0) {
+            if (s == null)
+                s = By.pkg(getPackageName());
+            else
+                s = s.pkg(getPackageName());
+        }
+		if ((getMask() & Selector.MASK_PACKAGENAMEMATCHES) > 0) {
+            if (s == null)
+                s = By.pkg(Pattern.compile(getPackageNameMatches()));
+            else
+                s = s.pkg(Pattern.compile(getPackageNameMatches()));
+        }
+		if ((getMask() & Selector.MASK_RESOURCEID) > 0) {
+            if (s == null)
+                s = By.res(getResourceId());
+            else
+                s = s.res(getResourceId());
+        }
+		if ((getMask() & Selector.MASK_RESOURCEIDMATCHES) > 0) {
+            if (s == null)
+                s = By.res(Pattern.compile(getResourceIdMatches()));
+            else
+                s = s.res(Pattern.compile(getResourceIdMatches()));
+        }
+		if ((getMask() & Selector.MASK_SCROLLABLE) > 0) {
+            if (s == null)
+                s = By.scrollable(isScrollable());
+            else
+                s = s.scrollable(isScrollable());
+        }
+		if ((getMask() & Selector.MASK_SELECTED) > 0) {
+            if (s == null)
+                s = By.selected(isSelected());
+            else
+                s = s.selected(isSelected());
+        }
+		if ((getMask() & Selector.MASK_TEXT) > 0) {
+            if (s == null)
+                s = By.text(getText());
+            else
+                s = s.text(getText());
+        }
+		if ((getMask() & Selector.MASK_TEXTCONTAINS) > 0) {
+            if (s == null)
+                s = By.textContains(getTextContains());
+            else
+                s = s.textContains(getTextContains());
+        }
+		if ((getMask() & Selector.MASK_TEXTSTARTSWITH) > 0) {
+            if (s == null)
+                s = By.textStartsWith(getTextStartsWith());
+            else
+                s = s.textStartsWith(getTextStartsWith());
+        }
+		if ((getMask() & Selector.MASK_TEXTMATCHES) > 0) {
+            if (s == null)
+                s = By.text(Pattern.compile(getTextMatches()));
+            else
+                s = s.text(Pattern.compile(getTextMatches()));
+        }
 
 		return s;
 	}
