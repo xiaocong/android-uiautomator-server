@@ -308,20 +308,8 @@ public class Selector {
 		if (checkBySelectorNull(this)) return null;
 
 		UiObject2 obj2 = device.findObject(toBySelector());
-		for (int i = 0; i < this.getChildOrSibling().length && i < this.getChildOrSiblingSelector().length; i++) {
-			if (this.getChildOrSibling()[i].toLowerCase().equals("child"))
-				if(obj2==null||checkBySelectorNull(getChildOrSiblingSelector()[i])){
-					return null;
-				}else{
-					obj2 = obj2.findObject(getChildOrSiblingSelector()[i].toBySelector());
-				}
-			else if (this.getChildOrSibling()[i].toLowerCase().equals("sibling")) {
-				if(obj2==null||checkBySelectorNull(getChildOrSiblingSelector()[i])) {
-					return null;
-				} else{
-					obj2 = obj2.getParent().findObject(getChildOrSiblingSelector()[i].toBySelector());
-				}
-			}
+		if(this.getChildOrSibling().length>0){
+			return null;
 		}
 		return obj2;
 	}
