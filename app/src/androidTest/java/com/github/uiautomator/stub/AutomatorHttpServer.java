@@ -60,7 +60,7 @@ public class AutomatorHttpServer extends NanoHTTPD {
         if ("/stop".equals(uri)) {
             stop();
             return new Response("Server stopped!!!");
-        } else if ("/0/screenshot".equals(uri)) {
+        } else if ("/0/screenshot".equals(uri) || "/screenshot/0".equals(uri)) {
             float scale = 1.0f;
             if (params.containsKey("scale")) {
                 try {
