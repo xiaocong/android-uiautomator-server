@@ -780,10 +780,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean pinchIn(Selector obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        if(obj.toUiObject2() != null){
-            obj.toUiObject2().pinchClose(percent,steps);
-            return true;
-        }
         return pinchIn(device.findObject(obj.toUiSelector()), percent, steps);
     }
 
@@ -803,9 +799,6 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean pinchOut(Selector obj, int percent, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        if(obj.toUiObject2() != null){
-            obj.toUiObject2().pinchOpen(percent,steps);
-        }
         return pinchOut(device.findObject(obj.toUiSelector()), percent, steps);
     }
 
