@@ -294,20 +294,22 @@ public class Selector {
 		return s;
 	}
 
+	public boolean checkBySelectorNull(Selector s){
+		if((s.getMask() & Selector.MASK_INDEX)>0||(s.getMask() & Selector.MASK_INSTANCE)>0){
+			return true;
+		}
+		if(s.toBySelector()==null){
+			return true;
+		}
+		return false;
+	}
+
 	public UiObject2 toUiObject2() {
-		if((getMask() & Selector.MASK_INDEX) > 0){
-			return null;
-		}
-		if(toBySelector()==null){
-			return null;
-		}
+		if (checkBySelectorNull(this)) return null;
+
 		UiObject2 obj2 = device.findObject(toBySelector());
-		for (int i = 0; i < this.getChildOrSibling().length && i < this.getChildOrSiblingSelector().length; i++) {
-			if (this.getChildOrSibling()[i].toLowerCase().equals("child"))
-				obj2 = obj2.findObject(getChildOrSiblingSelector()[i].toBySelector());
-			else if (this.getChildOrSibling()[i].toLowerCase().equals("sibling")) {
-				obj2 = obj2.getParent().findObject(getChildOrSiblingSelector()[i].toBySelector());
-			}
+		if(this.getChildOrSibling().length>0){
+			return null;
 		}
 		return obj2;
 	}

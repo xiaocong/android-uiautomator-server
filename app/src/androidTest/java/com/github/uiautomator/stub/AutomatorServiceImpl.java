@@ -41,8 +41,12 @@ import com.github.uiautomator.stub.watcher.PressKeysWatcher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -869,7 +873,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitForExists(Selector obj, long timeout) {
-        if (obj.getChildOrSibling().length==0&&obj.toBySelector()!=null)
+        if (obj.getChildOrSibling().length==0&&obj.checkBySelectorNull(obj)==false)
             return device.wait(Until.hasObject(obj.toBySelector()),timeout);
         return device.findObject(obj.toUiSelector()).waitForExists(timeout);
     }
@@ -883,7 +887,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitUntilGone(Selector obj, long timeout) {
-        if (obj.getChildOrSibling().length==0&&obj.toBySelector()!=null)
+        if (obj.getChildOrSibling().length==0&&obj.checkBySelectorNull(obj)==false)
             return device.wait(Until.gone(obj.toBySelector()),timeout);
         return device.findObject(obj.toUiSelector()).waitUntilGone(timeout);
     }
