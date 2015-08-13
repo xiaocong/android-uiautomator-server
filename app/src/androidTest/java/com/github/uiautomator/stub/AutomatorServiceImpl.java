@@ -41,12 +41,8 @@ import com.github.uiautomator.stub.watcher.PressKeysWatcher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -514,6 +510,7 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean setText(Selector obj, String text) throws UiObjectNotFoundException {
         try{
+            obj.toUiObject2().click();
             obj.toUiObject2().setText(text);
             return true;
         }catch(NullPointerException e){
