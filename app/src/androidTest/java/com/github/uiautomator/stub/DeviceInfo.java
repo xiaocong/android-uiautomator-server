@@ -56,7 +56,6 @@ public class DeviceInfo {
 		this._naturalOrientation = ud.isNaturalOrientation();
 		this._displaySizeDpX = ud.getDisplaySizeDp().x;
 		this._displaySizeDpY = ud.getDisplaySizeDp().y;
-        Log.d("--------");
         try {
             this._screenOn = ud.isScreenOn();
         } catch (RemoteException e) {
