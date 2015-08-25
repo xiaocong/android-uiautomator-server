@@ -23,6 +23,7 @@
 
 package com.github.uiautomator.stub;
 
+import android.os.RemoteException;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.UiDevice;
 
@@ -35,10 +36,11 @@ public class DeviceInfo {
 	private int _displaySizeDpY;
 	private String _productName;
 	private boolean _naturalOrientation;
+    private boolean _screenOn;
 	
 	private int _sdkInt;
 
-    public final static DeviceInfo getDeviceInfo() {
+    public static DeviceInfo getDeviceInfo() {
         return new DeviceInfo();
     }
 
@@ -54,7 +56,14 @@ public class DeviceInfo {
 		this._naturalOrientation = ud.isNaturalOrientation();
 		this._displaySizeDpX = ud.getDisplaySizeDp().x;
 		this._displaySizeDpY = ud.getDisplaySizeDp().y;
-	}
+        Log.d("--------");
+        try {
+            this._screenOn = ud.isScreenOn();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            Log.e(e.getMessage());
+        }
+    }
 	
 	public String getCurrentPackageName() {
 		return _currentPackageName;
@@ -127,4 +136,12 @@ public class DeviceInfo {
 	public void setSdkInt(int sdkInt) {
 		this._sdkInt = sdkInt;
 	}
+
+    public boolean getScreenOn() {
+        return _screenOn;
+    }
+
+    public void setScreenOn(boolean screenOn) {
+        this._screenOn = screenOn;
+    }
 }
