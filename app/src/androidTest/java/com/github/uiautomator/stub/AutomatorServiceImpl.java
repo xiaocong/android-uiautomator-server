@@ -36,6 +36,11 @@ import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
 import android.view.KeyEvent;
 
+import android.view.MotionEvent;
+import android.view.InputDevice;
+import android.os.SystemClock;
+import android.app.UiAutomation;
+
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
 import com.github.uiautomator.stub.watcher.PressKeysWatcher;
 
@@ -57,9 +62,11 @@ public class AutomatorServiceImpl implements AutomatorService {
     private final ConcurrentHashMap<String, UiObject> uiObjects = new ConcurrentHashMap<String, UiObject>();
 
     private UiDevice device;
+    private UiAutomation uiAutomation;
 
     public AutomatorServiceImpl() {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        this.uiAutomation = InstrumentationRegistry.getInstrumentation().getUiAutomation();
     }
 
     /**
@@ -123,6 +130,25 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public boolean swipe(int startX, int startY, int endX, int endY, int steps) {
         return device.swipe(startX, startY, endX, endY, steps);
+    }
+
+    @Override
+    public boolean swipePoints(int[] segments, int segmentSteps) {
+        android.graphics.Point[] points = new android.graphics.Point[segments.length/2];
+        for (int i = 0; i < segments.length/2; i++) {
+            points[i] = new android.graphics.Point(segments[2*i], segments[2*i+1]);
+        }
+        return device.swipe(points, segmentSteps);
+    }
+
+    public boolean injectInputEvent(int action, float x, float y, int metaState) {
+        MotionEvent e = MotionEvent.obtain(SystemClock.uptimeMillis(),
+                SystemClock.uptimeMillis(),
+                action, x, y, metaState);
+        e.setSource(InputDevice.SOURCE_TOUCHSCREEN);
+        boolean b = uiAutomation.injectInputEvent(e, true);
+        e.recycle();
+        return b;
     }
 
     /**

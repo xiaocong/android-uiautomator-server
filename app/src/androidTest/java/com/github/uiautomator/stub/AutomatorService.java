@@ -80,6 +80,23 @@ public interface AutomatorService {
     boolean swipe(int startX, int startY, int endX, int endY, int steps);
 
     /**
+     * Performs a swipe between points in the point array
+     * @param segments the point array
+     * @param segmentSteps steps to inject between two points, each step lasting 5ms
+     */
+    boolean swipePoints(int[] segments, int segmentSteps);
+
+
+    /**
+     * Inject a low-level InputEvent (MotionEvent) to the input stream
+     * @param action MotionEvent.ACTION_*
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param metaState any meta info
+     */
+    boolean injectInputEvent(int action, float x, float y, int metaState);
+
+    /**
      * Helper method used for debugging to dump the current window's layout hierarchy. The file root location is /data/local/tmp
      * @param compressed use compressed layout hierarchy or not using setCompressedLayoutHeirarchy method. Ignore the parameter in case the API level lt 18.
      * @param filename the filename to be stored.
