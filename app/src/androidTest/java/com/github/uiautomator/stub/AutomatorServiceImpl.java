@@ -182,6 +182,8 @@ public class AutomatorServiceImpl implements AutomatorService {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            device.setCompressedLayoutHeirarchy(false);
         }
 
         return null;
