@@ -44,5 +44,4 @@ If you have any idea, please email xiaocong@gmail.com or [submit tickets](https:
 
 # TODO
 
-- move from java to kotlin
 - support unicode input

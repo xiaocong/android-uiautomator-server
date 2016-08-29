@@ -21,12 +21,16 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.github.uiautomator
+package com.github.uiautomator;
 
-import android.app.Application
-import android.test.ApplicationTestCase
+import android.app.Application;
+import android.test.ApplicationTestCase;
 
 /**
  * [Testing Fundamentals](http://d.android.com/tools/testing/testing_android.html)
  */
-public class ApplicationTest : ApplicationTestCase<Application>(javaClass<Application>())
+public class ApplicationTest extends ApplicationTestCase<Application> {
+    public ApplicationTest() {
+        super(Application.class);
+    }
+}

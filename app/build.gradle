@@ -22,38 +22,17 @@
  */
 
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "com.github.uiautomator"
         minSdkVersion 18
-        targetSdkVersion 22
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
-    }
-
-    signingConfigs {
-        release {
-            storeFile file("../release.keystore")
-            storePassword "uiautomator-release-2015"
-            keyAlias "uiautomator"
-            keyPassword "uiautomator"
-        }
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
-    }
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
     }
 
     defaultConfig {
@@ -65,18 +44,18 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
+    dexOptions {
+        incremental true
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
-    androidTestCompile 'com.android.support.test:runner:0.2'
-    androidTestCompile 'com.android.support.test:rules:0.2'
-    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.0'
-    androidTestCompile 'com.android.support:support-v4:22.1.1'
-    androidTestCompile 'com.android.support:support-annotations:22.1.1'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
+    androidTestCompile 'com.android.support:support-v4:24.2.0'
+    androidTestCompile 'com.android.support:support-annotations:24.2.0'
     androidTestCompile 'com.nanohttpd:nanohttpd:2.1.1'
     androidTestCompile 'com.fasterxml.jackson.core:jackson-core:2.5.3'
     androidTestCompile 'com.fasterxml.jackson.core:jackson-annotations:2.5.3'
@@ -84,17 +63,4 @@ dependencies {
     androidTestCompile 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.1'
     androidTestCompile 'javax.servlet:servlet-api:2.5'
     androidTestCompile 'javax.portlet:portlet-api:2.0'
-}
-
-buildscript {
-    ext.kotlin_version = '0.12.200'
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-repositories {
-    mavenCentral()
 }
