@@ -23,18 +23,22 @@ that we can just write PC side script to write UIAutomator tests.
 # How to use
 
 ```python
+
 from uiautomator import device as d
 
+d.info
 d.screen.on()
 d(text="Settings").click()
 d(scrollable=True).scroll.vert.forward()
+d().gestureM((100,200),(100,300),(100,400)).to((100,400),(100,400),(100,400),100)
+
 ```
 
 Refer to python wrapper library [uiautomator](https://github.com/xiaocong/uiautomator).
 
 # Notes
 
-If you have any idea, please email xiaocong@gmail.com or [submit tickets](https://github.com/xiaocong/uiautomator/issues/new).
+If you have any idea, please email xiaocong@gmail.com, hongbin.bao@gmail.com or [submit tickets](https://github.com/xiaocong/uiautomator/issues/new).
 
 # Dependencies
 
@@ -43,6 +47,4 @@ If you have any idea, please email xiaocong@gmail.com or [submit tickets](https:
 - [jackson](https://github.com/FasterXML/jackson)
 
 # TODO
-
-- move from java to kotlin
 - support unicode input
