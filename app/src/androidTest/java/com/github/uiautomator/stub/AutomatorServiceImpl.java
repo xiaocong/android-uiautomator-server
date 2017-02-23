@@ -775,7 +775,7 @@ public class AutomatorServiceImpl implements AutomatorService {
     /**
      * Generates a two-pointer gesture with arbitrary starting and ending points.
      *
-     * @param obj         the target ui object. ??
+     * @param obj         the target ui object.
      * @param startPoint1 start point of pointer 1
      * @param startPoint2 start point of pointer 2
      * @param endPoint1   end point of pointer 1
@@ -792,6 +792,16 @@ public class AutomatorServiceImpl implements AutomatorService {
     private boolean gesture(UiObject obj, Point startPoint1, Point startPoint2, Point endPoint1, Point endPoint2, int steps) throws UiObjectNotFoundException, NotImplementedException {
         return obj.performTwoPointerGesture(startPoint1.toPoint(), startPoint2.toPoint(), endPoint1.toPoint(), endPoint2.toPoint(), steps);
     }
+
+    //FOR 3 point
+    @Override
+    public boolean gesture(Selector obj, Point startPoint1, Point startPoint2, Point startPoint3, Point endPoint1, Point endPoint2, Point endPoint3, int steps) throws UiObjectNotFoundException, NotImplementedException {
+        return gesture(device.findObject(obj.toUiSelector()), startPoint1, startPoint2, endPoint1, endPoint2, steps);
+    }
+    private boolean gesture(UiObject obj, Point startPoint1, Point startPoint2, Point startPoint3, Point endPoint1, Point endPoint2,  Point endPoint3, int steps) throws UiObjectNotFoundException, NotImplementedException {
+        return obj.performTwoPointerGesture(startPoint1.toPoint(), startPoint2.toPoint(), endPoint1.toPoint(), endPoint2.toPoint(), steps);
+    }
+
 
     /**
      * Performs a two-pointer gesture, where each pointer moves diagonally toward the other, from the edges to the center of this UiObject .
@@ -1409,6 +1419,26 @@ public class AutomatorServiceImpl implements AutomatorService {
     }
 
     /**
+     * Generates a 3-pointer gesture with arbitrary starting and ending points.
+     *
+     * @param obj         the id of target ui object. ??
+     * @param startPoint1 start point of pointer 1
+     * @param startPoint2 start point of pointer 2
+     * @param startPoint3 start point of pointer 3
+     * @param endPoint1   end point of pointer 1
+     * @param endPoint2   end point of pointer 2
+     * @param endPoint3   end point of pointer 3
+     * @param steps       the number of steps for the gesture. Steps are injected about 5 milliseconds apart, so 100 steps may take around 0.5 seconds to complete.
+     * @return true if all touch events for this gesture are injected successfully, false otherwise
+     * @throws android.support.test.uiautomator.UiObjectNotFoundException
+     */
+    @Override
+    public boolean gesture(String obj, Point startPoint1, Point startPoint2,  Point startPoint3, Point endPoint1, Point endPoint2, Point endPoint3, int steps) throws UiObjectNotFoundException, NotImplementedException {
+        return gesture(getUiObject(obj), startPoint1, startPoint2, startPoint3, endPoint1, endPoint2, endPoint3, steps);
+    }
+
+
+    /**
      * Performs a two-pointer gesture, where each pointer moves diagonally toward the other, from the edges to the center of this UiObject .
      *
      * @param obj     the id of target ui object.
@@ -1451,6 +1481,7 @@ public class AutomatorServiceImpl implements AutomatorService {
     public boolean swipe(String obj, String dir, int steps) throws UiObjectNotFoundException {
         return swipe(getUiObject(obj), dir, steps);
     }
+
 
     /**
      * Waits a specified length of time for a view to become visible. This method waits until the view becomes visible on the display, or until the timeout has elapsed. You can use this method in situations where the content that you want to select is not immediately displayed.
