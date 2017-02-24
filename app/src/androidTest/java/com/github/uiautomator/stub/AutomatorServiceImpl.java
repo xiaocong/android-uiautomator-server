@@ -40,6 +40,7 @@ import android.view.MotionEvent;
 import android.view.InputDevice;
 import android.os.SystemClock;
 import android.app.UiAutomation;
+import android.view.MotionEvent.PointerCoords;
 
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
 import com.github.uiautomator.stub.watcher.PressKeysWatcher;
@@ -793,13 +794,82 @@ public class AutomatorServiceImpl implements AutomatorService {
         return obj.performTwoPointerGesture(startPoint1.toPoint(), startPoint2.toPoint(), endPoint1.toPoint(), endPoint2.toPoint(), steps);
     }
 
-    //FOR 3 point
+    //FOR 3
     @Override
     public boolean gesture(Selector obj, Point startPoint1, Point startPoint2, Point startPoint3, Point endPoint1, Point endPoint2, Point endPoint3, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return gesture(device.findObject(obj.toUiSelector()), startPoint1, startPoint2, endPoint1, endPoint2, steps);
+        return gesture(device.findObject(obj.toUiSelector()), startPoint1, startPoint2, startPoint3, endPoint1, endPoint2, endPoint3, steps);
     }
+    //TODO other way to inject multi pointers
     private boolean gesture(UiObject obj, Point startPoint1, Point startPoint2, Point startPoint3, Point endPoint1, Point endPoint2,  Point endPoint3, int steps) throws UiObjectNotFoundException, NotImplementedException {
-        return obj.performTwoPointerGesture(startPoint1.toPoint(), startPoint2.toPoint(), endPoint1.toPoint(), endPoint2.toPoint(), steps);
+        //PointerCoords[] pcs = new PointerCoords[3];
+        PointerCoords[] points1 = new PointerCoords[steps+2];
+        PointerCoords[] points2 = new PointerCoords[steps+2];
+        PointerCoords[] points3 = new PointerCoords[steps+2];
+        float eventX1 = startPoint1.getX();
+        float eventY1 = startPoint1.getY();
+        float eventX2 = startPoint2.getX();
+        float eventY2 = startPoint2.getY();
+        float eventX3 = startPoint3.getX();
+        float eventY3 = startPoint3.getY();
+        float offY1 = (endPoint1.getY() - eventY1)/steps;
+        float offY2 = (endPoint2.getY() - eventY2)/steps;
+        float offY3 = (endPoint3.getY() - eventY3)/steps;
+        float offX1 = (endPoint1.getX() - eventX1)/steps;
+        float offX2 = (endPoint2.getX() - eventX2)/steps;
+        float offX3 = (endPoint3.getX() - eventX3)/steps;
+
+        for (int i = 0; i < steps + 1; i++) {
+            PointerCoords p1 = new PointerCoords();
+            p1.x = eventX1;
+            p1.y = eventY1;
+            p1.pressure = 1;
+            p1.size = 2;
+            //p1.toolMajor = 5;
+            //p1.toolMinor = 5;
+            //p1.touchMinor = 5;
+            //p1.touchMajor = 5;
+            points1[i] = p1;
+            PointerCoords p2 = new PointerCoords();
+            p2.x = eventX2;
+            p2.y = eventY2;
+            p2.pressure = 1;
+            p2.size = 2;
+            points2[i] = p2;
+            PointerCoords p3 = new PointerCoords();
+            p3.x = eventX3;
+            p3.y = eventY3;
+            p3.pressure = 1;
+            p3.size = 2;
+            points3[i] = p3;
+            eventX1 += offX1;
+            eventY1 += offY1;
+            eventX2 += offX2;
+            eventY2 += offY2;
+            eventX3 += offX3;
+            eventY3 += offY3;
+        }
+
+        // ending pointers coordinates
+        PointerCoords p1 = new PointerCoords();
+        p1.x = endPoint1.getX();
+        p1.y = endPoint1.getY();
+        p1.pressure = 1;
+        p1.size = 2;
+        points1[steps + 1] = p1;
+        PointerCoords p2 = new PointerCoords();
+        p2.x = endPoint2.getX();
+        p2.y = endPoint2.getY();
+        p2.pressure = 1;
+        p2.size = 2;
+        points2[steps + 1] = p2;
+        PointerCoords p3 = new PointerCoords();
+        p3.x = endPoint3.getX();
+        p3.y = endPoint3.getY();
+        p3.pressure = 1;
+        p3.size = 2;
+        points3[steps + 1] = p3;
+        return obj.performMultiPointerGesture(points1, points2, points3);
+
     }
 
 
