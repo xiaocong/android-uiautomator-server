@@ -23,7 +23,9 @@
 
 package com.github.uiautomator.stub;
 
+import android.app.UiAutomation;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.Direction;
 import android.support.test.uiautomator.UiCollection;
@@ -34,12 +36,9 @@ import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiScrollable;
 import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
-import android.view.KeyEvent;
-
-import android.view.MotionEvent;
 import android.view.InputDevice;
-import android.os.SystemClock;
-import android.app.UiAutomation;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
 import com.github.uiautomator.stub.watcher.PressKeysWatcher;
@@ -134,13 +133,14 @@ public class AutomatorServiceImpl implements AutomatorService {
 
     @Override
     public boolean swipePoints(int[] segments, int segmentSteps) {
-        android.graphics.Point[] points = new android.graphics.Point[segments.length/2];
-        for (int i = 0; i < segments.length/2; i++) {
-            points[i] = new android.graphics.Point(segments[2*i], segments[2*i+1]);
+        android.graphics.Point[] points = new android.graphics.Point[segments.length / 2];
+        for (int i = 0; i < segments.length / 2; i++) {
+            points[i] = new android.graphics.Point(segments[2 * i], segments[2 * i + 1]);
         }
         return device.swipe(points, segmentSteps);
     }
 
+    // Multi touch is a little complicated
     public boolean injectInputEvent(int action, float x, float y, int metaState) {
         MotionEvent e = MotionEvent.obtain(SystemClock.uptimeMillis(),
                 SystemClock.uptimeMillis(),
@@ -503,7 +503,7 @@ public class AutomatorServiceImpl implements AutomatorService {
     public void clearTextField(Selector obj) throws UiObjectNotFoundException {
         try {
             obj.toUiObject2().clear();
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
             device.findObject(obj.toUiSelector()).clearTextField();
         }
 
@@ -535,11 +535,11 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean setText(Selector obj, String text) throws UiObjectNotFoundException {
-        try{
+        try {
             obj.toUiObject2().click();
             obj.toUiObject2().setText(text);
             return true;
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
             return device.findObject(obj.toUiSelector()).setText(text);
         }
     }
@@ -691,8 +691,8 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean exist(Selector obj) {
-        if (obj.getChildOrSibling().length==0&&obj.toBySelector()!=null)
-            return device.wait(Until.hasObject(obj.toBySelector()),0L);
+        if (obj.getChildOrSibling().length == 0 && obj.toBySelector() != null)
+            return device.wait(Until.hasObject(obj.toBySelector()), 0L);
         return device.findObject(obj.toUiSelector()).exists();
     }
 
@@ -856,27 +856,28 @@ public class AutomatorServiceImpl implements AutomatorService {
     /**
      * Performs the swipe up/down/left/right action on the UiObject
      *
-     * @param obj   the target ui object.
-     * @param dir   "u"/"up", "d"/"down", "l"/"left", "r"/"right"
+     * @param obj     the target ui object.
+     * @param dir     "u"/"up", "d"/"down", "l"/"left", "r"/"right"
      * @param percent expect value: percent >= 0.0F && percent <= 1.0F,The length of the swipe as a percentage of this object's size.
-     * @param steps indicates the number of injected move steps into the system. Steps are injected about 5ms apart. So a 100 steps may take about 1/2 second to complete.
+     * @param steps   indicates the number of injected move steps into the system. Steps are injected about 5ms apart. So a 100 steps may take about 1/2 second to complete.
      * @return true of successful
      * @throws android.support.test.uiautomator.UiObjectNotFoundException
      */
     @Override
-    public boolean swipe(Selector obj, String dir,float percent, int steps) throws UiObjectNotFoundException {
-        if(obj.toUiObject2() == null){
+    public boolean swipe(Selector obj, String dir, float percent, int steps) throws UiObjectNotFoundException {
+        if (obj.toUiObject2() == null) {
             return swipe(device.findObject(obj.toUiSelector()), dir, steps);
         }
         return swipe(obj.toUiObject2(), dir, percent, steps);
     }
 
-    private boolean swipe(UiObject2 item, String dir,float percent, int steps) throws UiObjectNotFoundException {
+    private boolean swipe(UiObject2 item, String dir, float percent, int steps) throws UiObjectNotFoundException {
         dir = dir.toLowerCase();
-        if ("u".equals(dir) || "up".equals(dir)) item.swipe(Direction.UP,percent,steps);
-        else if ("d".equals(dir) || "down".equals(dir)) item.swipe(Direction.DOWN,percent,steps);
-        else if ("l".equals(dir) || "left".equals(dir)) item.swipe(Direction.LEFT,percent,steps);
-        else if ("r".equals(dir) || "right".equals(dir)) item.swipe(Direction.RIGHT,percent,steps);
+        if ("u".equals(dir) || "up".equals(dir)) item.swipe(Direction.UP, percent, steps);
+        else if ("d".equals(dir) || "down".equals(dir)) item.swipe(Direction.DOWN, percent, steps);
+        else if ("l".equals(dir) || "left".equals(dir)) item.swipe(Direction.LEFT, percent, steps);
+        else if ("r".equals(dir) || "right".equals(dir))
+            item.swipe(Direction.RIGHT, percent, steps);
         return true;
     }
 
@@ -889,8 +890,8 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitForExists(Selector obj, long timeout) {
-        if (obj.getChildOrSibling().length==0&&obj.checkBySelectorNull(obj)==false)
-            return device.wait(Until.hasObject(obj.toBySelector()),timeout);
+        if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
+            return device.wait(Until.hasObject(obj.toBySelector()), timeout);
         return device.findObject(obj.toUiSelector()).waitForExists(timeout);
     }
 
@@ -903,8 +904,8 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitUntilGone(Selector obj, long timeout) {
-        if (obj.getChildOrSibling().length==0&&obj.checkBySelectorNull(obj)==false)
-            return device.wait(Until.gone(obj.toBySelector()),timeout);
+        if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
+            return device.wait(Until.gone(obj.toBySelector()), timeout);
         return device.findObject(obj.toUiSelector()).waitUntilGone(timeout);
     }
 

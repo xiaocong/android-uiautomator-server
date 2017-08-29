@@ -94,7 +94,7 @@ public class AutomatorHttpServer extends NanoHTTPD {
                 return new Response(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Invalid http post data!");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             try {
-                jsonRpcServer.handle(is, os);
+                jsonRpcServer.handleRequest(is, os);
                 return new Response(Response.Status.OK, "application/json", new ByteArrayInputStream(os.toByteArray()));
             } catch (IOException e) {
                 return new Response(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal Server Error!!!");
