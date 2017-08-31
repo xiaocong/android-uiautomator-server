@@ -69,6 +69,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:25.3.1'
+    // compile 'org.nanohttpd:nanohttpd-websocket:2.3.1'
 
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
@@ -76,7 +77,7 @@ dependencies {
     androidTestCompile 'com.android.support:support-v4:25.3.1'
     androidTestCompile 'com.android.support:support-annotations:25.3.1'
     // server
-    androidTestCompile 'com.nanohttpd:nanohttpd:2.1.1'
+    androidTestCompile 'org.nanohttpd:nanohttpd:2.3.1'
     androidTestCompile 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.5.0'
 }
 

@@ -55,11 +55,13 @@ public class AutomatorHttpServer extends NanoHTTPD {
     public Response serve(String uri, Method method,
                           Map<String, String> headers, Map<String, String> params,
                           Map<String, String> files) {
-        Log.d(String.format("URI: %s, Method: %s, Header: %s, params, %s, files: %s", uri, method, headers, params, files));
+        Log.d(String.format("URI: %s, Method: %s, params, %s, files: %s", uri, method, params, files));
 
         if ("/stop".equals(uri)) {
             stop();
-            return new Response("Server stopped!!!");
+            return newFixedLengthResponse("Server stopped!!!");
+        } else if ("/ping".equals(uri)) {
+            return newFixedLengthResponse("pong");
         } else if ("/screenshot/0".equals(uri)) {
             float scale = 1.0f;
             if (params.containsKey("scale")) {
@@ -77,11 +79,12 @@ public class AutomatorHttpServer extends NanoHTTPD {
             }
             File f = new File(InstrumentationRegistry.getTargetContext().getFilesDir(), "screenshot.png");
             UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).takeScreenshot(f, scale, quality);
+
             try {
-                return new Response(Response.Status.OK, "image/png", new FileInputStream(f));
+                return newChunkedResponse(Response.Status.OK, "image/png", new FileInputStream(f));
             } catch (FileNotFoundException e) {
                 Log.e(e.getMessage());
-                return new Response(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal Server Error!!!");
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal Server Error!!!");
             }
         } else if (router.containsKey(uri)) {
             JsonRpcServer jsonRpcServer = router.get(uri);
@@ -91,16 +94,16 @@ public class AutomatorHttpServer extends NanoHTTPD {
             else if (files.get("postData") != null)
                 is = new ByteArrayInputStream(files.get("postData").getBytes());
             else
-                return new Response(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Invalid http post data!");
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Invalid http post data!");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             try {
                 jsonRpcServer.handleRequest(is, os);
-                return new Response(Response.Status.OK, "application/json", new ByteArrayInputStream(os.toByteArray()));
+                return newFixedLengthResponse(Response.Status.OK, "application/json", new ByteArrayInputStream(os.toByteArray()), os.size());
             } catch (IOException e) {
-                return new Response(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal Server Error!!!");
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal Server Error!!!");
             }
         } else
-            return new Response(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found!!!");
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found!!!");
     }
 
 }
