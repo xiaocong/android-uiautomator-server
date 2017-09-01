@@ -1,8 +1,5 @@
 package com.github.uiautomator;
 
-import android.graphics.Bitmap;
-
-import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -18,18 +15,19 @@ public class ScreenClient {
     public static void main(String[] args) {
         setArgV0(PROCESS_NAME);
 
-        // Requires SDK >= 18
-        Method injector = null;
+        ScreenHttpServer server = new ScreenHttpServer(9010);
         try {
-            injector = Class.forName("android.view.SurfaceControl").getDeclaredMethod("screenshot", new Class[]{Integer.TYPE, Integer.TYPE});
-            Bitmap bmp = (Bitmap) injector.invoke(null, new Object[]{Integer.valueOf(0), Integer.valueOf(0)});
+            server.initialize();
+            server.start();
 
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.JPEG, 75, bout);
-            System.out.println("screenshot success " + bmp.getHeight() + ", " + bmp.getWidth());
+            while (server.isAlive()) {
+                Thread.sleep(100);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.toString());
+        } finally {
+            server.stop();
+            System.out.println("Server stopped");
         }
     }
 
