@@ -24,13 +24,18 @@
 package com.github.uiautomator.stub;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.filters.SdkSuppress;
 import android.support.test.runner.AndroidJUnit4;
+import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.Until;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.googlecode.jsonrpc4j.JsonRpcServer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,29 +43,59 @@ import org.junit.runner.RunWith;
 
 /**
  * Use JUnit test to start the uiautomator jsonrpc server.
+ *
  * @author xiaocong@gmail.com
  */
 @RunWith(AndroidJUnit4.class)
 @SdkSuppress(minSdkVersion = 18)
 public class Stub {
+    private final String TAG = "UIAUTOMATOR";
+    private static final int LAUNCH_TIMEOUT = 5000;
+
     int PORT = 9008;
     AutomatorHttpServer server = new AutomatorHttpServer(PORT);
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         server.route("/jsonrpc/0", new JsonRpcServer(new ObjectMapper(), new AutomatorServiceImpl(), AutomatorService.class));
         server.start();
-        UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()).wakeUp();
+        UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        device.wakeUp();
+        // Wait for launcher
+        String launcherPackage = device.getLauncherPackageName();
+        device.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
+
+        // Launch the app
+        Context context = InstrumentationRegistry.getContext();
+        final String packageName = "com.github.uiautomator";
+
+//        if (Helper.isAppRunning(context, packageName)) {
+//            Log.i(TAG, "Service is running");
+//            System.out.println("UiAutomator service is running");
+//            return;
+//        }
+        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
+//        Log.i(TAG, "Launch " + packageName);
+//        final Intent intent = context.getPackageManager()
+//                .getLaunchIntentForPackage(packageName);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        context.startActivity(intent);
+//
+//        device.wait(Until.hasObject(By.pkg(packageName).depth(0)),
+//                LAUNCH_TIMEOUT);
+//        device.pressHome();
     }
 
     @After
     public void tearDown() {
         server.stop();
+        Context context = InstrumentationRegistry.getContext();
+        context.startService(new Intent("com.github.uiautomator.ACTION_STOP"));
     }
 
     @Test
     @LargeTest
-    public void testUIAutomatorStub() throws InterruptedException{
+    public void testUIAutomatorStub() throws InterruptedException {
         while (server.isAlive()) {
             Thread.sleep(100);
         }

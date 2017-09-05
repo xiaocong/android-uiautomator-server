@@ -1,4 +1,5 @@
 # Purpose
+[![Build Status](https://travis-ci.org/openatx/android-uiautomator-server.svg?branch=master)](https://travis-ci.org/openatx/android-uiautomator-server)
 
 [UIAutomator](http://developer.android.com/tools/testing/testing_ui.html) is a
 great tool to perform Android UI testing, but to do it, you have to write java

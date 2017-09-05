@@ -19,6 +19,7 @@ public class ScreenClient {
         try {
             server.initialize();
             server.start();
+            System.out.println("Server started");
 
             while (server.isAlive()) {
                 Thread.sleep(100);

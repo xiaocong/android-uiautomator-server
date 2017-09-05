@@ -14,7 +14,7 @@ import android.view.Surface;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
@@ -31,15 +31,15 @@ public class ScreenHttpServer extends NanoHTTPD {
     private int mWidth = 1080;
     private int mHeight = 1920;
     private boolean landscape = false;
+    private Boolean recording = false;
 
     private Class surfaceControl;
     private java.lang.reflect.Method rDestroyDisplay;
-    java.lang.reflect.Method rOpenTransaction;
-    java.lang.reflect.Method rCloseTransaction;
-    java.lang.reflect.Method rCreateDisplay;
+    private java.lang.reflect.Method rOpenTransaction;
+    private java.lang.reflect.Method rCloseTransaction;
+    private java.lang.reflect.Method rCreateDisplay;
 
-    IBinder bScreen;
-    private Boolean recordFinished = true;
+    protected static final int TIMEOUT_USEC = 10000;    // 10[msec]
 
     public ScreenHttpServer(int port) {
         super(port);
@@ -117,30 +117,35 @@ public class ScreenHttpServer extends NanoHTTPD {
         if (Build.VERSION.SDK_INT < 21) {
             return newFixedLengthResponse("Screenrecord require SDK >= 21");
         }
-        if (!this.recordFinished) {
+        if (this.recording) {
             return newFixedLengthResponse("Already started record!");
         }
-        this.recordFinished = false;
+        this.recording = true;
         this.landscape = "true".equals(params.get("landscape")) || "1".equals(params.get("landscape"));
 
         String videoPath = params.get("path");
         if (videoPath == null || "".equals(videoPath)) {
             videoPath = "/sdcard/video.mp4";
         }
-        final MediaCodec mediaCodec = createMediaCodec();
+        new File(videoPath).delete(); // delete file before create
+
+        final MediaCodec avc = createAVC();
         final MediaMuxer muxer = new MediaMuxer(videoPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 
+        final String finalVideoPath = videoPath;
         new Thread("ScreenRecord") {
             @Override
             public void run() {
+                IBinder virtualDisplay = null;
                 try {
-                    IBinder bScreen = createVirtualDisplay(mediaCodec);
+                    virtualDisplay = createVirtualDisplay(avc);
                     System.out.println("> Recording started");
-                    startRecording(mediaCodec, bScreen, muxer);
-                    System.out.println("> Recording finished");
-                    releaseRecording(mediaCodec, bScreen, muxer);
+                    startRecording(avc, muxer);
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    System.out.println("> Recording finished, saved to " + finalVideoPath);
+                    releaseRecording(avc, virtualDisplay, muxer);
                 }
             }
         }.start();
@@ -150,31 +155,34 @@ public class ScreenHttpServer extends NanoHTTPD {
 
     // Stop VideoRecord
     private Response handlePutScreenrecord() throws Exception {
-        this.recordFinished = true;
+        this.recording = false;
         return newFixedLengthResponse("OK");
     }
 
     @TargetApi(21)
-    private void startRecording(MediaCodec mediaCodec, IBinder bScreen, MediaMuxer muxer) {
+    private void startRecording(MediaCodec avc, MediaMuxer muxer) {
         MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
-        int trackIndex = -1;
+        int track = -1;
         try {
-            while (!recordFinished) {
+            while (this.recording) {
                 // get virtual display data
-                int index = mediaCodec.dequeueOutputBuffer(bufferInfo, 0);
+                int index = avc.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
                 if (index == MediaCodec.INFO_TRY_AGAIN_LATER) {
-                    Thread.sleep(10);
+                    // Nothing to do here, anyway, deuqueueOutputBuffer will block for 10ms if no buffer
                 } else if (index == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    if (track != -1) {
+                        throw new RuntimeException("format changed twice");
+                    }
                     // Should only call once
-                    MediaFormat format = mediaCodec.getOutputFormat();
+                    MediaFormat format = avc.getOutputFormat();
                     System.out.println("Output format changed to " + format.toString());
-                    trackIndex = muxer.addTrack(format);
+                    track = muxer.addTrack(format);
                     muxer.start();
                 } else if (index >= 0) {
-                    if (trackIndex == -1) {
+                    if (track == -1) {
                         throw new Exception("MediaCodec track index is not setted!");
                     }
-                    ByteBuffer data = mediaCodec.getOutputBuffer(index);
+                    ByteBuffer data = avc.getOutputBuffer(index);
                     if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                         System.out.println("ignoring BUFFER_FLAG_CODEC_CONFIG");
                         bufferInfo.size = 0;
@@ -184,11 +192,10 @@ public class ScreenHttpServer extends NanoHTTPD {
                         data = null;
                     }
                     if (data != null) {
-                        System.out.println("Append data to video");
                         data.position(bufferInfo.offset);
                         data.limit(bufferInfo.offset + bufferInfo.size);
-                        muxer.writeSampleData(trackIndex, data, bufferInfo);
-                        mediaCodec.releaseOutputBuffer(index, false);
+                        muxer.writeSampleData(track, data, bufferInfo);
+                        avc.releaseOutputBuffer(index, false);
                     }
                 }
             }
@@ -209,14 +216,12 @@ public class ScreenHttpServer extends NanoHTTPD {
             java.lang.reflect.Method setDisplayProjection = surfaceControl.getDeclaredMethod("setDisplayProjection", IBinder.class, Integer.TYPE, Rect.class, Rect.class);
             java.lang.reflect.Method setDisplayLayerStack = surfaceControl.getDeclaredMethod("setDisplayLayerStack", IBinder.class, Integer.TYPE);
 
-//            Rect physicalRect = new Rect(0, 0, mWidth, mHeight);
-
             Surface surface = mediaCodec.createInputSurface();
             mediaCodec.start(); // TODO
 
             rOpenTransaction.invoke(null);
             setDisplaySurface.invoke(null, mDisplay, surface);
-            setDisplayProjection.invoke(null, mDisplay, 0, getCurrentDisplayRect(), getCurrentDisplayRect());
+            setDisplayProjection.invoke(null, mDisplay, 0, getCurrentDisplayRect(), getCurrentDisplayRect()); // make video smaller
             setDisplayLayerStack.invoke(null, mDisplay, 0);
             rCloseTransaction.invoke(null);
 
@@ -227,25 +232,30 @@ public class ScreenHttpServer extends NanoHTTPD {
         }
     }
 
-    private void releaseRecording(MediaCodec mediaCodec, IBinder bDisplay, MediaMuxer muxer) throws InvocationTargetException, IllegalAccessException {
-        mediaCodec.stop();
-        mediaCodec.release();
-        rDestroyDisplay.invoke(null, bDisplay);
-        muxer.stop();
-        // raise Null exception
-        // muxer.release();
-        // TODO muxer
+    // avc: Video Encoding is AVC(H.264)
+    private void releaseRecording(MediaCodec avc, IBinder bDisplay, MediaMuxer muxer) {
+        try {
+            avc.stop();
+            avc.release();
+            rDestroyDisplay.invoke(null, bDisplay);
+            muxer.stop();
+            // raise Null exception
+            // muxer.release();
+            // TODO muxer
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private MediaCodec createMediaCodec() throws Exception {
+    private MediaCodec createAVC() throws Exception {
         Rect display = getCurrentDisplayRect();
         MediaFormat format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, display.width(), display.height());
         // Set color format
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
                 MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, 1500000); // bit rate
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, 24); // FPS
+        format.setInteger(MediaFormat.KEY_BIT_RATE, 1500000); // bit rate 1500000
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, 20); // FPS
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10); // Frame interval, unit seconds
         MediaCodec mMediaCodec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC); // Output encoding
         mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE); // 配置好格式参数

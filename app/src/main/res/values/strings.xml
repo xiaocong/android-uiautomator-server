@@ -26,4 +26,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="service_ticker">UiAutomator is running</string>
+    <string name="service_title">UiAutomator</string>
+    <string name="service_text">service is running</string>
 </resources>
