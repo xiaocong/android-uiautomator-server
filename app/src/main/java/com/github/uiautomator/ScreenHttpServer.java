@@ -88,7 +88,6 @@ public class ScreenHttpServer extends NanoHTTPD {
         java.lang.reflect.Method injector = null;
         try {
             Bitmap bmp = this.takeScreenshot();
-
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             bmp.compress(Bitmap.CompressFormat.JPEG, 75, bout);
             bmp.recycle();
