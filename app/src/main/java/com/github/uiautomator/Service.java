@@ -2,7 +2,9 @@ package com.github.uiautomator;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -13,6 +15,8 @@ public class Service extends android.app.Service {
 
     private static final String TAG = "ATXService";
     private static final int NOTIFICATION_ID = 0x1;
+
+    WifiManager.WifiLock mWifiLock = null;
 
     public Service() {
     }
@@ -27,7 +31,7 @@ public class Service extends android.app.Service {
     public void onCreate() {
         super.onCreate();
 
-        Intent notificationIntent = new Intent(this, IdentifyActivity.class);
+        Intent notificationIntent = new Intent(this, MainActivity.class);
         Notification notification = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setTicker(getString(R.string.service_ticker))
@@ -38,6 +42,7 @@ public class Service extends android.app.Service {
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);
+        holdWifiLock();
     }
 
     @Override
@@ -45,6 +50,7 @@ public class Service extends android.app.Service {
         super.onDestroy();
         Log.i(TAG, "Stopping service");
         stopForeground(true);
+        releaseWifiLock();
     }
 
     @Override
@@ -66,5 +72,36 @@ public class Service extends android.app.Service {
     @Override
     public void onLowMemory() {
         Log.w(TAG, "Low memory");
+    }
+
+    /***
+     * Calling this method will aquire the lock on wifi. This is avoid wifi
+     * from going to sleep as long as <code>releaseWifiLock</code> method is called.
+     **/
+    private void holdWifiLock() {
+        Log.i(TAG, "Hold wifi-lock");
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
+        if (mWifiLock == null)
+            mWifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL, TAG);
+
+        mWifiLock.setReferenceCounted(false);
+
+        if (!mWifiLock.isHeld())
+            mWifiLock.acquire();
+    }
+
+    /***
+     * Calling this method will release if the lock is already help. After this method is called,
+     * the Wifi on the device can goto sleep.
+     **/
+    private void releaseWifiLock() {
+        Log.i(TAG, "Release wifi-lock");
+        if (mWifiLock == null)
+            Log.w(TAG, "#releaseWifiLock mWifiLock was not created previously");
+
+        if (mWifiLock != null && mWifiLock.isHeld()) {
+            mWifiLock.release();
+        }
     }
 }

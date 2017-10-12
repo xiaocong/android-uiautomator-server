@@ -8,19 +8,25 @@
 
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:height="300dp"
         android:gravity="center"
         android:textSize="24sp"
         android:text="Do not delete this app when test is running" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="1dp"
+        android:text="ATX-Agent Status" />
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:id="@+id/btn_finish"
-        android:text="Destroy" />
+        android:text="Quit" />
 
 </LinearLayout>

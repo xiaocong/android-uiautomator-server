@@ -1,7 +1,6 @@
 package com.github.uiautomator;
 
 import android.app.Activity;
-import android.app.KeyguardManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -9,8 +8,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 
 public class MainActivity extends Activity {
@@ -34,7 +31,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ensureVisibility();
         Intent intent = new Intent(this, Service.class);
         bindService(intent, connection, BIND_AUTO_CREATE);
 
@@ -50,7 +46,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        ensureVisibility();
     }
 
     @Override
@@ -58,24 +53,6 @@ public class MainActivity extends Activity {
         moveTaskToBack(true);
     }
 
-    private void ensureVisibility() {
-        Window window = getWindow();
-
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-
-        unlock();
-
-        WindowManager.LayoutParams params = window.getAttributes();
-        params.screenBrightness = 1.0f;
-        window.setAttributes(params);
-    }
-
-    @SuppressWarnings("deprecation")
-    private void unlock() {
-        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-        keyguardManager.newKeyguardLock("InputService/Unlock").disableKeyguard();
-    }
 
     @Override
     protected void onDestroy() {
