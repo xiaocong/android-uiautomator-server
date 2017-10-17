@@ -72,7 +72,7 @@ dependencies {
     // server
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'org.nanohttpd:nanohttpd:2.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    // compile 'com.android.support.constraint:constraint-layout:1.0.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'

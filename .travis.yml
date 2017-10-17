@@ -8,9 +8,6 @@ android:
   - extra
   - android-25
   - android-17
-  licenses:
-  - android-sdk-license-.+
-  - '.+'
 cache:
   directories:
   - "$HOME/.gradle/caches/"
