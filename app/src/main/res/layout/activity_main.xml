@@ -8,14 +8,6 @@
 
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:height="300dp"
-        android:gravity="center"
-        android:textSize="24sp"
-        android:text="Do not delete this app when test is running" />
-
-    <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
