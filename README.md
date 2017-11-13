@@ -21,6 +21,19 @@ that we can just write PC side script to write UIAutomator tests.
         $ ./gradlew cC
         $ adb forward tcp:9008 tcp:9008 # tcp forward
 
+# The buildin input method
+**Fast input method**
+
+Encode the text into UTF-8 and then Base64
+
+For example:
+
+    "Hello 你好" -> (UTF-8 && Base64) = SGVsbG8g5L2g5aW9
+
+Send to FastInputIME with broadcast
+
+    $ adb shell am broadcast -a ADB_INPUT_TEXT --es text SGVsbG8g5L2g5aW9
+
 # How to use
 
 ```python

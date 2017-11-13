@@ -29,4 +29,5 @@
     <string name="service_ticker">UiAutomator is running</string>
     <string name="service_title">UiAutomator</string>
     <string name="service_text">service is running</string>
+    <string name="fast_input_label">FastInputIME</string>
 </resources>

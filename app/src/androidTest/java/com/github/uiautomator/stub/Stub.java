@@ -69,21 +69,25 @@ public class Stub {
         Context context = InstrumentationRegistry.getContext();
         final String packageName = "com.github.uiautomator";
 
+//        Useless: Check if service is running
 //        if (Helper.isAppRunning(context, packageName)) {
 //            Log.i(TAG, "Service is running");
 //            System.out.println("UiAutomator service is running");
 //            return;
 //        }
-        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
-//        Log.i(TAG, "Launch " + packageName);
-//        final Intent intent = context.getPackageManager()
-//                .getLaunchIntentForPackage(packageName);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        context.startActivity(intent);
-//
-//        device.wait(Until.hasObject(By.pkg(packageName).depth(0)),
-//                LAUNCH_TIMEOUT);
-//        device.pressHome();
+
+//        Log.i(TAG, "Launch service");
+//        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
+
+        Log.i(TAG, "Launch " + packageName);
+        final Intent intent = context.getPackageManager()
+                .getLaunchIntentForPackage(packageName);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+
+        device.wait(Until.hasObject(By.pkg(packageName).depth(0)),
+                LAUNCH_TIMEOUT);
+        device.pressHome();
     }
 
     @After

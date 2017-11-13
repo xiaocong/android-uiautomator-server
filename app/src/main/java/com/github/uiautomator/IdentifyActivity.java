@@ -37,7 +37,18 @@ public class IdentifyActivity extends Activity {
                 LinearLayout.LayoutParams.MATCH_PARENT
         ));
 
-        layout.setBackgroundColor(Color.BLACK);
+        Bundle extras = intent.getExtras();
+        String activityTheme = "BLACK";
+        if (extras != null && extras.getString("theme") != null) {
+            activityTheme = extras.getString("theme").toUpperCase();
+        }
+        Log.i(TAG, "theme " + activityTheme);
+        Integer backgroundColor = Color.BLACK;
+        if (activityTheme != null && "RED".equals(activityTheme)) {
+            backgroundColor = Color.RED;
+        }
+
+        layout.setBackgroundColor(backgroundColor);
         layout.setPadding(16, 16, 16, 16);
         layout.setGravity(Gravity.CENTER);
 

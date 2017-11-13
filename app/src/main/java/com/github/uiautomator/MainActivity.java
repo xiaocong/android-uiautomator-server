@@ -41,6 +41,18 @@ public class MainActivity extends Activity {
                 finish();
             }
         });
+
+        Button btnIdentify = (Button) findViewById(R.id.btn_identify);
+        btnIdentify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, IdentifyActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("theme", "RED");
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
