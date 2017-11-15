@@ -76,18 +76,18 @@ public class Stub {
 //            return;
 //        }
 
-//        Log.i(TAG, "Launch service");
-//        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
+        Log.i(TAG, "Launch service");
+        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
 
-        Log.i(TAG, "Launch " + packageName);
-        final Intent intent = context.getPackageManager()
-                .getLaunchIntentForPackage(packageName);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        context.startActivity(intent);
-
-        device.wait(Until.hasObject(By.pkg(packageName).depth(0)),
-                LAUNCH_TIMEOUT);
-        device.pressHome();
+//        Log.i(TAG, "Launch " + packageName);
+//        final Intent intent = context.getPackageManager()
+//                .getLaunchIntentForPackage(packageName);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        context.startActivity(intent);
+//
+//        device.wait(Until.hasObject(By.pkg(packageName).depth(0)),
+//                LAUNCH_TIMEOUT);
+//        device.pressHome();
     }
 
     @After

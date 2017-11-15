@@ -32,12 +32,14 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         Intent intent = new Intent(this, Service.class);
-        bindService(intent, connection, BIND_AUTO_CREATE);
+        startService(intent);
 
         Button btnFinish = (Button) findViewById(R.id.btn_finish);
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, Service.class);
+                stopService(intent);
                 finish();
             }
         });
@@ -69,7 +71,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(connection);
+//        unbindService(connection);
         stopService(new Intent(this, Service.class));
     }
 }
