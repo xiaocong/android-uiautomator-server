@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="1dp"
-        android:text="ATX-Agent Status" />
+        android:text="ATX-Agent" />
 
     <Button
         android:layout_width="match_parent"
@@ -27,5 +27,22 @@
         android:gravity="center"
         android:id="@+id/btn_identify"
         android:text="Identify" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="快捷方式" />
+
+    <Button
+        android:id="@+id/development_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="开发者选项" />
+
+    <Button
+        android:id="@+id/accessibility"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="无障碍" />
 
 </LinearLayout>

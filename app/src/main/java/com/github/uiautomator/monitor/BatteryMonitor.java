@@ -14,6 +14,7 @@ import android.util.Log;
 public class BatteryMonitor extends AbstractMonitor {
     private static final String TAG = "UIABatteryMonitor";
 
+    private static final String USB_STATE_CHANGE = "android.hardware.usb.action.USB_STATE";
     private BroadcastReceiver receiver = null;
 
     public BatteryMonitor(Context context, HttpPostNotifier notifier) {
@@ -32,7 +33,11 @@ public class BatteryMonitor extends AbstractMonitor {
                 report(notifier, intent);
             }
         };
-        context.registerReceiver(receiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED);
+        filter.addAction(USB_STATE_CHANGE);
+        context.registerReceiver(receiver, filter);
     }
 
     @Override

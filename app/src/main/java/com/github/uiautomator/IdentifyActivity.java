@@ -43,9 +43,11 @@ public class IdentifyActivity extends Activity {
             activityTheme = extras.getString("theme").toUpperCase();
         }
         Log.i(TAG, "theme " + activityTheme);
+        Float brightness = 0.1f;
         Integer backgroundColor = Color.BLACK;
         if (activityTheme != null && "RED".equals(activityTheme)) {
             backgroundColor = Color.RED;
+            brightness = 1.0f;
         }
 
         layout.setBackgroundColor(backgroundColor);
@@ -76,7 +78,7 @@ public class IdentifyActivity extends Activity {
         layout.addView(createData(tm.getSimSerialNumber()));
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        ensureVisibility();
+        ensureVisibility(brightness);
         setContentView(layout);
     }
 
@@ -98,7 +100,7 @@ public class IdentifyActivity extends Activity {
         return dataView;
     }
 
-    private void ensureVisibility() {
+    private void ensureVisibility(Float brightness) {
         Window window = getWindow();
 
         window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
@@ -107,7 +109,7 @@ public class IdentifyActivity extends Activity {
         unlock();
 
         WindowManager.LayoutParams params = window.getAttributes();
-        params.screenBrightness = 1.0f;
+        params.screenBrightness = brightness;
         window.setAttributes(params);
     }
 
