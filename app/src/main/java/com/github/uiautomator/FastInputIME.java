@@ -5,12 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.inputmethodservice.InputMethodService;
+import android.inputmethodservice.Keyboard;
+import android.inputmethodservice.KeyboardView;
 import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 
 import java.io.UnsupportedEncodingException;
 
@@ -22,7 +26,7 @@ public class FastInputIME extends InputMethodService {
 
     @Override
     public View onCreateInputView() {
-        View mInputView = (View) getLayoutInflater().inflate(R.layout.input, null);
+        KeyboardView keyboardView = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
         IntentFilter filter = new IntentFilter();
         filter.addAction(USB_STATE_CHANGE);
         filter.addAction("ADB_INPUT_TEXT");
@@ -31,7 +35,10 @@ public class FastInputIME extends InputMethodService {
         mReceiver = new InputMessageReceiver();
         registerReceiver(mReceiver, filter);
 
-        return mInputView;
+        Keyboard keyboard = new Keyboard(this, R.xml.number_pad);
+        keyboardView.setKeyboard(keyboard);
+        keyboardView.setOnKeyboardActionListener(new MyKeyboardActionListener());
+        return keyboardView;
     }
 
     @Override
@@ -76,6 +83,49 @@ public class FastInputIME extends InputMethodService {
                     // TODO: not finished yet
                     break;
             }
+        }
+    }
+
+    private class MyKeyboardActionListener implements KeyboardView.OnKeyboardActionListener {
+
+        @Override
+        public void onPress(int i) {
+
+        }
+
+        @Override
+        public void onRelease(int i) {
+
+        }
+
+        @Override
+        public void onKey(int i, int[] ints) {
+
+        }
+
+        @Override
+        public void onText(CharSequence charSequence) {
+
+        }
+
+        @Override
+        public void swipeLeft() {
+
+        }
+
+        @Override
+        public void swipeRight() {
+
+        }
+
+        @Override
+        public void swipeDown() {
+
+        }
+
+        @Override
+        public void swipeUp() {
+
         }
     }
 }

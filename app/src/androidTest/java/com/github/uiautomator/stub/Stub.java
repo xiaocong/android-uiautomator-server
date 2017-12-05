@@ -25,6 +25,7 @@ package com.github.uiautomator.stub;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.RemoteException;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.filters.SdkSuppress;
@@ -59,8 +60,12 @@ public class Stub {
     public void setUp() throws Exception {
         server.route("/jsonrpc/0", new JsonRpcServer(new ObjectMapper(), new AutomatorServiceImpl(), AutomatorService.class));
         server.start();
+    }
+
+    private void launchService() throws RemoteException {
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         device.wakeUp();
+
         // Wait for launcher
         String launcherPackage = device.getLauncherPackageName();
         device.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);

@@ -10,4 +10,12 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textColor="#fff" />
+
+    <Button
+        android:id="@+id/switch_ime"
+        android:text="Switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        />
 </RelativeLayout>
