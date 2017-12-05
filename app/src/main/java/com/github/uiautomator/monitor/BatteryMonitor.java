@@ -42,7 +42,9 @@ public class BatteryMonitor extends AbstractMonitor {
 
     @Override
     public void unregister() {
-        context.unregisterReceiver(receiver);
+        if (receiver != null) {
+            context.unregisterReceiver(receiver);
+        }
     }
 
     private void report(HttpPostNotifier notifier, Intent intent) {
