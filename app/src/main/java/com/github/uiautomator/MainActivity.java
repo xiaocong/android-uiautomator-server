@@ -23,17 +23,22 @@ public class MainActivity extends Activity {
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             Log.i(TAG, "service disconnected");
+
+            // restart service
+            Intent intent = new Intent(MainActivity.this, Service.class);
+            startService(intent);
+            bindService(intent, connection, BIND_IMPORTANT | BIND_AUTO_CREATE);
         }
     };
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Intent intent = new Intent(this, Service.class);
         startService(intent);
+        bindService(intent, connection, BIND_IMPORTANT | BIND_AUTO_CREATE);
 
         Button btnFinish = (Button) findViewById(R.id.btn_finish);
         btnFinish.setOnClickListener(new View.OnClickListener() {
@@ -63,7 +68,7 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
             }
         });
-        
+
         ((Button) findViewById(R.id.development_settings)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +91,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        unbindService(connection);
-        stopService(new Intent(this, Service.class));
+        unbindService(connection);
+//        stopService(new Intent(this, Service.class));
     }
 }
