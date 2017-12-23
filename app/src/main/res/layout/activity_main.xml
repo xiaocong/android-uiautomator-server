@@ -45,4 +45,15 @@
         android:layout_height="wrap_content"
         android:text="无障碍" />
 
+    <Button
+        android:id="@+id/stop_uiautomator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="停止UIAutomator" />
+
+    <Button
+        android:id="@+id/stop_atx_agent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="停止ATXAgent" />
 </LinearLayout>

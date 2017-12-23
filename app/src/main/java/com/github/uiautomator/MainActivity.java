@@ -6,10 +6,20 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainActivity extends Activity {
     private final String TAG = "ATXMainActivity";
@@ -62,6 +72,8 @@ public class MainActivity extends Activity {
             }
         });
 
+//        private OkHttpClient httpClient = ;
+
         ((Button) findViewById(R.id.accessibility)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,6 +85,58 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+            }
+        });
+
+        ((Button)findViewById(R.id.stop_uiautomator)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Request request = new Request.Builder()
+                        .url("http://127.0.0.1:7912/uiautomator")
+                        .delete()
+                        .build();
+                new OkHttpClient().newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.this, "Uiautomator already stopped ", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.this, "Uiautomator stopped", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                });
+            }
+        });
+
+        ((Button)findViewById(R.id.stop_atx_agent)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Request request = new Request.Builder()
+                        .url("http://127.0.0.1:7912/stop")
+                        .get()
+                        .build();
+                new OkHttpClient().newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.this, "server already stopped", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.this, "server stopped", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                });
             }
         });
     }
