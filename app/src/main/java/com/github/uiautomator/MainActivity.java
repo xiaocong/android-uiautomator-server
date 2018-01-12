@@ -46,16 +46,17 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent intent = new Intent(this, Service.class);
-        startService(intent);
-        bindService(intent, connection, BIND_IMPORTANT | BIND_AUTO_CREATE);
+        Intent serviceIntent = new Intent(this, Service.class);
+        startService(serviceIntent);
+        bindService(serviceIntent, connection, BIND_IMPORTANT | BIND_AUTO_CREATE);
 
         Button btnFinish = (Button) findViewById(R.id.btn_finish);
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Service.class);
-                stopService(intent);
+//                Intent intent = new Intent(MainActivity.this, Service.class);
+//                unbindService(connection);
+//                stopService(intent);
                 finish();
             }
         });
@@ -72,8 +73,6 @@ public class MainActivity extends Activity {
             }
         });
 
-//        private OkHttpClient httpClient = ;
-
         ((Button) findViewById(R.id.accessibility)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,7 +87,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        ((Button)findViewById(R.id.stop_uiautomator)).setOnClickListener(new View.OnClickListener() {
+        ((Button) findViewById(R.id.stop_uiautomator)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Request request = new Request.Builder()
@@ -114,7 +113,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        ((Button)findViewById(R.id.stop_atx_agent)).setOnClickListener(new View.OnClickListener() {
+        ((Button) findViewById(R.id.stop_atx_agent)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Request request = new Request.Builder()
@@ -139,6 +138,13 @@ public class MainActivity extends Activity {
                 });
             }
         });
+
+        Intent intent = getIntent();
+        boolean isHide = intent.getBooleanExtra("hide", false);
+        if (isHide) {
+            Log.i(TAG, "launch args hide:true, move to background");
+            moveTaskToBack(true);
+        }
     }
 
     @Override
@@ -156,6 +162,6 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         unbindService(connection);
-//        stopService(new Intent(this, Service.class));
+        stopService(new Intent(this, Service.class));
     }
 }
