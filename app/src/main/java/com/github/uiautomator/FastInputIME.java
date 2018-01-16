@@ -30,8 +30,9 @@ public class FastInputIME extends InputMethodService {
         IntentFilter filter = new IntentFilter();
         filter.addAction(USB_STATE_CHANGE);
         filter.addAction("ADB_INPUT_TEXT");
-        filter.addAction("ADB_INPUT_CHARS");
-        filter.addAction("ADB_EDITOR_CODE");
+        filter.addAction("ADB_CLEAR_TEXT");
+        // TODO: filter.addAction("ADB_INPUT_CHARS");
+        // TODO: filter.addAction("ADB_EDITOR_CODE");
         mReceiver = new InputMessageReceiver();
         registerReceiver(mReceiver, filter);
 
@@ -81,7 +82,8 @@ public class FastInputIME extends InputMethodService {
                     }
                     break;
                 case "ADB_CLEAR_TEXT":
-                    // TODO: not finished yet
+                    Log.i(TAG, "receive ADB_CLEAR_TEXT");
+                    clearText();
                     break;
             }
         }
