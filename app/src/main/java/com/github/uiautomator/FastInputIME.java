@@ -10,13 +10,13 @@ import android.inputmethodservice.KeyboardView;
 import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Random;
 
 public class FastInputIME extends InputMethodService {
     private static final String TAG = "FastInputIME";
@@ -38,6 +38,7 @@ public class FastInputIME extends InputMethodService {
         Keyboard keyboard = new Keyboard(this, R.xml.number_pad);
         keyboardView.setKeyboard(keyboard);
         keyboardView.setOnKeyboardActionListener(new MyKeyboardActionListener());
+
         return keyboardView;
     }
 
@@ -86,46 +87,79 @@ public class FastInputIME extends InputMethodService {
         }
     }
 
+    // Refs: https://www.jianshu.com/p/892168a57fe3
     private class MyKeyboardActionListener implements KeyboardView.OnKeyboardActionListener {
 
         @Override
         public void onPress(int i) {
-
         }
 
         @Override
         public void onRelease(int i) {
-
         }
 
         @Override
-        public void onKey(int i, int[] ints) {
-
+        public void onKey(int primaryCode, int[] keyCodes) {
+            if (primaryCode == Keyboard.KEYCODE_CANCEL) {
+                Log.d(TAG, "Keyboard CANCEL not implemented");
+            } else if (primaryCode == -10) {
+                clearText();
+            } else if (primaryCode == -5) {
+                switchToLastInputMethod();
+            } else if (primaryCode == -7) {
+                InputConnection ic = getCurrentInputConnection();
+                ic.commitText(randomString(1), 0);
+            } else {
+                Log.w(TAG, "Unknown primaryCode " + primaryCode);
+            }
         }
 
         @Override
+
         public void onText(CharSequence charSequence) {
-
         }
 
         @Override
         public void swipeLeft() {
-
         }
 
         @Override
         public void swipeRight() {
-
         }
 
         @Override
         public void swipeDown() {
-
         }
 
         @Override
         public void swipeUp() {
-
         }
+    }
+
+    private void clearText() {
+        // Refs: https://stackoverflow.com/questions/33082004/android-custom-soft-keyboard-how-to-clear-edit-text-commited-text
+        InputConnection ic = getCurrentInputConnection();
+        CharSequence currentText = ic.getExtractedText(new ExtractedTextRequest(), 0).text;
+        Log.d(TAG, "Current text: " + currentText);
+        CharSequence beforCursorText = ic.getTextBeforeCursor(currentText.length(), 0);
+        CharSequence afterCursorText = ic.getTextAfterCursor(currentText.length(), 0);
+        ic.deleteSurroundingText(beforCursorText.length(), afterCursorText.length());
+    }
+
+    private void switchToLastInputMethod() {
+        final IBinder token = getWindow().getWindow().getAttributes().token;
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.switchToLastInputMethod(token);
+    }
+
+    public String randomString(int length) {
+        String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        Random random = new Random();
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < length; i++) {
+            int num = random.nextInt(62);
+            buf.append(str.charAt(num));
+        }
+        return buf.toString();
     }
 }
