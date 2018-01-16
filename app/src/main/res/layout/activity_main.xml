@@ -56,4 +56,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="停止ATXAgent" />
+
+    <TextView
+        android:id="@+id/ip_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10sp"
+        android:text="IP: " />
 </LinearLayout>

@@ -2,8 +2,11 @@ package com.github.uiautomator;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
@@ -11,6 +14,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -54,9 +58,6 @@ public class MainActivity extends Activity {
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(MainActivity.this, Service.class);
-//                unbindService(connection);
-//                stopService(intent);
                 finish();
             }
         });
@@ -145,6 +146,13 @@ public class MainActivity extends Activity {
             Log.i(TAG, "launch args hide:true, move to background");
             moveTaskToBack(true);
         }
+
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        int ip = wifiManager.getConnectionInfo().getIpAddress();
+        String ipStr = (ip & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + ((ip >> 24) & 0xFF);
+        TextView textViewIP = (TextView) findViewById(R.id.ip_address);
+        textViewIP.setText(ipStr);
+        textViewIP.setTextColor(Color.BLUE);
     }
 
     @Override

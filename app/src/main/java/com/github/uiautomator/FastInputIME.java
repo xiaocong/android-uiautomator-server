@@ -20,7 +20,6 @@ import java.util.Random;
 
 public class FastInputIME extends InputMethodService {
     private static final String TAG = "FastInputIME";
-    private static final String USB_STATE_CHANGE = "android.hardware.usb.action.USB_STATE";
 
     private BroadcastReceiver mReceiver = null;
 
@@ -28,11 +27,11 @@ public class FastInputIME extends InputMethodService {
     public View onCreateInputView() {
         KeyboardView keyboardView = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
         IntentFilter filter = new IntentFilter();
-        filter.addAction(USB_STATE_CHANGE);
         filter.addAction("ADB_INPUT_TEXT");
         filter.addAction("ADB_CLEAR_TEXT");
         // TODO: filter.addAction("ADB_INPUT_CHARS");
         // TODO: filter.addAction("ADB_EDITOR_CODE");
+        // NONEED: filter.addAction(USB_STATE_CHANGE);
         mReceiver = new InputMessageReceiver();
         registerReceiver(mReceiver, filter);
 
@@ -59,13 +58,6 @@ public class FastInputIME extends InputMethodService {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             switch (action) {
-                case USB_STATE_CHANGE:
-                    if (!intent.getExtras().getBoolean("connected")) {
-                        final IBinder token = getWindow().getWindow().getAttributes().token;
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.switchToLastInputMethod(token);
-                    }
-                    break;
                 case "ADB_INPUT_TEXT":
                     String msg = intent.getStringExtra("text");
                     if (msg == null) {
