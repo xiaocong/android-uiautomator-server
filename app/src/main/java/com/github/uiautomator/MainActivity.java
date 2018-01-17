@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
             // restart service
             Intent intent = new Intent(MainActivity.this, Service.class);
             startService(intent);
-            bindService(intent, connection, BIND_IMPORTANT | BIND_AUTO_CREATE);
+//            bindService(intent, connection, BIND_IMPORTANT | BIND_AUTO_CREATE);
         }
     };
 
@@ -58,6 +58,8 @@ public class MainActivity extends Activity {
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                unbindService(connection);
+                stopService(new Intent(MainActivity.this, Service.class));
                 finish();
             }
         });
@@ -169,7 +171,5 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(connection);
-        stopService(new Intent(this, Service.class));
     }
 }
