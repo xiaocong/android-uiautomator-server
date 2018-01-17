@@ -21,6 +21,16 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'com.gladed.androidgitversion' version '0.4.3'
+}
+
 apply plugin: 'com.android.application'
 
 android {
@@ -35,8 +45,8 @@ android {
         applicationId "com.github.uiautomator"
         minSdkVersion 18
         targetSdkVersion 22
-        versionCode 6
-        versionName "1.0.6"
+        versionCode androidGitVersion.code()
+        versionName androidGitVersion.name()
     }
 
     signingConfigs {
@@ -83,11 +93,7 @@ dependencies {
     androidTestCompile 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.5.0'
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
+
 repositories {
     mavenCentral()
 }

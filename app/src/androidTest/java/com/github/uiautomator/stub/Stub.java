@@ -1,6 +1,6 @@
 /*
  * The MIT License (MIT)
- * Copyright (c) 2015 xiaocong@gmail.com
+ * Copyright (c) 2015 xiaocong@gmail.com, 2018 codeskyblue@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -74,6 +74,7 @@ public class Stub {
         Context context = InstrumentationRegistry.getContext();
         final String packageName = "com.github.uiautomator";
 
+
 //        Useless: Check if service is running
 //        if (Helper.isAppRunning(context, packageName)) {
 //            Log.i(TAG, "Service is running");
@@ -81,8 +82,8 @@ public class Stub {
 //            return;
 //        }
 
-        Log.i(TAG, "Launch service");
-        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
+//        Log.i(TAG, "Launch service");
+//        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
 
 //        Log.i(TAG, "Launch " + packageName);
 //        final Intent intent = context.getPackageManager()
@@ -99,7 +100,7 @@ public class Stub {
     public void tearDown() {
         server.stop();
         Context context = InstrumentationRegistry.getContext();
-        context.startService(new Intent("com.github.uiautomator.ACTION_STOP"));
+        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
     }
 
     @Test
