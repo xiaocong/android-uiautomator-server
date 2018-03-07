@@ -23,6 +23,7 @@
 
 package com.github.uiautomator.stub;
 
+import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.UiAutomation;
 import android.os.RemoteException;
 import android.os.SystemClock;
@@ -39,6 +40,7 @@ import android.support.test.uiautomator.Until;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.accessibility.AccessibilityEvent;
 
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
 import com.github.uiautomator.stub.watcher.PressKeysWatcher;
@@ -47,6 +49,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -86,6 +89,25 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public DeviceInfo deviceInfo() {
         return DeviceInfo.getDeviceInfo();
+    }
+
+    /**
+     * Enable or disable auto install
+     *
+     * @param patterns is trigger conditions
+     */
+    @Override
+    public void setAccessibilityPatterns(HashMap<String, String[]> patterns) {
+        String[] packageNames = patterns.keySet().toArray(new String[patterns.size()]);
+        for (String name : packageNames) {
+            Log.d("Accessibility package names " + name);
+        }
+        AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
+        serviceInfo.packageNames = packageNames;
+        serviceInfo.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
+        serviceInfo.notificationTimeout = 500;
+        uiAutomation.setServiceInfo(serviceInfo);
+        uiAutomation.setOnAccessibilityEventListener(new EventListener(patterns));
     }
 
     /**
