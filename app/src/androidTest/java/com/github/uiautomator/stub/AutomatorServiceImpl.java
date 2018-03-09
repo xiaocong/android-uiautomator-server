@@ -103,14 +103,18 @@ public class AutomatorServiceImpl implements AutomatorService {
     public void setAccessibilityPatterns(HashMap<String, String[]> patterns) {
         String[] packageNames = patterns.keySet().toArray(new String[patterns.size()]);
         for (String name : packageNames) {
-            Log.d("Accessibility package names " + name);
+            Log.d("Accessibility package name " + name);
         }
         AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
         serviceInfo.packageNames = packageNames;
         serviceInfo.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
         serviceInfo.notificationTimeout = 500;
         uiAutomation.setServiceInfo(serviceInfo);
-        uiAutomation.setOnAccessibilityEventListener(new EventListener(patterns));
+        if (patterns.isEmpty()){
+            uiAutomation.setOnAccessibilityEventListener(null);
+        } else {
+            uiAutomation.setOnAccessibilityEventListener(new EventListener(patterns));
+        }
     }
 
     @Override
