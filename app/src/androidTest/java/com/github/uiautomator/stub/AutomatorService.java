@@ -50,6 +50,30 @@ public interface AutomatorService {
      */
     void setAccessibilityPatterns(HashMap<String, String[]> patterns);
 
+    /**
+     *  show toast text in seconds
+     * @param text the text to show
+     * @param duration text duration
+     * @return true if text is shown, false otherwise
+     */
+    boolean makeToast(String text, int duration);
+
+    /**
+     * get last toast text
+     *
+     * @return the latest toast text or empty String
+     * @throws NotImplementedException
+     */
+    String getLastToast() throws NotImplementedException;
+
+    /**
+     * clear the last toast text and set
+     *
+     * @return true if we clear the last toast text, false otherwise
+     * @throws NotImplementedException
+     */
+    boolean clearLastToast() throws NotImplementedException;
+
     /***************************************************************************
      * Below section contains all methods from UiDevice.
      ***************************************************************************/

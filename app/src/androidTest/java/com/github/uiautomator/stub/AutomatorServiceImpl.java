@@ -25,6 +25,8 @@ package com.github.uiautomator.stub;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.UiAutomation;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
@@ -42,6 +44,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.github.uiautomator.ToastHelper;
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
 import com.github.uiautomator.stub.watcher.PressKeysWatcher;
 
@@ -108,6 +111,34 @@ public class AutomatorServiceImpl implements AutomatorService {
         serviceInfo.notificationTimeout = 500;
         uiAutomation.setServiceInfo(serviceInfo);
         uiAutomation.setOnAccessibilityEventListener(new EventListener(patterns));
+    }
+
+    @Override
+    public boolean makeToast(final String text, final int duration) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                ToastHelper.makeText(InstrumentationRegistry.getTargetContext(), text, duration).show();
+            }
+        });
+
+//        Intent intent = new Intent("com.github.uiautomator.ACTION_TOAST");
+//        intent.setPackage("com.github.uiautomator");
+//        intent.putExtra("text", text);
+//        intent.putExtra("duration", duration);
+//        InstrumentationRegistry.getContext().startService(intent);
+        return true;
+    }
+
+    @Override
+    public String getLastToast() throws NotImplementedException {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public boolean clearLastToast() throws NotImplementedException {
+        throw new NotImplementedException();
     }
 
     /**
