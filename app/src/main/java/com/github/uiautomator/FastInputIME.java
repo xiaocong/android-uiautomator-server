@@ -10,10 +10,13 @@ import android.inputmethodservice.KeyboardView;
 import android.os.IBinder;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
@@ -28,14 +31,16 @@ public class FastInputIME extends InputMethodService {
         KeyboardView keyboardView = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
         IntentFilter filter = new IntentFilter();
         filter.addAction("ADB_INPUT_TEXT");
+        filter.addAction("ADB_INPUT_KEYCODE");
         filter.addAction("ADB_CLEAR_TEXT");
+        filter.addAction("ADB_SET_TEXT"); // Equals to: Clear then Input
         // TODO: filter.addAction("ADB_INPUT_CHARS");
         // TODO: filter.addAction("ADB_EDITOR_CODE");
         // NONEED: filter.addAction(USB_STATE_CHANGE);
         mReceiver = new InputMessageReceiver();
         registerReceiver(mReceiver, filter);
 
-        Keyboard keyboard = new Keyboard(this, R.xml.number_pad);
+        Keyboard keyboard = new Keyboard(this, R.xml.keyboard);
         keyboardView.setKeyboard(keyboard);
         keyboardView.setOnKeyboardActionListener(new MyKeyboardActionListener());
 
@@ -49,6 +54,20 @@ public class FastInputIME extends InputMethodService {
     }
 
     @Override
+    public void onStartInputView(EditorInfo info, boolean restarting) {
+        super.onStartInputView(info, restarting);
+        String text = getText();
+        makeToast("StartInputView: text -- " + text);
+    }
+
+    @Override
+    public void onFinishInputView(boolean finishingInput) {
+        super.onFinishInputView(finishingInput);
+        // send message
+        makeToast("FinishInputView");
+    }
+
+    @Override
     public boolean onEvaluateFullscreenMode() {
         return false;
     }
@@ -57,26 +76,48 @@ public class FastInputIME extends InputMethodService {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            String msgText;
+            InputConnection ic = getCurrentInputConnection();
+            if (ic == null) {
+                return;
+            }
             switch (action) {
                 case "ADB_INPUT_TEXT":
-                    String msg = intent.getStringExtra("text");
-                    if (msg == null) {
+                    /* test method
+                     * TEXT=$(echo -n "Hello World" | base64)
+                     * adb shell am broadcast -a ADB_INPUT_TEXT --es text ${TEXT:-"SGVsbG8gd29ybGQ="}
+                     */
+                    msgText = intent.getStringExtra("text");
+                    if (msgText == null) {
                         return;
                     }
-                    Log.i(TAG, "input text(base64): " + msg);
-                    byte[] data = Base64.decode(msg, Base64.DEFAULT);
-                    try {
-                        String text = new String(data, "UTF-8");
-                        InputConnection ic = getCurrentInputConnection();
-                        ic.commitText(text, 1);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                    Log.i(TAG, "input text(base64): " + msgText);
+                    inputTextBase64(msgText);
                     break;
+                case "ADB_INPUT_KEYCODE":
+                    /* test method
+                     * Enter code 66
+                     * adb shell am broadcast -a ADB_INPUT_KEYCODE --ei code 66
+                     */
+                    int code = intent.getIntExtra("code", -1);
+                    if (code != -1) {
+                        ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, code));
+                    }
                 case "ADB_CLEAR_TEXT":
                     Log.i(TAG, "receive ADB_CLEAR_TEXT");
                     clearText();
                     break;
+                case "ADB_SET_TEXT":
+                    Log.i(TAG, "receive ADB_SET_TEXT");
+                    msgText = intent.getStringExtra("text");
+                    if (msgText == null) {
+                        return;
+                    }
+                    Log.i(TAG, "input text(base64): " + msgText);
+                    ic.beginBatchEdit();
+                    clearText();
+                    inputTextBase64(msgText);
+                    ic.endBatchEdit();
             }
         }
     }
@@ -99,7 +140,8 @@ public class FastInputIME extends InputMethodService {
             } else if (primaryCode == -10) {
                 clearText();
             } else if (primaryCode == -5) {
-                switchToLastInputMethod();
+                changeInputMethod();
+                // switchToLastInputMethod();
             } else if (primaryCode == -7) {
                 InputConnection ic = getCurrentInputConnection();
                 ic.commitText(randomString(1), 0);
@@ -130,6 +172,17 @@ public class FastInputIME extends InputMethodService {
         }
     }
 
+    private void inputTextBase64(String base64text) {
+        byte[] data = Base64.decode(base64text, Base64.DEFAULT);
+        try {
+            String text = new String(data, "UTF-8");
+            InputConnection ic = getCurrentInputConnection();
+            ic.commitText(text, 1);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void clearText() {
         // Refs: https://stackoverflow.com/questions/33082004/android-custom-soft-keyboard-how-to-clear-edit-text-commited-text
         InputConnection ic = getCurrentInputConnection();
@@ -140,10 +193,34 @@ public class FastInputIME extends InputMethodService {
         ic.deleteSurroundingText(beforCursorText.length(), afterCursorText.length());
     }
 
+    private String getText() {
+        String text = "";
+        try {
+            InputConnection ic = getCurrentInputConnection();
+            ExtractedTextRequest req = new ExtractedTextRequest();
+            req.hintMaxChars = 100000;
+            req.hintMaxLines = 10000;
+            req.flags = 0;
+            req.token = 0;
+            text = ic.getExtractedText(req, 0).text.toString();
+        } catch (Throwable t) {
+        }
+        return text;
+    }
+
+    private void changeInputMethod() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showInputMethodPicker();
+    }
+
     private void switchToLastInputMethod() {
         final IBinder token = getWindow().getWindow().getAttributes().token;
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.switchToLastInputMethod(token);
+    }
+
+    private void makeToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     public String randomString(int length) {

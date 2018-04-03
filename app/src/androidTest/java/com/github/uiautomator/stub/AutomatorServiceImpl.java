@@ -100,20 +100,17 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param patterns is trigger conditions
      */
     @Override
-    public void setAccessibilityPatterns(HashMap<String, String[]> patterns) {
-        String[] packageNames = patterns.keySet().toArray(new String[patterns.size()]);
-        for (String name : packageNames) {
-            Log.d("Accessibility package name " + name);
-        }
+    public void setAccessibilityPatterns(HashMap<String, String[]> patterns, Selector[] selectors) {
+        // Important: UiAutomator2 is based on accessibility. so we should keep the old eventTypes.
+        // and keep serviceInfo.packageNames unchanged.
         AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
-        serviceInfo.packageNames = packageNames;
-        serviceInfo.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
-        serviceInfo.notificationTimeout = 500;
+        serviceInfo.eventTypes |= AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
         uiAutomation.setServiceInfo(serviceInfo);
-        if (patterns.isEmpty()){
+
+        if (patterns.isEmpty()) {
             uiAutomation.setOnAccessibilityEventListener(null);
         } else {
-            uiAutomation.setOnAccessibilityEventListener(new EventListener(patterns));
+            uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(patterns, InstrumentationRegistry.getInstrumentation(), selectors));
         }
     }
 
@@ -126,12 +123,6 @@ public class AutomatorServiceImpl implements AutomatorService {
                 ToastHelper.makeText(InstrumentationRegistry.getTargetContext(), text, duration).show();
             }
         });
-
-//        Intent intent = new Intent("com.github.uiautomator.ACTION_TOAST");
-//        intent.setPackage("com.github.uiautomator");
-//        intent.putExtra("text", text);
-//        intent.putExtra("duration", duration);
-//        InstrumentationRegistry.getContext().startService(intent);
         return true;
     }
 
@@ -198,6 +189,7 @@ public class AutomatorServiceImpl implements AutomatorService {
     }
 
     // Multi touch is a little complicated
+    @Override
     public boolean injectInputEvent(int action, float x, float y, int metaState) {
         MotionEvent e = MotionEvent.obtain(SystemClock.uptimeMillis(),
                 SystemClock.uptimeMillis(),
@@ -1142,6 +1134,7 @@ public class AutomatorServiceImpl implements AutomatorService {
             this.name = name;
         }
 
+        @Override
         public void run() {
             uiObjects.remove(name);
         }

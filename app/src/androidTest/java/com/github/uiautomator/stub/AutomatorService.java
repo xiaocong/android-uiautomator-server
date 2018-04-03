@@ -24,11 +24,10 @@
 package com.github.uiautomator.stub;
 
 import android.os.RemoteException;
-
 import android.support.test.uiautomator.UiObjectNotFoundException;
 
-import com.googlecode.jsonrpc4j.JsonRpcErrors;
 import com.googlecode.jsonrpc4j.JsonRpcError;
+import com.googlecode.jsonrpc4j.JsonRpcErrors;
 
 import java.util.HashMap;
 
@@ -48,11 +47,12 @@ public interface AutomatorService {
      * @param patterns key is packageName, values is button names
      * @throws NotImplementedException
      */
-    void setAccessibilityPatterns(HashMap<String, String[]> patterns);
+    void setAccessibilityPatterns(HashMap<String, String[]> patterns, Selector[] selectors);
 
     /**
-     *  show toast text in seconds
-     * @param text the text to show
+     * show toast text in seconds
+     *
+     * @param text     the text to show
      * @param duration text duration
      * @return true if text is shown, false otherwise
      */

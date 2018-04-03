@@ -1,7 +1,7 @@
 package com.github.uiautomator.stub;
 
+import android.app.Instrumentation;
 import android.app.UiAutomation;
-import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
@@ -16,25 +16,25 @@ import java.util.List;
  * Created by hzsunshx on 2018/3/7.
  */
 
-public class EventListener implements UiAutomation.OnAccessibilityEventListener {
+public class AccessibilityEventListener implements UiAutomation.OnAccessibilityEventListener {
     //    private String[] buttonTexts; // For example: "确定", "安装", "继续安装", "下一步", "完成"
     private HashMap<String, String[]> patterns;
+    private Selector[] selectors;
+    private HashMap<String, List<Selector>> selectorMap;
+    private Instrumentation mInstrumentation;
 
-    public EventListener(HashMap<String, String[]> patterns) {
+    public AccessibilityEventListener(HashMap<String, String[]> patterns, Instrumentation instrumentation, Selector[] selectors) {
         this.patterns = patterns;
+        this.mInstrumentation = instrumentation;
+        this.selectors = selectors;
     }
 
     @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {
-        Log.d("Accessibility event " + event.toString());
-        Log.d("Package name " + event.getPackageName());
-        for (String packageName : this.patterns.keySet()) {
-            if (event.getPackageName().equals(packageName)) {
-                String[] labels = patterns.get(packageName);
-                boolean r = performInstallation(event, labels);
-                Log.d("Action perform: " + TextUtils.join(", ", labels) + " " + r);
-            }
+    public void onAccessibilityEvent(final AccessibilityEvent event) {
+        if (event.getPackageName() == null) {
+            return;
         }
+        CharSequence packageName = event.getPackageName();
     }
 
     private boolean performInstallation(AccessibilityEvent event, String[] texts) {

@@ -31,6 +31,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.filters.SdkSuppress;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.Configurator;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.Until;
 
@@ -92,6 +93,13 @@ public class Stub {
 
         Log.d("Launch service");
         context.startService(new Intent("com.github.uiautomator.ACTION_START"));
+
+        // Reset Configurator Wait Timeout
+        Configurator configurator = Configurator.getInstance();
+        configurator.setWaitForSelectorTimeout(0L);
+
+        // BUG(uiautomator): setWaitForIdleTimeout is useless
+        // Refs: https://www.ydkf.me/archives/22
     }
 
     @After

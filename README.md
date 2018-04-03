@@ -32,7 +32,16 @@ For example:
 
 Send to FastInputIME with broadcast
 
-    $ adb shell am broadcast -a ADB_INPUT_TEXT --es text SGVsbG8g5L2g5aW9
+```bash
+# Append text to input field
+adb shell am broadcast -a ADB_INPUT_TEXT --es text SGVsbG8g5L2g5aW9
+# Clear text
+adb shell am broadcast -a ADB_CLEAR_TEXT
+# Clear text before append text
+adb shell am broadcast -a ADB_SET_TEXT --es text SGVsbG8g5L2g5aW9
+# Send keycode, eg: ENTER
+adb shell am broadcast -a ADB_INPUT_KEYCODE --ei code 66
+```
 
 # How to use
 
@@ -56,7 +65,7 @@ conventional-changelog -p grunt -i CHANGELOG.md -s -r 0
 
 # Notes
 
-If you have any idea, please email xiaocong@gmail.com or [submit tickets](https://github.com/xiaocong/uiautomator/issues/new).
+If you have any idea, please email codeskyblue@gmail.com or [submit tickets](https://github.com/openatx/android-uiautomator-server/issues/new).
 
 # Dependencies
 
@@ -68,3 +77,8 @@ If you have any idea, please email xiaocong@gmail.com or [submit tickets](https:
 
 - ~~move from java to kotlin~~
 - [x] support unicode input
+
+# Thanks to
+- [xiaocong](https://github.com/xiaocong)
+- https://github.com/willerce/WhatsInput
+- https://github.com/senzhk/ADBKeyBoard
