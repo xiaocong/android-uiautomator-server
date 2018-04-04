@@ -110,7 +110,7 @@ public class AutomatorServiceImpl implements AutomatorService {
         if (patterns.isEmpty()) {
             uiAutomation.setOnAccessibilityEventListener(null);
         } else {
-            uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(patterns, InstrumentationRegistry.getInstrumentation(), selectors));
+            uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(patterns));
         }
     }
 

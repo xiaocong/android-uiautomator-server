@@ -2,9 +2,12 @@ package com.github.uiautomator.stub;
 
 import android.app.Instrumentation;
 import android.app.UiAutomation;
+import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
+
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,10 +26,10 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
     private HashMap<String, List<Selector>> selectorMap;
     private Instrumentation mInstrumentation;
 
-    public AccessibilityEventListener(HashMap<String, String[]> patterns, Instrumentation instrumentation, Selector[] selectors) {
+    public AccessibilityEventListener(HashMap<String, String[]> patterns) {
         this.patterns = patterns;
-        this.mInstrumentation = instrumentation;
-        this.selectors = selectors;
+
+        // this.selectors = selectors;
     }
 
     @Override
@@ -34,7 +37,14 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
         if (event.getPackageName() == null) {
             return;
         }
-        CharSequence packageName = event.getPackageName();
+        CharSequence eventPackageName = event.getPackageName();
+        for (String packageName : this.patterns.keySet()){
+            if (packageName.equals(eventPackageName)){
+                String[] labels = patterns.get(eventPackageName);
+                boolean r = performInstallation(event, labels);
+                Log.d("Action perform: "+ TextUtils.join(", ", labels) + " " + r);
+            }
+        }
     }
 
     private boolean performInstallation(AccessibilityEvent event, String[] texts) {
@@ -43,8 +53,8 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
             nodeInfoList = event.getSource().findAccessibilityNodeInfosByText(text);
             // Note: findAccessibilityNodeInfosByText will return all node which contains text
             if (nodeInfoList != null && !nodeInfoList.isEmpty()) {
-                boolean performed = performClick(nodeInfoList, text, Button.class.getName());
-                if (performed) return true;
+//                boolean performed = performClick(nodeInfoList, text, Button.class.getName());
+//                if (performed) return true;
             }
         }
         return false;

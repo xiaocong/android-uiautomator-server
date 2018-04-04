@@ -18,13 +18,24 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.github.uiautomator.monitor.HttpPostNotifier;
+
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 public class FastInputIME extends InputMethodService {
     private static final String TAG = "FastInputIME";
-
     private BroadcastReceiver mReceiver = null;
+    protected OkHttpClient httpClient = new OkHttpClient();
 
     @Override
     public View onCreateInputView() {
@@ -58,6 +69,7 @@ public class FastInputIME extends InputMethodService {
         super.onStartInputView(info, restarting);
         String text = getText();
         makeToast("StartInputView: text -- " + text);
+        sendRequestToATXAgent("I"+text);
     }
 
     @Override
@@ -65,6 +77,7 @@ public class FastInputIME extends InputMethodService {
         super.onFinishInputView(finishingInput);
         // send message
         makeToast("FinishInputView");
+        sendRequestToATXAgent("F");
     }
 
     @Override
@@ -111,7 +124,7 @@ public class FastInputIME extends InputMethodService {
                     Log.i(TAG, "receive ADB_SET_TEXT");
                     msgText = intent.getStringExtra("text");
                     if (msgText == null) {
-                        return;
+                        msgText = "";
                     }
                     Log.i(TAG, "input text(base64): " + msgText);
                     ic.beginBatchEdit();
@@ -220,7 +233,26 @@ public class FastInputIME extends InputMethodService {
     }
 
     private void makeToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void sendRequestToATXAgent(String text) {
+        RequestBody body = RequestBody.create(MediaType.parse("text/plain; charset=utf-8"), text);
+        Request request = new Request.Builder()
+                .url("http://127.0.0.1:7912/whatsinput")
+                .post(body)
+                .build();
+        httpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                Log.i(TAG, "StartInputView text send to atx-agent");
+            }
+        });
     }
 
     public String randomString(int length) {
