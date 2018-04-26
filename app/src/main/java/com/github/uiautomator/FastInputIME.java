@@ -7,7 +7,10 @@ import android.content.IntentFilter;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -16,12 +19,14 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
-import com.github.uiautomator.monitor.HttpPostNotifier;
-
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.Socket;
 import java.util.Random;
 
 import okhttp3.Call;
@@ -36,6 +41,24 @@ public class FastInputIME extends InputMethodService {
     private static final String TAG = "FastInputIME";
     private BroadcastReceiver mReceiver = null;
     protected OkHttpClient httpClient = new OkHttpClient();
+    protected static final int INPUT_EDIT = 1;
+    Socket socketClient;
+    WhatsInputThread inputThread;
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case INPUT_EDIT:
+                    String text = msg.getData().getString("text");
+                    setText(text);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     public View onCreateInputView() {
@@ -58,10 +81,73 @@ public class FastInputIME extends InputMethodService {
         return keyboardView;
     }
 
+    class WhatsInputThread extends Thread {
+        private Socket socketClient;
+
+        public void stopThread() {
+            try {
+                if (this.socketClient != null) {
+                    this.socketClient.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                socketClient = new Socket("127.0.0.1", 7912);
+                Writer writer = new OutputStreamWriter(socketClient.getOutputStream());
+                writer.write("CONNECT /whatsinput HTTP/1.1\r\nHost: FastInputIME\r\n\r\n");
+                writer.flush();
+                Log.i(TAG, "/whatsinput connected");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
+                while (!Thread.currentThread().isInterrupted()) {
+                    String line = reader.readLine();
+                    if (line == null || "".equals(line)) {
+                        Log.i(TAG, "Read line empty, maybe disconnected");
+                        break;
+                    }
+                    if (line.charAt(0) == 'I') {
+                        line = line.substring(1);
+                        Log.i(TAG, "Raw data: " + line);
+                        String text = new String(Base64.decode(line, Base64.DEFAULT), "UTF-8");
+                        Log.i(TAG, "Real data: " + text);
+
+                        Bundle data = new Bundle();
+                        data.putString("text", text);
+                        Message message = new Message();
+                        message.what = INPUT_EDIT;
+                        message.setData(data);
+                        handler.sendMessage(message);
+                    } else {
+                        break;
+                    }
+                }
+
+                socketClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                Log.i(TAG, "/whatsinput disconnected");
+            }
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        inputThread = new WhatsInputThread();
+        inputThread.start();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mReceiver);
+        Log.i(TAG, "input destroyed");
+        inputThread.stopThread();
     }
 
     @Override
@@ -69,7 +155,7 @@ public class FastInputIME extends InputMethodService {
         super.onStartInputView(info, restarting);
         String text = getText();
         makeToast("StartInputView: text -- " + text);
-        sendRequestToATXAgent("I"+text);
+        sendRequestToATXAgent("I" + text);
     }
 
     @Override
@@ -200,7 +286,6 @@ public class FastInputIME extends InputMethodService {
         // Refs: https://stackoverflow.com/questions/33082004/android-custom-soft-keyboard-how-to-clear-edit-text-commited-text
         InputConnection ic = getCurrentInputConnection();
         CharSequence currentText = ic.getExtractedText(new ExtractedTextRequest(), 0).text;
-        Log.d(TAG, "Current text: " + currentText);
         CharSequence beforCursorText = ic.getTextBeforeCursor(currentText.length(), 0);
         CharSequence afterCursorText = ic.getTextAfterCursor(currentText.length(), 0);
         ic.deleteSurroundingText(beforCursorText.length(), afterCursorText.length());
@@ -221,6 +306,17 @@ public class FastInputIME extends InputMethodService {
         return text;
     }
 
+    private void setText(String text) {
+        InputConnection ic = getCurrentInputConnection();
+        if (ic == null) {
+            return;
+        }
+        ic.beginBatchEdit();
+        clearText();
+        ic.commitText(text, 1);
+        ic.endBatchEdit();
+    }
+
     private void changeInputMethod() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showInputMethodPicker();
@@ -233,7 +329,7 @@ public class FastInputIME extends InputMethodService {
     }
 
     private void makeToast(String msg) {
-        // Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     private void sendRequestToATXAgent(String text) {

@@ -31,6 +31,7 @@ import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.Direction;
+import android.support.test.uiautomator.StaleObjectException;
 import android.support.test.uiautomator.UiCollection;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
@@ -52,7 +53,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -96,21 +96,21 @@ public class AutomatorServiceImpl implements AutomatorService {
 
     /**
      * Enable or disable auto install
-     *
-     * @param patterns is trigger conditions
      */
     @Override
-    public void setAccessibilityPatterns(HashMap<String, String[]> patterns, Selector[] selectors) {
+    public void runWatchersOnWindowsChanged(boolean enabled) {
         // Important: UiAutomator2 is based on accessibility. so we should keep the old eventTypes.
         // and keep serviceInfo.packageNames unchanged.
         AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
-        serviceInfo.eventTypes |= AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
-        uiAutomation.setServiceInfo(serviceInfo);
-
-        if (patterns.isEmpty()) {
-            uiAutomation.setOnAccessibilityEventListener(null);
+        final int windowChangeEventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
+        if (enabled) {
+            serviceInfo.eventTypes |= windowChangeEventTypes;
+            uiAutomation.setServiceInfo(serviceInfo);
+            uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(device));
         } else {
-            uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(patterns));
+            serviceInfo.eventTypes &= ~windowChangeEventTypes;
+            uiAutomation.setServiceInfo(serviceInfo);
+            uiAutomation.setOnAccessibilityEventListener(null);
         }
     }
 
@@ -552,7 +552,7 @@ public class AutomatorServiceImpl implements AutomatorService {
     public void clearTextField(Selector obj) throws UiObjectNotFoundException {
         try {
             obj.toUiObject2().clear();
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | StaleObjectException e) {
             device.findObject(obj.toUiSelector()).clearTextField();
         }
 
@@ -588,7 +588,7 @@ public class AutomatorServiceImpl implements AutomatorService {
             obj.toUiObject2().click();
             obj.toUiObject2().setText(text);
             return true;
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | StaleObjectException e) {
             return device.findObject(obj.toUiSelector()).setText(text);
         }
     }

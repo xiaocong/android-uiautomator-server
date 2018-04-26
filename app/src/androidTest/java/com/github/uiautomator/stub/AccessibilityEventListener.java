@@ -1,15 +1,10 @@
 package com.github.uiautomator.stub;
 
-import android.app.Instrumentation;
 import android.app.UiAutomation;
-import android.text.TextUtils;
+import android.support.test.uiautomator.UiDevice;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.widget.Button;
 
-import org.w3c.dom.Text;
-
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,16 +15,10 @@ import java.util.List;
  */
 
 public class AccessibilityEventListener implements UiAutomation.OnAccessibilityEventListener {
-    //    private String[] buttonTexts; // For example: "确定", "安装", "继续安装", "下一步", "完成"
-    private HashMap<String, String[]> patterns;
-    private Selector[] selectors;
-    private HashMap<String, List<Selector>> selectorMap;
-    private Instrumentation mInstrumentation;
+    private UiDevice device;
 
-    public AccessibilityEventListener(HashMap<String, String[]> patterns) {
-        this.patterns = patterns;
-
-        // this.selectors = selectors;
+    public AccessibilityEventListener(UiDevice device) {
+        this.device = device;
     }
 
     @Override
@@ -37,13 +26,8 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
         if (event.getPackageName() == null) {
             return;
         }
-        CharSequence eventPackageName = event.getPackageName();
-        for (String packageName : this.patterns.keySet()){
-            if (packageName.equals(eventPackageName)){
-                String[] labels = patterns.get(eventPackageName);
-                boolean r = performInstallation(event, labels);
-                Log.d("Action perform: "+ TextUtils.join(", ", labels) + " " + r);
-            }
+        if ((event.getEventType() & (AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED)) != 0) {
+            device.runWatchers();
         }
     }
 

@@ -29,8 +29,6 @@ import android.support.test.uiautomator.UiObjectNotFoundException;
 import com.googlecode.jsonrpc4j.JsonRpcError;
 import com.googlecode.jsonrpc4j.JsonRpcErrors;
 
-import java.util.HashMap;
-
 public interface AutomatorService {
     final static int ERROR_CODE_BASE = -32000;
 
@@ -44,10 +42,10 @@ public interface AutomatorService {
     /**
      * Auto click permission popups
      *
-     * @param patterns key is packageName, values is button names
+     * @param enabled to enable runWatches on windowChanged
      * @throws NotImplementedException
      */
-    void setAccessibilityPatterns(HashMap<String, String[]> patterns, Selector[] selectors);
+    void runWatchersOnWindowsChanged(boolean enabled);
 
     /**
      * show toast text in seconds
