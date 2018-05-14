@@ -7,17 +7,14 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.util.Log;
 
-public class adbBrodcastReceiver extends BroadcastReceiver {
+public class AdbBrodcastReceiver extends BroadcastReceiver {
 
     MockLocationProvider mockGPS;
     MockLocationProvider mockWifi;
-    String logTag="MockGpsadbBrodcastReceiver";
+    String TAG ="MockGpsadbBrodcastReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
-
-
         if (intent.getAction().equals("stop.mock")) {
             if (mockGPS!=null) {
                 mockGPS.shutdown();
@@ -37,7 +34,7 @@ public class adbBrodcastReceiver extends BroadcastReceiver {
             lon = Double.parseDouble(intent.getStringExtra("lon") != null ? intent.getStringExtra("lon") : "0");
             alt = Double.parseDouble(intent.getStringExtra("alt") != null ? intent.getStringExtra("alt") : "0");
             accurate = Float.parseFloat(intent.getStringExtra("accurate") != null ? intent.getStringExtra("accurate") : "0");
-            Log.i(logTag, String.format("setting mock to Latitude=%f, Longitude=%f Altitude=%f Accuracy=%f", lat, lon, alt, accurate));
+            Log.i(TAG, String.format("setting mock to Latitude=%f, Longitude=%f Altitude=%f Accuracy=%f", lat, lon, alt, accurate));
             mockGPS.pushLocation(lat, lon, alt, accurate);
             mockWifi.pushLocation(lat, lon, alt, accurate);
         }

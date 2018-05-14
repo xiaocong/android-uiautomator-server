@@ -44,7 +44,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <receiver
-            android:name=".adbBrodcastReceiver"
+            android:name=".AdbBrodcastReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
