@@ -33,15 +33,23 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.test.uiautomator.By;
 import android.support.test.uiautomator.Configurator;
 import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.Until;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.googlecode.jsonrpc4j.ErrorResolver;
 import com.googlecode.jsonrpc4j.JsonRpcServer;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Use JUnit test to start the uiautomator jsonrpc server.
@@ -53,7 +61,8 @@ import org.junit.runner.RunWith;
 public class Stub {
     private final String TAG = "UIAUTOMATOR";
     private static final int LAUNCH_TIMEOUT = 5000;
-
+    // http://www.jsonrpc.org/specification#error_object
+    private static final int CUSTOM_ERROR_CODE = -32001;
 
     int PORT = 9008;
     AutomatorHttpServer server = new AutomatorHttpServer(PORT);
@@ -61,7 +70,22 @@ public class Stub {
     @Before
     public void setUp() throws Exception {
         launchService();
-        server.route("/jsonrpc/0", new JsonRpcServer(new ObjectMapper(), new AutomatorServiceImpl(), AutomatorService.class));
+        JsonRpcServer jrs = new JsonRpcServer(new ObjectMapper(), new AutomatorServiceImpl(), AutomatorService.class);
+        jrs.setShouldLogInvocationErrors(true);
+        jrs.setErrorResolver(new ErrorResolver() {
+            @Override
+            public JsonError resolveError(Throwable throwable, Method method, List<JsonNode> list) {
+                String data = throwable.getMessage();
+                if (!throwable.getClass().equals(UiObjectNotFoundException.class)) {
+                    throwable.printStackTrace();
+                    StringWriter sw = new StringWriter();
+                    throwable.printStackTrace(new PrintWriter(sw));
+                    data = sw.toString();
+                }
+                return new JsonError(CUSTOM_ERROR_CODE, throwable.getClass().getName(), data);
+            }
+        });
+        server.route("/jsonrpc/0", jrs);
         server.start();
     }
 

@@ -81,7 +81,7 @@ public class Service extends android.app.Service {
         } else if (ACTION_STOP.equals(action)) {
             stopSelf();
         } else {
-            Log.e(TAG, "Unknown action " + action);
+            Log.w(TAG, "Unknown action " + action);
         }
 
         return START_NOT_STICKY; // not start again, when killed by system
