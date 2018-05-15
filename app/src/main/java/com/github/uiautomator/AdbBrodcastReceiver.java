@@ -11,19 +11,18 @@ public class AdbBrodcastReceiver extends BroadcastReceiver {
 
     MockLocationProvider mockGPS;
     MockLocationProvider mockWifi;
-    String TAG ="MockGpsadbBrodcastReceiver";
+    String TAG = "MockGPSReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("stop.mock")) {
-            if (mockGPS!=null) {
+            if (mockGPS != null) {
                 mockGPS.shutdown();
             }
-            if (mockWifi!=null) {
+            if (mockWifi != null) {
                 mockWifi.shutdown();
             }
-        }
-        else {
+        } else {
             mockGPS = new MockLocationProvider(LocationManager.GPS_PROVIDER, context);
             mockWifi = new MockLocationProvider(LocationManager.NETWORK_PROVIDER, context);
 

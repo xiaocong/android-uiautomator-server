@@ -47,7 +47,7 @@ adb shell am broadcast -a ADB_INPUT_KEYCODE --ei code 66
 You can change mock location from terminal using adb in order to test GPS on real devices.
 
 ```
-adb [-s <specific device>] shell am broadcast -a send.mock [-e lat<latitude>] [-e lon <longitude>]
+adb [-s <specific device>] shell am broadcast -a send.mock [-e lat <latitude>] [-e lon <longitude>]
         [-e alt <altitude>] [-e accurate <accurate>]
 ```
 

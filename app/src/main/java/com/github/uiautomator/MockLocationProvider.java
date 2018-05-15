@@ -23,7 +23,7 @@ class MockLocationProvider {
         lm.setTestProviderEnabled(providerName, true);
     }
 
-    void pushLocation(double lat, double lon,double alt,float accuracy) {
+    void pushLocation(double lat, double lon, double alt, float accuracy) {
         LocationManager lm = (LocationManager) ctx.getSystemService(
                 Context.LOCATION_SERVICE);
 
@@ -33,7 +33,7 @@ class MockLocationProvider {
         mockLocation.setAltitude(alt);
         mockLocation.setTime(System.currentTimeMillis());
         mockLocation.setAccuracy(accuracy);
-        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             mockLocation.setElapsedRealtimeNanos(SystemClock.elapsedRealtimeNanos());
         }
         lm.setTestProviderLocation(providerName, mockLocation);
