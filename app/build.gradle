@@ -66,6 +66,12 @@ android {
         }
     }
 
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
+
     defaultConfig {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
