@@ -97,3 +97,4 @@ If you have any idea, please email codeskyblue@gmail.com or [submit tickets](htt
 - [xiaocong](https://github.com/xiaocong)
 - https://github.com/willerce/WhatsInput
 - https://github.com/senzhk/ADBKeyBoard
+- https://github.com/amotzte/android-mock-location-for-development
