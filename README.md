@@ -13,13 +13,17 @@ that we can just write PC side script to write UIAutomator tests.
 
 - Run command:
 
-        $ ./gradlew build
-        $ ./gradlew packageDebugAndroidTest
+```bash
+$ ./gradlew build
+$ ./gradlew packageDebugAndroidTest
+```
 
 - Run the jsonrcp server on Android device
 
-        $ ./gradlew cC
-        $ adb forward tcp:9008 tcp:9008 # tcp forward
+```bash
+$ ./gradlew cC
+$ adb forward tcp:9008 tcp:9008 # tcp forward
+```
 
 # The buildin input method
 **Fast input method**
@@ -87,11 +91,15 @@ If you have any idea, please email codeskyblue@gmail.com or [submit tickets](htt
 - [nanohttpd](https://github.com/NanoHttpd/nanohttpd)
 - [jsonrpc4j](https://github.com/briandilley/jsonrpc4j)
 - [jackson](https://github.com/FasterXML/jackson)
+- [com.android.support.test.uiautomator](https://mvnrepository.com/artifact/com.android.support.test.uiautomator/uiautomator-v18)
 
-# TODO
-
-- ~~move from java to kotlin~~
+# Added features
 - [x] support unicode input
+
+# Resources
+- [Google UiAutomator Tutorial](https://developer.android.com/training/testing/ui-testing/uiautomator-testing?hl=zh-cn)
+- [Google UiAutomator API](https://developer.android.com/reference/android/support/test/uiautomator/package-summary?hl=zh-cn)
+- [Maven repository of uiautomator-v18](https://mvnrepository.com/artifact/com.android.support.test.uiautomator/uiautomator-v18)
 
 # Thanks to
 - [xiaocong](https://github.com/xiaocong)

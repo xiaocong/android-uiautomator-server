@@ -30,6 +30,7 @@ import android.os.Looper;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.uiautomator.Configurator;
 import android.support.test.uiautomator.Direction;
 import android.support.test.uiautomator.StaleObjectException;
 import android.support.test.uiautomator.UiCollection;
@@ -70,8 +71,13 @@ public class AutomatorServiceImpl implements AutomatorService {
     private UiAutomation uiAutomation;
 
     public AutomatorServiceImpl() {
-        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         this.uiAutomation = InstrumentationRegistry.getInstrumentation().getUiAutomation();
+        this.device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+
+        // Reset Configurator Wait Timeout
+        Configurator configurator = Configurator.getInstance();
+        configurator.setWaitForSelectorTimeout(0L);
+        configurator.setWaitForIdleTimeout(0L);
     }
 
     /**

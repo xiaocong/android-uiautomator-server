@@ -117,13 +117,6 @@ public class Stub {
 
         Log.d("Launch service");
         context.startService(new Intent("com.github.uiautomator.ACTION_START"));
-
-        // Reset Configurator Wait Timeout
-        Configurator configurator = Configurator.getInstance();
-        configurator.setWaitForSelectorTimeout(0L);
-
-        // BUG(uiautomator): setWaitForIdleTimeout is useless
-        // Refs: https://www.ydkf.me/archives/22
     }
 
     @After
