@@ -23,7 +23,6 @@
 
 package com.github.uiautomator.stub;
 
-import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.UiAutomation;
 import android.os.Handler;
 import android.os.Looper;
@@ -133,13 +132,17 @@ public class AutomatorServiceImpl implements AutomatorService {
     }
 
     @Override
-    public String getLastToast() throws NotImplementedException {
-        return AccessibilityEventListener.getInstance().toastMessage;
+    public String getLastToast(long cacheDuration) {
+        AccessibilityEventListener instance = AccessibilityEventListener.getInstance();
+        if (System.currentTimeMillis() < cacheDuration + instance.toastTime) {
+            return instance.toastMessage;
+        }
+        return null;
     }
 
     @Override
-    public boolean clearLastToast() throws NotImplementedException {
-        AccessibilityEventListener.getInstance().toastMessage = "";
+    public boolean clearLastToast() {
+        AccessibilityEventListener.getInstance().toastMessage = null;
         return true;
     }
 

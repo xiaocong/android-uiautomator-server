@@ -43,7 +43,6 @@ public interface AutomatorService {
      * Auto click permission popups
      *
      * @param enabled to enable runWatches on windowChanged
-     * @throws NotImplementedException
      */
     void runWatchersOnWindowsChange(boolean enabled);
 
@@ -64,18 +63,17 @@ public interface AutomatorService {
     /**
      * get last toast text
      *
+     * @param cacheDuration milliseconds
      * @return the latest toast text or empty String
-     * @throws NotImplementedException
      */
-    String getLastToast() throws NotImplementedException;
+    String getLastToast(long cacheDuration);
 
     /**
      * clear the last toast text and set
      *
      * @return true if we clear the last toast text, false otherwise
-     * @throws NotImplementedException
      */
-    boolean clearLastToast() throws NotImplementedException;
+    boolean clearLastToast();
 
     /***************************************************************************
      * Below section contains all methods from UiDevice.

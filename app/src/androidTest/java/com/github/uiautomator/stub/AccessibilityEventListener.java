@@ -17,6 +17,7 @@ import android.view.accessibility.AccessibilityEvent;
 public class AccessibilityEventListener implements UiAutomation.OnAccessibilityEventListener {
     public String toastMessage;
     public Boolean triggerWatchers = false;
+    public long toastTime;
 
     private static AccessibilityEventListener instance;
     private UiDevice device;
@@ -45,36 +46,10 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
             Parcelable parcelable = event.getParcelableData();
             if (!(parcelable instanceof Notification)) { // without Notification is Toast
                 String packageName = event.getPackageName().toString();
-                long eventTime = event.getEventTime();
+                this.toastTime = System.currentTimeMillis();
                 toastMessage = (String) event.getText().get(0);
-                Log.d("Toast:" + toastMessage + " Pkg:" + packageName + " Time:" + eventTime);
+                Log.d("Toast:" + toastMessage + " Pkg:" + packageName + " Time:" + toastTime);
             }
         }
     }
-
-//    private boolean performInstallation(AccessibilityEvent event, String[] texts) {
-//        List<AccessibilityNodeInfo> nodeInfoList;
-//        for (String text : texts) {
-//            nodeInfoList = event.getSource().findAccessibilityNodeInfosByText(text);
-//            // Note: findAccessibilityNodeInfosByText will return all node which contains text
-//            if (nodeInfoList != null && !nodeInfoList.isEmpty()) {
-////                boolean performed = performClick(nodeInfoList, text, Button.class.getName());
-////                if (performed) return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private boolean performClick(List<AccessibilityNodeInfo> nodeInfoList, String text, String widgetType) {
-//        for (AccessibilityNodeInfo node : nodeInfoList) {
-//            Log.d("travel node: " + node);
-//            if (node.isClickable() && node.isEnabled() && text.equals(node.getText())) {
-//                if (widgetType == null || node.getClassName().equals(widgetType)) {
-//                    Log.d("click: " + node.getText());
-//                    return node.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-//                }
-//            }
-//        }
-//        return false;
-//    }
 }
