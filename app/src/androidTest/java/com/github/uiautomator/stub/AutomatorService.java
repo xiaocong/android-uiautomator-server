@@ -45,7 +45,12 @@ public interface AutomatorService {
      * @param enabled to enable runWatches on windowChanged
      * @throws NotImplementedException
      */
-    void runWatchersOnWindowsChanged(boolean enabled);
+    void runWatchersOnWindowsChange(boolean enabled);
+
+    /**
+     * get watched status
+     */
+    boolean hasWatchedOnWindowsChange();
 
     /**
      * show toast text in seconds

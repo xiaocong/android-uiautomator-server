@@ -44,7 +44,6 @@ import android.support.test.uiautomator.Until;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.accessibility.AccessibilityEvent;
 
 import com.github.uiautomator.ToastHelper;
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
@@ -77,7 +76,12 @@ public class AutomatorServiceImpl implements AutomatorService {
         // Reset Configurator Wait Timeout
         Configurator configurator = Configurator.getInstance();
         configurator.setWaitForSelectorTimeout(0L);
-        configurator.setWaitForIdleTimeout(0L);
+        configurator.setWaitForIdleTimeout(100L);
+        configurator.setActionAcknowledgmentTimeout(500); // 0.5s
+
+        // default uiAutomation serviceInfo.eventTypes is -1
+        // I guess this might be watch all eventTypes
+        uiAutomation.setOnAccessibilityEventListener(AccessibilityEventListener.getInstance());
     }
 
     /**
@@ -101,23 +105,19 @@ public class AutomatorServiceImpl implements AutomatorService {
     }
 
     /**
-     * Enable or disable auto install
+     * Trigger all watchers when TYPE_WINDOW_STATE_CHANGED or TYPE_WINDOW_CONTENT_CHANGED
      */
     @Override
-    public void runWatchersOnWindowsChanged(boolean enabled) {
+    public void runWatchersOnWindowsChange(boolean enabled) {
         // Important: UiAutomator2 is based on accessibility. so we should keep the old eventTypes.
+        // Default eventTypes contains many ...
         // and keep serviceInfo.packageNames unchanged.
-        AccessibilityServiceInfo serviceInfo = uiAutomation.getServiceInfo();
-        final int windowChangeEventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED;
-        if (enabled) {
-            serviceInfo.eventTypes |= windowChangeEventTypes;
-            uiAutomation.setServiceInfo(serviceInfo);
-            uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(device));
-        } else {
-            serviceInfo.eventTypes &= ~windowChangeEventTypes;
-            uiAutomation.setServiceInfo(serviceInfo);
-            uiAutomation.setOnAccessibilityEventListener(null);
-        }
+        AccessibilityEventListener.getInstance().triggerWatchers = enabled;
+    }
+
+    @Override
+    public boolean hasWatchedOnWindowsChange() {
+        return AccessibilityEventListener.getInstance().triggerWatchers;
     }
 
     @Override
@@ -134,12 +134,13 @@ public class AutomatorServiceImpl implements AutomatorService {
 
     @Override
     public String getLastToast() throws NotImplementedException {
-        throw new NotImplementedException();
+        return AccessibilityEventListener.getInstance().toastMessage;
     }
 
     @Override
     public boolean clearLastToast() throws NotImplementedException {
-        throw new NotImplementedException();
+        AccessibilityEventListener.getInstance().toastMessage = "";
+        return true;
     }
 
     /**
