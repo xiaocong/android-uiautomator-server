@@ -74,9 +74,11 @@ public class AutomatorServiceImpl implements AutomatorService {
 
         // Reset Configurator Wait Timeout
         Configurator configurator = Configurator.getInstance();
-        configurator.setWaitForSelectorTimeout(0L);
-        configurator.setWaitForIdleTimeout(100L);
-        configurator.setActionAcknowledgmentTimeout(500); // 0.5s
+        configurator.setWaitForSelectorTimeout(0L); // Default 10000
+        configurator.setWaitForIdleTimeout(0L); // Default 10000
+        configurator.setActionAcknowledgmentTimeout(500); // Default 3000
+        configurator.setScrollAcknowledgmentTimeout(200); // Default 200
+        configurator.setKeyInjectionDelay(0); // Default 0
 
         // default uiAutomation serviceInfo.eventTypes is -1
         // I guess this might be watch all eventTypes
@@ -764,10 +766,13 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public ObjInfo objInfo(Selector obj) throws UiObjectNotFoundException {
-        if (obj.toUiObject2() == null) {
-            return ObjInfo.getObjInfo(device.findObject(obj.toUiSelector()));
-        }
-        return ObjInfo.getObjInfo(obj.toUiObject2());
+        return ObjInfo.getObjInfo(device.findObject(obj.toUiSelector()));
+        // HotFix(ssx): Here always raise StaleObjectException, so not use UiObject2 here
+        // Refs: https://github.com/openatx/uiautomator2/issues/138
+        // if (obj.toUiObject2() == null) {
+        //    return ObjInfo.getObjInfo(device.findObject(obj.toUiSelector()));
+        // }
+        // return ObjInfo.getObjInfo(obj.toUiObject2());
     }
 
     /**
@@ -778,7 +783,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public int count(Selector obj) {
-        if ((obj.getMask() & Selector.MASK_INSTANCE) > 0) {
+        if ((obj.deepSelector().getMask() & Selector.MASK_INSTANCE) > 0) {
             if (device.findObject(obj.toUiSelector()).exists()) return 1;
             else return 0;
         } else {
@@ -786,15 +791,18 @@ public class AutomatorServiceImpl implements AutomatorService {
             if (!device.findObject(sel).exists()) return 0;
             int low = 1;
             int high = 2;
-            sel = sel.instance(high - 1);
+
+            // Note: can not use `sel = sel.instance(high -1)`
+            // because this will change first selector in chain not last.
+            sel = obj.toUiSelector(high - 1);
             while (device.findObject(sel).exists()) {
                 low = high;
                 high = high * 2;
-                sel = sel.instance(high - 1);
+                sel = obj.toUiSelector(high - 1);
             }
             while (high > low + 1) {
                 int mid = (low + high) / 2;
-                sel = sel.instance(mid - 1);
+                sel = obj.toUiSelector(mid - 1);
                 if (device.findObject(sel).exists()) low = mid;
                 else high = mid;
             }
