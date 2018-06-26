@@ -82,7 +82,7 @@ public class AutomatorServiceImpl implements AutomatorService {
 
         // default uiAutomation serviceInfo.eventTypes is -1
         // I guess this might be watch all eventTypes
-        uiAutomation.setOnAccessibilityEventListener(AccessibilityEventListener.getInstance());
+        uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(device, watchers));
     }
 
     /**

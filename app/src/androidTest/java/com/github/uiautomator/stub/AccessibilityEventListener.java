@@ -7,6 +7,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.UiDevice;
 import android.view.accessibility.AccessibilityEvent;
 
+import java.util.HashSet;
+
 /**
  * Used to skip apk auto install && permission popups
  * Called in method: setPermissionPatterns
@@ -19,16 +21,19 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
     public Boolean triggerWatchers = false;
     public long toastTime;
 
+    private HashSet<String> watchers;
     private static AccessibilityEventListener instance;
     private UiDevice device;
 
-    public AccessibilityEventListener(UiDevice device) {
+    public AccessibilityEventListener(UiDevice device, HashSet<String> watchers) {
         this.device = device;
+        this.watchers = watchers;
+        AccessibilityEventListener.instance = this;
     }
 
     public static AccessibilityEventListener getInstance() {
         if (instance == null) {
-            instance = new AccessibilityEventListener(UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()));
+            throw new RuntimeException(); // Must be init first.
         }
         return instance;
     }
@@ -40,7 +45,9 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
         }
         if ((event.getEventType() & (AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED)) != 0) {
             if (triggerWatchers) {
-                device.runWatchers();
+                synchronized (watchers) {
+                    device.runWatchers();
+                }
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
             Parcelable parcelable = event.getParcelableData();
