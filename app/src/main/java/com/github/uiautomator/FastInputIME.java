@@ -63,16 +63,19 @@ public class FastInputIME extends InputMethodService {
     @Override
     public View onCreateInputView() {
         KeyboardView keyboardView = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("ADB_INPUT_TEXT");
-        filter.addAction("ADB_INPUT_KEYCODE");
-        filter.addAction("ADB_CLEAR_TEXT");
-        filter.addAction("ADB_SET_TEXT"); // Equals to: Clear then Input
-        // TODO: filter.addAction("ADB_INPUT_CHARS");
-        // TODO: filter.addAction("ADB_EDITOR_CODE");
-        // NONEED: filter.addAction(USB_STATE_CHANGE);
-        mReceiver = new InputMessageReceiver();
-        registerReceiver(mReceiver, filter);
+
+        if (mReceiver == null){
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("ADB_INPUT_TEXT");
+            filter.addAction("ADB_INPUT_KEYCODE");
+            filter.addAction("ADB_CLEAR_TEXT");
+            filter.addAction("ADB_SET_TEXT"); // Equals to: Clear then Input
+            // TODO: filter.addAction("ADB_INPUT_CHARS");
+            // TODO: filter.addAction("ADB_EDITOR_CODE");
+            // NONEED: filter.addAction(USB_STATE_CHANGE);
+            mReceiver = new InputMessageReceiver();
+            registerReceiver(mReceiver, filter);
+        }
 
         Keyboard keyboard = new Keyboard(this, R.xml.keyboard);
         keyboardView.setKeyboard(keyboard);
@@ -145,8 +148,10 @@ public class FastInputIME extends InputMethodService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
-        Log.i(TAG, "input destroyed");
+        Log.i(TAG, "Input destroyed");
+        if (mReceiver != null){
+            unregisterReceiver(mReceiver);
+        }
         inputThread.stopThread();
     }
 
@@ -171,7 +176,7 @@ public class FastInputIME extends InputMethodService {
         return false;
     }
 
-    class InputMessageReceiver extends BroadcastReceiver {
+    public class InputMessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();

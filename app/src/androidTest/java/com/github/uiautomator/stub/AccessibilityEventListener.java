@@ -45,9 +45,14 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
         }
         if ((event.getEventType() & (AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED)) != 0) {
             if (triggerWatchers) {
-                synchronized (watchers) {
-                    device.runWatchers();
-                }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        synchronized (watchers) {
+                            device.runWatchers();
+                        }
+                    }
+                }, "Watchers").start();
             }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
             Parcelable parcelable = event.getParcelableData();

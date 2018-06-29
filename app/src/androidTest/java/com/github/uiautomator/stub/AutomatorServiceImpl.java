@@ -957,8 +957,9 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitForExists(Selector obj, long timeout) {
-        if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
-            return device.wait(Until.hasObject(obj.toBySelector()), timeout);
+        // Comment it because of https://github.com/openatx/uiautomator2/issues/140
+        // if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
+        //    return device.wait(Until.hasObject(obj.toBySelector()), timeout);
         return device.findObject(obj.toUiSelector()).waitForExists(timeout);
     }
 
