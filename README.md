@@ -45,7 +45,12 @@ adb shell am broadcast -a ADB_CLEAR_TEXT
 adb shell am broadcast -a ADB_SET_TEXT --es text SGVsbG8g5L2g5aW9
 # Send keycode, eg: ENTER
 adb shell am broadcast -a ADB_INPUT_KEYCODE --ei code 66
+# Send Editor code
+adb shell am broadcast -a ADB_EDITOR_CODE --ei code 2 # IME_ACTION_GO
 ```
+
+- [Editor Code](https://developer.android.com/reference/android/view/inputmethod/EditorInfo)
+- [Key Event](https://developer.android.com/reference/android/view/KeyEvent)
 
 # Change GPS mock location
 You can change mock location from terminal using adb in order to test GPS on real devices.

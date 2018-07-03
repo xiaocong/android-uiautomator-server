@@ -64,14 +64,15 @@ public class FastInputIME extends InputMethodService {
     public View onCreateInputView() {
         KeyboardView keyboardView = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
 
-        if (mReceiver == null){
+        if (mReceiver == null) {
             IntentFilter filter = new IntentFilter();
             filter.addAction("ADB_INPUT_TEXT");
             filter.addAction("ADB_INPUT_KEYCODE");
             filter.addAction("ADB_CLEAR_TEXT");
             filter.addAction("ADB_SET_TEXT"); // Equals to: Clear then Input
+            filter.addAction("ADB_EDITOR_CODE");
             // TODO: filter.addAction("ADB_INPUT_CHARS");
-            // TODO: filter.addAction("ADB_EDITOR_CODE");
+
             // NONEED: filter.addAction(USB_STATE_CHANGE);
             mReceiver = new InputMessageReceiver();
             registerReceiver(mReceiver, filter);
@@ -149,7 +150,7 @@ public class FastInputIME extends InputMethodService {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "Input destroyed");
-        if (mReceiver != null){
+        if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
         inputThread.stopThread();
@@ -181,6 +182,7 @@ public class FastInputIME extends InputMethodService {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String msgText;
+            int code;
             InputConnection ic = getCurrentInputConnection();
             if (ic == null) {
                 return;
@@ -203,10 +205,11 @@ public class FastInputIME extends InputMethodService {
                      * Enter code 66
                      * adb shell am broadcast -a ADB_INPUT_KEYCODE --ei code 66
                      */
-                    int code = intent.getIntExtra("code", -1);
+                    code = intent.getIntExtra("code", -1);
                     if (code != -1) {
                         ic.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, code));
                     }
+                    break;
                 case "ADB_CLEAR_TEXT":
                     Log.i(TAG, "receive ADB_CLEAR_TEXT");
                     clearText();
@@ -222,6 +225,13 @@ public class FastInputIME extends InputMethodService {
                     clearText();
                     inputTextBase64(msgText);
                     ic.endBatchEdit();
+                    break;
+                case "ADB_EDITOR_CODE":
+                    code = intent.getIntExtra("code", -1);
+                    if (code != -1) {
+                        ic.performEditorAction(code);
+                    }
+                    break;
             }
         }
     }
