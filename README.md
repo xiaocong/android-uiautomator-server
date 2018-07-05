@@ -47,4 +47,4 @@ If you have any idea, please email xiaocong@gmail.com, hongbin.bao@gmail.com or 
 - [jackson](https://github.com/FasterXML/jackson)
 
 # TODO
-- support unicode input
+- android O support
