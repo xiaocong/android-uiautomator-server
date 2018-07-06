@@ -59,7 +59,7 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
             if (!(parcelable instanceof Notification)) { // without Notification is Toast
                 String packageName = event.getPackageName().toString();
                 this.toastTime = System.currentTimeMillis();
-                toastMessage = (String) event.getText().get(0);
+                toastMessage = "" + event.getText().get(0);
                 Log.d("Toast:" + toastMessage + " Pkg:" + packageName + " Time:" + toastTime);
             }
         }
