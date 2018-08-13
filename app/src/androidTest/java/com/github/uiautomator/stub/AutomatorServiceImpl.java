@@ -766,13 +766,15 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public ObjInfo objInfo(Selector obj) throws UiObjectNotFoundException {
+        try {
+             if (obj.toUiObject2() != null) {
+                 return ObjInfo.getObjInfo(obj.toUiObject2());
+             }
+        } catch(StaleObjectException e){
+            // HotFix(ssx): Here always raise StaleObjectException
+            // Refs: https://github.com/openatx/uiautomator2/issues/138
+        }
         return ObjInfo.getObjInfo(device.findObject(obj.toUiSelector()));
-        // HotFix(ssx): Here always raise StaleObjectException, so not use UiObject2 here
-        // Refs: https://github.com/openatx/uiautomator2/issues/138
-        // if (obj.toUiObject2() == null) {
-        //    return ObjInfo.getObjInfo(device.findObject(obj.toUiSelector()));
-        // }
-        // return ObjInfo.getObjInfo(obj.toUiObject2());
     }
 
     /**
