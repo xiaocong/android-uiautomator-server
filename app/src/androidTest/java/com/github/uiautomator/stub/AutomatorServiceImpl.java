@@ -771,6 +771,7 @@ public class AutomatorServiceImpl implements AutomatorService {
                  return ObjInfo.getObjInfo(obj.toUiObject2());
              }
         } catch(StaleObjectException e){
+            Log.d("objInfo got StaleObjectException " + e);
             // HotFix(ssx): Here always raise StaleObjectException
             // Refs: https://github.com/openatx/uiautomator2/issues/138
         }
@@ -959,9 +960,14 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitForExists(Selector obj, long timeout) {
-        // Comment it because of https://github.com/openatx/uiautomator2/issues/140
-        // if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
-        //    return device.wait(Until.hasObject(obj.toBySelector()), timeout);
+        try {
+            if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
+                return device.wait(Until.hasObject(obj.toBySelector()), timeout);
+        } catch (ClassCastException e) {
+            Log.d("waitForExists got ClassCastException "+ e);
+            // Hotfix because of https://github.com/openatx/uiautomator2/issues/140
+        }
+        // https://developer.android.com/reference/android/support/test/uiautomator/UiObject#waitforexists
         return device.findObject(obj.toUiSelector()).waitForExists(timeout);
     }
 
@@ -974,8 +980,12 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean waitUntilGone(Selector obj, long timeout) {
-        if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
-            return device.wait(Until.gone(obj.toBySelector()), timeout);
+        try {
+            if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
+                return device.wait(Until.gone(obj.toBySelector()), timeout);
+        } catch (ClassCastException e) {
+            Log.d("waitUntilGone got ClassCastException "+ e);
+        }
         return device.findObject(obj.toUiSelector()).waitUntilGone(timeout);
     }
 
