@@ -24,10 +24,14 @@
 package com.github.uiautomator.stub;
 
 import android.os.RemoteException;
-
 import android.support.test.uiautomator.UiObjectNotFoundException;
-import com.googlecode.jsonrpc4j.JsonRpcErrors;
+
+import com.github.uiautomator.stub.exceptions.NotImplementedException;
+import com.github.uiautomator.stub.exceptions.UiAutomator2Exception;
 import com.googlecode.jsonrpc4j.JsonRpcError;
+import com.googlecode.jsonrpc4j.JsonRpcErrors;
+
+import java.util.List;
 
 public interface AutomatorService {
     final static int ERROR_CODE_BASE = -32000;
@@ -103,6 +107,7 @@ public interface AutomatorService {
      * @return the absolute path name of dumped file.
      */
     @Deprecated
+    @JsonRpcErrors({@JsonRpcError(exception=UiAutomator2Exception.class, code=ERROR_CODE_BASE)})
     String dumpWindowHierarchy(boolean compressed, String filename);
 
     /**
@@ -110,6 +115,7 @@ public interface AutomatorService {
      * @param compressed use compressed layout hierarchy or not using setCompressedLayoutHeirarchy method. Ignore the parameter in case the API level lt 18.
      * @return the absolute path name of dumped file.
      */
+    @JsonRpcErrors({@JsonRpcError(exception=UiAutomator2Exception.class, code=ERROR_CODE_BASE)})
     String dumpWindowHierarchy(boolean compressed);
 
     /**
@@ -276,7 +282,7 @@ public interface AutomatorService {
      * @param timeout the timeout for the wait
      * @return true if a window update occurred, false if timeout has elapsed or if the current window does not have the specified package name
      */
-    boolean waitForWindowUpdate (String packageName, long timeout);
+    boolean waitForWindowUpdate(String packageName, long timeout);
 
     /***************************************************************************
      * Below section contains all methods from UiObject.
@@ -370,7 +376,7 @@ public interface AutomatorService {
      * @throws NotImplementedException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2), @JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE-3)})
-    boolean dragTo (Selector obj, Selector destObj, int steps) throws UiObjectNotFoundException, NotImplementedException;
+    boolean dragTo(Selector obj, Selector destObj, int steps) throws UiObjectNotFoundException, NotImplementedException;
 
     /**
      * Drags this object to arbitrary coordinates. The number of steps specified in your input parameter can influence the drag speed, and varying speeds may impact the results. Consider evaluating different speeds when using this method in your tests.
@@ -383,7 +389,7 @@ public interface AutomatorService {
      * @throws NotImplementedException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2), @JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE-3)})
-    boolean dragTo (Selector obj, int destX, int destY, int steps) throws UiObjectNotFoundException, NotImplementedException;
+    boolean dragTo(Selector obj, int destX, int destY, int steps) throws UiObjectNotFoundException, NotImplementedException;
 
     /**
      * Check if view exists. This methods performs a waitForExists(long) with zero timeout. This basically returns immediately whether the view represented by this UiObject exists or not.
@@ -489,10 +495,10 @@ public interface AutomatorService {
      * @param percent expect value: percent >= 0.0F && percent <= 1.0F,The length of the swipe as a percentage of this object's size.
      * @param steps indicates the number of injected move steps into the system. Steps are injected about 5ms apart. So a 100 steps may take about 1/2 second to complete.
      * @return true of successful
-     * @throws android.support.test.uiautomator.UiObjectNotFoundException
+     * @throws UiObjectNotFoundException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean swipe(Selector obj, String dir,float percent, int steps) throws UiObjectNotFoundException;
+    boolean swipe(Selector obj, String dir, float percent, int steps) throws UiObjectNotFoundException;
 
     /**
      * Waits a specified length of time for a view to become visible. This method waits until the view becomes visible on the display, or until the timeout has elapsed. You can use this method in situations where the content that you want to select is not immediately displayed.
@@ -501,7 +507,7 @@ public interface AutomatorService {
      * @return true if the view is displayed, else false if timeout elapsed while waiting
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean waitForExists (Selector obj, long timeout);
+    boolean waitForExists(Selector obj, long timeout);
 
     /**
      * Waits a specified length of time for a view to become undetectable. This method waits until a view is no longer matchable, or until the timeout has elapsed. A view becomes undetectable when the UiSelector of the object is unable to find a match because the element has either changed its state or is no longer displayed. You can use this method when attempting to wait for some long operation to compete, such as downloading a large file or connecting to a remote server.
@@ -510,7 +516,7 @@ public interface AutomatorService {
      * @return true if the element is gone before timeout elapsed, else false if timeout elapsed but a matching element is still found.
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean waitUntilGone (Selector obj, long timeout);
+    boolean waitUntilGone(Selector obj, long timeout);
 
     /***************************************************************************
      * Below section contains all methods from UiScrollable.
@@ -545,7 +551,7 @@ public interface AutomatorService {
      * @throws UiObjectNotFoundException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean flingToBeginning (Selector obj, boolean isVertical, int maxSwipes) throws UiObjectNotFoundException;
+    boolean flingToBeginning(Selector obj, boolean isVertical, int maxSwipes) throws UiObjectNotFoundException;
 
     /**
      * Performs a fling gesture to reach the end of a scrollable layout element. The end can be at the bottom-most edge in the case of vertical controls, or the right-most edge for horizontal controls. Make sure to take into account devices configured with right-to-left languages like Arabic and Hebrew.
@@ -556,7 +562,7 @@ public interface AutomatorService {
      * @throws UiObjectNotFoundException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean flingToEnd (Selector obj, boolean isVertical, int maxSwipes) throws UiObjectNotFoundException;
+    boolean flingToEnd(Selector obj, boolean isVertical, int maxSwipes) throws UiObjectNotFoundException;
 
     /**
      * Performs a backward scroll. If the swipe direction is set to vertical, then the swipes will be performed from top to bottom. If the swipe direction is set to horizontal, then the swipes will be performed from left to right. Make sure to take into account devices configured with right-to-left languages like Arabic and Hebrew.
@@ -567,7 +573,7 @@ public interface AutomatorService {
      * @throws UiObjectNotFoundException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean scrollBackward (Selector obj, boolean isVertical, int steps) throws UiObjectNotFoundException;
+    boolean scrollBackward(Selector obj, boolean isVertical, int steps) throws UiObjectNotFoundException;
 
     /**
      * Performs a forward scroll with the default number of scroll steps (55). If the swipe direction is set to vertical, then the swipes will be performed from bottom to top. If the swipe direction is set to horizontal, then the swipes will be performed from right to left. Make sure to take into account devices configured with right-to-left languages like Arabic and Hebrew.
@@ -578,7 +584,7 @@ public interface AutomatorService {
      * @throws UiObjectNotFoundException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean scrollForward (Selector obj, boolean isVertical, int steps) throws UiObjectNotFoundException;
+    boolean scrollForward(Selector obj, boolean isVertical, int steps) throws UiObjectNotFoundException;
 
     /**
      * Scrolls to the beginning of a scrollable layout element. The beginning can be at the top-most edge in the case of vertical controls, or the left-most edge for horizontal controls. Make sure to take into account devices configured with right-to-left languages like Arabic and Hebrew.
@@ -590,7 +596,7 @@ public interface AutomatorService {
      * @throws UiObjectNotFoundException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean scrollToBeginning (Selector obj, boolean isVertical, int maxSwipes, int steps) throws UiObjectNotFoundException;
+    boolean scrollToBeginning(Selector obj, boolean isVertical, int maxSwipes, int steps) throws UiObjectNotFoundException;
 
     /**
      * Scrolls to the end of a scrollable layout element. The end can be at the bottom-most edge in the case of vertical controls, or the right-most edge for horizontal controls. Make sure to take into account devices configured with right-to-left languages like Arabic and Hebrew.
@@ -602,7 +608,7 @@ public interface AutomatorService {
      * @throws UiObjectNotFoundException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean scrollToEnd (Selector obj, boolean isVertical, int maxSwipes, int steps) throws UiObjectNotFoundException;
+    boolean scrollToEnd(Selector obj, boolean isVertical, int maxSwipes, int steps) throws UiObjectNotFoundException;
 
     /**
      * Perform a scroll forward action to move through the scrollable layout element until a visible item that matches the selector is found.
@@ -613,7 +619,7 @@ public interface AutomatorService {
      * @throws UiObjectNotFoundException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean scrollTo (Selector obj, Selector targetObj, boolean isVertical) throws UiObjectNotFoundException;
+    boolean scrollTo(Selector obj, Selector targetObj, boolean isVertical) throws UiObjectNotFoundException;
 
     /***************************************************************************
      * Some time we have to use chained selection, e.g.
@@ -784,7 +790,7 @@ public interface AutomatorService {
      * @throws NotImplementedException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2), @JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE-3)})
-    boolean dragTo (String obj, Selector destObj, int steps) throws UiObjectNotFoundException, NotImplementedException;
+    boolean dragTo(String obj, Selector destObj, int steps) throws UiObjectNotFoundException, NotImplementedException;
 
     /**
      * Drags this object to arbitrary coordinates. The number of steps specified in your input parameter can influence the drag speed, and varying speeds may impact the results. Consider evaluating different speeds when using this method in your tests.
@@ -797,7 +803,7 @@ public interface AutomatorService {
      * @throws NotImplementedException
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2), @JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE-3)})
-    boolean dragTo (String obj, int destX, int destY, int steps) throws UiObjectNotFoundException, NotImplementedException;
+    boolean dragTo(String obj, int destX, int destY, int steps) throws UiObjectNotFoundException, NotImplementedException;
 
     /**
      * Check if view exists. This methods performs a waitForExists(long) with zero timeout. This basically returns immediately whether the view represented by this UiObject exists or not.
@@ -889,7 +895,7 @@ public interface AutomatorService {
      * @return true if the view is displayed, else false if timeout elapsed while waiting
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean waitForExists (String obj, long timeout) throws UiObjectNotFoundException;
+    boolean waitForExists(String obj, long timeout) throws UiObjectNotFoundException;
 
     /**
      * Waits a specified length of time for a view to become undetectable. This method waits until a view is no longer matchable, or until the timeout has elapsed. A view becomes undetectable when the UiSelector of the object is unable to find a match because the element has either changed its state or is no longer displayed. You can use this method when attempting to wait for some long operation to compete, such as downloading a large file or connecting to a remote server.
@@ -898,7 +904,7 @@ public interface AutomatorService {
      * @return true if the element is gone before timeout elapsed, else false if timeout elapsed but a matching element is still found.
      */
     @JsonRpcErrors({@JsonRpcError(exception=UiObjectNotFoundException.class, code=ERROR_CODE_BASE-2)})
-    boolean waitUntilGone (String obj, long timeout) throws UiObjectNotFoundException;
+    boolean waitUntilGone(String obj, long timeout) throws UiObjectNotFoundException;
 
     /**
      * Get Configurator
@@ -915,4 +921,12 @@ public interface AutomatorService {
      */
     @JsonRpcErrors({@JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE-3)})
     ConfiguratorInfo setConfigurator(ConfiguratorInfo info) throws NotImplementedException;
+
+    /**
+     * Set Configurator.
+     * @param obj the configurator information to be set.
+     * @throws NotImplementedException
+     */
+    @JsonRpcErrors({@JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE-3)})
+    List<ObjInfo> finds(Selector obj) throws NotImplementedException;
 }
