@@ -56,6 +56,8 @@ public class Device {
         return uiDevice;
     }
 
+    public UiAutomation getUiAutomation(){ return uiAutomation; }
+
     public Display getDefaultDisplay(){
         return (Display) invoke(method(uiDevice.getClass(),METHOD_GET_DEFAULT_DISPLAY), uiDevice);
     }

@@ -929,4 +929,12 @@ public interface AutomatorService {
      */
     @JsonRpcErrors({@JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE-3)})
     List<ObjInfo> finds(Selector obj) throws NotImplementedException;
+
+    /**
+     * toast.
+     * @param switchStatus the toast information to be get and stop.
+     * @throws NotImplementedException
+     */
+    @JsonRpcErrors({@JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE)})
+    String toast(String switchStatus) throws NotImplementedException;
 }

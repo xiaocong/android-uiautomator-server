@@ -43,6 +43,7 @@ import android.view.MotionEvent.PointerCoords;
 
 import com.github.uiautomator.stub.exceptions.NotImplementedException;
 import com.github.uiautomator.stub.exceptions.UiAutomator2Exception;
+import com.github.uiautomator.stub.helper.NotificationListener;
 import com.github.uiautomator.stub.helper.ReflectionUtils;
 import com.github.uiautomator.stub.helper.XMLHierarchy;
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
@@ -1623,5 +1624,21 @@ public class AutomatorServiceImpl implements AutomatorService {
             objs.add(ObjInfo.getObjInfo(obj2s.get(i)));
         }
         return objs;
+    }
+
+    @Override
+    public String toast(String switchStatus) throws NotImplementedException {
+        if("on".equalsIgnoreCase(switchStatus)){
+            NotificationListener.getInstance().start();
+        }else if("off".equalsIgnoreCase(switchStatus)){
+            NotificationListener.getInstance().stop();
+            List<CharSequence> toastMsg = NotificationListener.getInstance().getToastMSGs();
+            StringBuilder sb = new StringBuilder();
+            for(CharSequence tmp:toastMsg){
+                sb.append(tmp.toString());
+            }
+            return sb.toString();
+        }
+        return null;
     }
 }
