@@ -28,4 +28,20 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="SelectButton" parent="LeftTitle">
+        <item name="android:background">@drawable/btn_nor_down</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="LeftTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginLeft">6dp</item>
+        <item name="android:layout_marginRight">6dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textColor">@color/font</item>
+    </style>
+
 </resources>
