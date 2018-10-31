@@ -22,7 +22,7 @@
   -->
 
 <resources>
-    <string name="app_name">uiautomator</string>
+    <string name="app_name">ATX</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -30,4 +30,15 @@
     <string name="service_title">UiAutomator</string>
     <string name="service_text">service is running</string>
     <string name="fast_input_label">FastInputIME</string>
+    <string name="stop_atxagent">停止ATXAGENT</string>
+    <string name="stop_uiautomator">停止UIAutomator</string>
+    <string name="barrier_free">无障碍</string>
+    <string name="develop_mode">开发者选项</string>
+    <string name="shot_cut">快捷方式</string>
+    <string name="identify">Identify</string>
+    <string name="quit">Quit</string>
+    <string name="no_permission_tip">No permission to write sd card</string>
+    <string name="atx_agent">ATX-Agent</string>
+    <string name="avaible_internal_storage">内部存储:</string>
+    <string name="avaible_sd_storage">SD卡:</string>
 </resources>
