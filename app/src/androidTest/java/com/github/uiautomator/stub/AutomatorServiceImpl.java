@@ -767,8 +767,9 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public ObjInfo objInfo(Selector obj) throws UiObjectNotFoundException {
         try {
-             if (obj.toUiObject2() != null) {
-                 return ObjInfo.getObjInfo(obj.toUiObject2());
+             final UiObject2 obj2 = obj.toUiObject2(); // to avoid a race condition
+             if (obj2 != null) {
+                 return ObjInfo.getObjInfo(obj2);
              }
         } catch(StaleObjectException e){
             Log.d("objInfo got StaleObjectException " + e);
