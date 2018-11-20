@@ -116,14 +116,20 @@ public class Stub {
         }
 
         Log.d("Launch service");
-        context.startService(new Intent("com.github.uiautomator.ACTION_START"));
+        Intent intent = new Intent();
+        intent.setAction("com.github.uiautomator.ACTION_START");
+        intent.setPackage(context.getPackageName());
+        context.startService(intent);
     }
 
     @After
     public void tearDown() {
         server.stop();
         Context context = InstrumentationRegistry.getContext();
-        context.startService(new Intent("com.github.uiautomator.ACTION_STOP"));
+        Intent intent = new Intent();
+        intent.setAction("com.github.uiautomator.ACTION_STOP");
+        intent.setPackage(context.getPackageName());
+        context.startService(intent);
     }
 
     @Test
