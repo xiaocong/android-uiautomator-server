@@ -30,9 +30,12 @@ import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.BufferedSink;
 
 public class MainActivity extends Activity {
     private final String TAG = "ATXMainActivity";
@@ -99,6 +102,32 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS));
+            }
+        });
+
+        ((Button) findViewById(R.id.start_uiautomator)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Request request = new Request.Builder()
+                        .url("http://127.0.0.1:7912/uiautomator")
+                        .post(RequestBody.create(null, new byte[0]))
+                        .build();
+                new OkHttpClient().newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.this, "Uiautomator not starting", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Looper.prepare();
+                        Toast.makeText(MainActivity.this, "Uiautomator started", Toast.LENGTH_SHORT).show();
+                        Looper.loop();
+                    }
+                });
             }
         });
 
@@ -174,14 +203,14 @@ public class MainActivity extends Activity {
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
                 Looper.prepare();
-                Toast.makeText(MainActivity.this, "server already stopped", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "atx-agent already stopped", Toast.LENGTH_SHORT).show();
                 Looper.loop();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 Looper.prepare();
-                Toast.makeText(MainActivity.this, "server stopped", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "atx-agent stopped", Toast.LENGTH_SHORT).show();
                 Looper.loop();
             }
         });

@@ -31,12 +31,14 @@
     <string name="service_text">service is running</string>
     <string name="fast_input_label">FastInputIME</string>
     <string name="stop_atxagent">停止ATXAGENT</string>
+    <string name="start_atxagent">启动ATXAGENT</string>
     <string name="stop_uiautomator">停止UIAutomator</string>
-    <string name="barrier_free">无障碍</string>
+    <string name="start_uiautomator">启动UIAutomator</string>
+    <string name="barrier_free">无障碍服务</string>
     <string name="develop_mode">开发者选项</string>
     <string name="shot_cut">快捷方式</string>
-    <string name="identify">Identify</string>
-    <string name="quit">Quit</string>
+    <string name="identify">识别本机</string>
+    <string name="quit">关闭所有服务</string>
     <string name="no_permission_tip">No permission to write sd card</string>
     <string name="atx_agent">ATX-Agent</string>
     <string name="avaible_internal_storage">内部存储:</string>

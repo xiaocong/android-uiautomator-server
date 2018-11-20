@@ -13,24 +13,50 @@
             style="@style/LeftTitle"
             android:text="@string/atx_agent"
             android:textStyle="bold"/>
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal">
-            <Button
-                android:id="@+id/btn_finish"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                style="@style/SelectButton"
-                android:text="@string/quit" />
 
             <Button
-                android:id="@+id/btn_identify"
+                android:id="@+id/stop_atx_agent"
+                style="@style/SelectButton"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                style="@style/SelectButton"
-                android:text="@string/identify" />
+                android:text="@string/stop_atxagent" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_atx_title2"
+            style="@style/LeftTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/service_title"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/start_uiautomator"
+                style="@style/SelectButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/start_uiautomator" />
+
+            <Button
+                android:id="@+id/stop_uiautomator"
+                style="@style/SelectButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/stop_uiautomator" />
+
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,15 +93,26 @@
                 android:text="@string/barrier_free" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/stop_uiautomator"
-            style="@style/SelectButton"
-            android:text="@string/stop_uiautomator" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/stop_atx_agent"
-            style="@style/SelectButton"
-            android:text="@string/stop_atxagent" />
+            <Button
+                android:id="@+id/btn_identify"
+                style="@style/SelectButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/identify" />
+
+            <Button
+                android:id="@+id/btn_finish"
+                style="@style/SelectButton"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/quit" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
