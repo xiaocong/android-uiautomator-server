@@ -241,5 +241,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // must unbind service, otherwise it will leak memory
+        unbindService(connection);
+        connection = null;
+        Log.i(TAG, "unbind service");
     }
 }
