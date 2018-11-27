@@ -26,9 +26,14 @@ import java.util.Set;
 // Note:
 // Here is a copy of android.support.test.uiautomator.AccessibilitiNodeInfoDumper source code
 // in order to fix dump hierarchy error
+//
+// Sync to new code: https://android.googlesource.com/platform/frameworks/testing/+/master/uiautomator/library/core-src/com/android/uiautomator/core/AccessibilityNodeInfoDumper.java
 class AccessibilityNodeInfoDumper {
     private static final String LOGTAG = AccessibilityNodeInfoDumper.class.getSimpleName();
-    private static final String[] NAF_EXCLUDED_CLASSES = new String[]{GridView.class.getName(), GridLayout.class.getName(), ListView.class.getName(), TableLayout.class.getName()};
+    private static final String[] NAF_EXCLUDED_CLASSES = new String[]{
+            GridView.class.getName(), GridLayout.class.getName(),
+            ListView.class.getName(), TableLayout.class.getName()
+    };
 
     AccessibilityNodeInfoDumper() {
     }
@@ -43,7 +48,7 @@ class AccessibilityNodeInfoDumper {
         AccessibilityNodeInfo[] arr$ = getWindowRoots(device); // device.getWindowRoots();
         int len$ = arr$.length;
 
-        for(int i$ = 0; i$ < len$; ++i$) {
+        for (int i$ = 0; i$ < len$; ++i$) {
             AccessibilityNodeInfo root = arr$[i$];
             dumpNodeRec(root, serializer, 0, device.getDisplayWidth(), device.getDisplayHeight());
         }
@@ -61,12 +66,12 @@ class AccessibilityNodeInfoDumper {
             roots.add(activeRoot);
         }
 
-        if (Build.VERSION.SDK_INT >= 21){
+        if (Build.VERSION.SDK_INT >= 21) {
 //        if (API_LEVEL_ACTUAL >= 21) {
             Iterator i$ = uiAutomation.getWindows().iterator();
 
-            while(i$.hasNext()) {
-                AccessibilityWindowInfo window = (AccessibilityWindowInfo)i$.next();
+            while (i$.hasNext()) {
+                AccessibilityWindowInfo window = (AccessibilityWindowInfo) i$.next();
                 AccessibilityNodeInfo root = window.getRoot();
                 if (root == null) {
                     Log.w(LOGTAG, String.format("Skipping null root node for window: %s", window.toString()));
@@ -76,7 +81,7 @@ class AccessibilityNodeInfoDumper {
             }
         }
 
-        return (AccessibilityNodeInfo[])roots.toArray(new AccessibilityNodeInfo[roots.size()]);
+        return (AccessibilityNodeInfo[]) roots.toArray(new AccessibilityNodeInfo[roots.size()]);
     }
 
     private static void dumpNodeRec(AccessibilityNodeInfo node, XmlSerializer serializer, int index, int width, int height) throws IOException {
@@ -105,7 +110,7 @@ class AccessibilityNodeInfoDumper {
         serializer.attribute("", "bounds", getVisibleBoundsInScreen(node, width, height).toShortString());
         int count = node.getChildCount();
 
-        for(int i = 0; i < count; ++i) {
+        for (int i = 0; i < count; ++i) {
             AccessibilityNodeInfo child = node.getChild(i);
             if (child != null) {
                 if (child.isVisibleToUser()) {
@@ -122,59 +127,102 @@ class AccessibilityNodeInfoDumper {
         serializer.endTag("", "node");
     }
 
+    /**
+     * The list of classes to exclude my not be complete. We're attempting to
+     * only reduce noise from standard layout classes that may be falsely
+     * configured to accept clicks and are also enabled.
+     *
+     * @param node
+     * @return true if node is excluded.
+     */
     private static boolean nafExcludedClass(AccessibilityNodeInfo node) {
         String className = safeCharSeqToString(node.getClassName());
-        String[] arr$ = NAF_EXCLUDED_CLASSES;
-        int len$ = arr$.length;
-
-        for(int i$ = 0; i$ < len$; ++i$) {
-            String excludedClassName = arr$[i$];
-            if (className.endsWith(excludedClassName)) {
+        for (String excludedClassName : NAF_EXCLUDED_CLASSES) {
+            if (className.endsWith(excludedClassName))
                 return true;
-            }
         }
-
         return false;
     }
 
+    /**
+     * We're looking for UI controls that are enabled, clickable but have no
+     * text nor content-description. Such controls configuration indicate an
+     * interactive control is present in the UI and is most likely not
+     * accessibility friendly. We refer to such controls here as NAF controls
+     * (Not Accessibility Friendly)
+     *
+     * @param node
+     * @return false if a node fails the check, true if all is OK
+     */
     private static boolean nafCheck(AccessibilityNodeInfo node) {
-        boolean isNaf = node.isClickable() && node.isEnabled() && safeCharSeqToString(node.getContentDescription()).isEmpty() && safeCharSeqToString(node.getText()).isEmpty();
-        return !isNaf ? true : childNafCheck(node);
+        boolean isNaf = node.isClickable() && node.isEnabled()
+                && safeCharSeqToString(node.getContentDescription()).isEmpty()
+                && safeCharSeqToString(node.getText()).isEmpty();
+        if (!isNaf)
+            return true;
+        // check children since sometimes the containing element is clickable
+        // and NAF but a child's text or description is available. Will assume
+        // such layout as fine.
+        return childNafCheck(node);
     }
 
+
+    /**
+     * This should be used when it's already determined that the node is NAF and
+     * a further check of its children is in order. A node maybe a container
+     * such as LinerLayout and may be set to be clickable but have no text or
+     * content description but it is counting on one of its children to fulfill
+     * the requirement for being accessibility friendly by having one or more of
+     * its children fill the text or content-description. Such a combination is
+     * considered by this dumper as acceptable for accessibility.
+     *
+     * @param node
+     * @return false if node fails the check.
+     */
     private static boolean childNafCheck(AccessibilityNodeInfo node) {
         int childCount = node.getChildCount();
-
-        for(int x = 0; x < childCount; ++x) {
+        for (int x = 0; x < childCount; x++) {
             AccessibilityNodeInfo childNode = node.getChild(x);
-            if (!safeCharSeqToString(childNode.getContentDescription()).isEmpty() || !safeCharSeqToString(childNode.getText()).isEmpty()) {
-                return true;
+            if (childNode == null) {
+                Log.i(LOGTAG, String.format("Null child %d/%d, parent: %s",
+                        x, childCount, node.toString()));
+                continue;
             }
-
-            if (childNafCheck(childNode)) {
+            if (!safeCharSeqToString(childNode.getContentDescription()).isEmpty()
+                    || !safeCharSeqToString(childNode.getText()).isEmpty())
                 return true;
-            }
+            if (childNafCheck(childNode))
+                return true;
         }
-
         return false;
     }
+
 
     private static String safeCharSeqToString(CharSequence cs) {
         return cs == null ? "" : stripInvalidXMLChars(cs);
     }
 
     private static String stripInvalidXMLChars(CharSequence cs) {
-        StringBuffer ret = new StringBuffer();
-
-        for(int i = 0; i < cs.length(); ++i) {
-            char ch = cs.charAt(i);
-            if (ch >= 1 && ch <= '\b' || ch >= 11 && ch <= '\f' || ch >= 14 && ch <= 31 || ch >= 127 && ch <= 132 || ch >= 134 && ch <= 159 || ch >= '\ufdd0' && ch <= '\ufddf' || ch >= 131070 && ch <= 131071 || ch >= 196606 && ch <= 196607 || ch >= 262142 && ch <= 262143 || ch >= 327678 && ch <= 327679 || ch >= 393214 && ch <= 393215 || ch >= 458750 && ch <= 458751 || ch >= 524286 && ch <= 524287 || ch >= 589822 && ch <= 589823 || ch >= 655358 && ch <= 655359 || ch >= 720894 && ch <= 720895 || ch >= 786430 && ch <= 786431 || ch >= 851966 && ch <= 851967 || ch >= 917502 && ch <= 917503 || ch >= 983038 && ch <= 983039 || ch >= 1048574 && ch <= 1048575 || ch >= 1114110 && ch <= 1114111) {
-                ret.append(".");
+        StringBuilder ret = new StringBuilder();
+        char ch;
+        for (int i = 0; i < cs.length(); i++) {
+            ch = cs.charAt(i);
+            // code below from Html#withinStyle, this is a temporary workaround because XML
+            // serializer does not support surrogates
+            if (ch >= 0xD800 && ch <= 0xDFFF) {
+                if (ch < 0xDC00 && i + 1 < cs.length()) {
+                    char d = cs.charAt(i + 1);
+                    if (d >= 0xDC00 && d <= 0xDFFF) {
+                        i++;
+                        ret.append("?");
+                    }
+                }
+            } else if (ch > 0x7E || ch < ' ') {
+                ret.append("?");
             } else {
                 ret.append(ch);
             }
         }
-
         return ret.toString();
     }
 
