@@ -236,7 +236,8 @@ public class AutomatorServiceImpl implements AutomatorService {
         device.setCompressedLayoutHeirarchy(compressed);
         try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            device.dumpWindowHierarchy(os);
+            AccessibilityNodeInfoDumper.dumpWindowHierarchy(device, os);
+//            device.dumpWindowHierarchy(os);
             os.close();
             return os.toString("UTF-8");
         } catch (FileNotFoundException e) {
