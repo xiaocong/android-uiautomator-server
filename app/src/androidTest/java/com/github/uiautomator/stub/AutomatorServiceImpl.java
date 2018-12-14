@@ -1641,4 +1641,14 @@ public class AutomatorServiceImpl implements AutomatorService {
         }
         return null;
     }
+
+    @Override
+    public void clearHierarchyCache() {
+        try {
+            ReflectionUtils.clearAccessibilityCache();
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new UiAutomator2Exception(e);
+        }
+    }
 }

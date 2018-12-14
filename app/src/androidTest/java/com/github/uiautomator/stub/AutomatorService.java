@@ -937,4 +937,10 @@ public interface AutomatorService {
      */
     @JsonRpcErrors({@JsonRpcError(exception=NotImplementedException.class, code=ERROR_CODE_BASE)})
     String toast(String switchStatus) throws NotImplementedException;
+
+    /**
+     * Method used to clear hierarachy in case of an update not occurring
+     */
+    @JsonRpcErrors({@JsonRpcError(exception=UiAutomator2Exception.class, code=ERROR_CODE_BASE)})
+    void clearHierarchyCache();
 }
