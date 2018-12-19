@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import com.github.uiautomator.R;
 import com.github.uiautomator.Service;
@@ -26,6 +27,7 @@ public class WifiMonitor extends AbstractMonitor {
 
     @Override
     public void register() {
+        Log.i(TAG, "Wifi monitor starting");
         this.receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -55,7 +57,7 @@ public class WifiMonitor extends AbstractMonitor {
                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 int ip = wifiManager.getConnectionInfo().getIpAddress();
                 String ipStr = (ip & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + ((ip >> 24) & 0xFF);
-                ((Service) context).setNotificationContentText(context.getString(R.string.service_text) + " on " + ipStr);
+                ((Service) context).setNotificationContentText(context.getString(R.string.monitor_service_text) + " on " + ipStr);
             }
         };
 
