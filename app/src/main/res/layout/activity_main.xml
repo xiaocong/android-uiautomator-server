@@ -4,15 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.github.uiautomator.MainActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <TextView
             android:id="@+id/tv_atx_title"
             style="@style/LeftTitle"
             android:text="@string/atx_agent"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,7 +26,17 @@
                 style="@style/SelectButton"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:onClick="atxAgentStopConfirm"
                 android:text="@string/stop_atxagent" />
+
+            <TextView
+                android:id="@+id/atx_agent_status"
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:onClick="checkAtxAgentStatus"
+                android:text="status" />
         </LinearLayout>
 
         <TextView
@@ -46,6 +58,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:onClick="startUiautomator"
                 android:text="@string/start_uiautomator" />
 
             <Button
@@ -53,6 +66,7 @@
                 style="@style/SelectButton"
                 android:layout_width="0dp"
                 android:layout_weight="1"
+                android:onClick="stopUiautomator"
                 android:text="@string/stop_uiautomator" />
 
         </LinearLayout>
@@ -61,35 +75,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 style="@style/LeftTitle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:text="@string/shot_cut"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/ip_address"
+                style="@style/LeftTitle"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                style="@style/LeftTitle" />
+                android:layout_weight="1" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <Button
                 android:id="@+id/development_settings"
+                style="@style/SelectButton"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                style="@style/SelectButton"
                 android:text="@string/develop_mode" />
 
             <Button
                 android:id="@+id/accessibility"
+                style="@style/SelectButton"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                style="@style/SelectButton"
                 android:text="@string/barrier_free" />
         </LinearLayout>
 
@@ -116,19 +133,41 @@
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                style="@style/SelectButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="showFloatWindow"
+                android:text="开启悬浮窗" />
+
+            <Button
+                style="@style/SelectButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="dismissFloatWindow"
+                android:text="关闭悬浮窗" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
+                style="@style/LeftTitle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                style="@style/LeftTitle"
                 android:text="@string/avaible_internal_storage" />
 
             <TextView
                 android:id="@+id/in_storage"
+                style="@style/LeftTitle"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                style="@style/LeftTitle" />
+                android:layout_weight="1" />
         </LinearLayout>
 
     </LinearLayout>

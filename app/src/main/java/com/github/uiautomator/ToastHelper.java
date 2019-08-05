@@ -12,6 +12,7 @@ import android.widget.Toast;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 public class ToastHelper {
 
     private static final String TAG = "ToastHelper";
@@ -21,11 +22,12 @@ public class ToastHelper {
     private WindowManager.LayoutParams params;
     private int duration;
     private Timer timer;
-    private ToastHelper(Context context, String text, int duration){
+
+    private ToastHelper(Context context, String text, int duration) {
         this.duration = duration;
         timer = new Timer();
         @SuppressLint("ShowToast") Toast toast = Toast.makeText(context, text, Toast.LENGTH_LONG);
-        windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         toastView = toast.getView();
         params = new WindowManager.LayoutParams();
         params.height = WindowManager.LayoutParams.WRAP_CONTENT;
@@ -44,11 +46,11 @@ public class ToastHelper {
     }
 
 
-    public static ToastHelper makeText(Context context, String text, int duration){
+    public static ToastHelper makeText(Context context, String text, int duration) {
         return new ToastHelper(context, text, duration);
     }
 
-    public void show(){
+    public void show() {
         windowManager.addView(toastView, params);
         timer.schedule(new TimerTask() {
             @Override
@@ -58,7 +60,7 @@ public class ToastHelper {
         }, duration);
     }
 
-    public void cancel(){
+    public void cancel() {
         windowManager.removeView(toastView);
         timer.cancel();
     }
