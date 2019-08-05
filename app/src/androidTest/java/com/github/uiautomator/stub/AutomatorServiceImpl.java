@@ -66,7 +66,7 @@ public class AutomatorServiceImpl implements AutomatorService {
 
     private final HashSet<String> watchers = new HashSet<String>();
     private final ConcurrentHashMap<String, UiObject> uiObjects = new ConcurrentHashMap<String, UiObject>();
-    private SoundPool soundPool = new SoundPool(100, AudioManager.STREAM_MUSIC,0);
+    private SoundPool soundPool = new SoundPool(100, AudioManager.STREAM_MUSIC, 0);
 
 
     private UiDevice device;
@@ -76,12 +76,11 @@ public class AutomatorServiceImpl implements AutomatorService {
         this.uiAutomation = InstrumentationRegistry.getInstrumentation().getUiAutomation();
         this.device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
 
-
-        // 音频加载完播放
+        // play music when loaded
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                soundPool.play(sampleId,1,1,1,0,1);
+                soundPool.play(sampleId, 1, 1, 1, 0, 1);
             }
         });
 
@@ -93,24 +92,32 @@ public class AutomatorServiceImpl implements AutomatorService {
         configurator.setScrollAcknowledgmentTimeout(200); // Default 200
         configurator.setKeyInjectionDelay(0); // Default 0
 
-        // default uiAutomation serviceInfo.eventTypes is -1
-        // I guess this might be watch all eventTypes
         uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(device, watchers));
     }
 
     /**
      * It's to play a section music to test
+     *
      * @return
      */
     @Override
-    public boolean playSound(String path){
+    public boolean playSound(String path) {
         try {
             soundPool.load(path, 1);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             return false;
         }
         return true;
+    }
+
+    public void setToastListener(boolean enabled) {
+        if (enabled) {
+            // default uiAutomation serviceInfo.eventTypes is -1
+            // this might means watch all eventTypes
+            uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(device, watchers));
+        } else {
+            uiAutomation.setOnAccessibilityEventListener(null);
+        }
     }
 
     /**
@@ -131,22 +138,6 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public DeviceInfo deviceInfo() {
         return DeviceInfo.getDeviceInfo();
-    }
-
-    /**
-     * Trigger all watchers when TYPE_WINDOW_STATE_CHANGED or TYPE_WINDOW_CONTENT_CHANGED
-     */
-    @Override
-    public void runWatchersOnWindowsChange(boolean enabled) {
-        // Important: UiAutomator2 is based on accessibility. so we should keep the old eventTypes.
-        // Default eventTypes contains many ...
-        // and keep serviceInfo.packageNames unchanged.
-        AccessibilityEventListener.getInstance().triggerWatchers = enabled;
-    }
-
-    @Override
-    public boolean hasWatchedOnWindowsChange() {
-        return AccessibilityEventListener.getInstance().triggerWatchers;
     }
 
     @Override
@@ -796,11 +787,11 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public ObjInfo objInfo(Selector obj) throws UiObjectNotFoundException {
         try {
-             final UiObject2 obj2 = obj.toUiObject2(); // to avoid a race condition
-             if (obj2 != null) {
-                 return ObjInfo.getObjInfo(obj2);
-             }
-        } catch(StaleObjectException e){
+            final UiObject2 obj2 = obj.toUiObject2(); // to avoid a race condition
+            if (obj2 != null) {
+                return ObjInfo.getObjInfo(obj2);
+            }
+        } catch (StaleObjectException e) {
             Log.d("objInfo got StaleObjectException " + e);
             // HotFix(ssx): Here always raise StaleObjectException
             // Refs: https://github.com/openatx/uiautomator2/issues/138
@@ -994,7 +985,7 @@ public class AutomatorServiceImpl implements AutomatorService {
             if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
                 return device.wait(Until.hasObject(obj.toBySelector()), timeout);
         } catch (ClassCastException e) {
-            Log.d("waitForExists got ClassCastException "+ e);
+            Log.d("waitForExists got ClassCastException " + e);
             // Hotfix because of https://github.com/openatx/uiautomator2/issues/140
         }
         // https://developer.android.com/reference/android/support/test/uiautomator/UiObject#waitforexists
@@ -1014,7 +1005,7 @@ public class AutomatorServiceImpl implements AutomatorService {
             if (obj.getChildOrSibling().length == 0 && obj.checkBySelectorNull(obj) == false)
                 return device.wait(Until.gone(obj.toBySelector()), timeout);
         } catch (ClassCastException e) {
-            Log.d("waitUntilGone got ClassCastException "+ e);
+            Log.d("waitUntilGone got ClassCastException " + e);
         }
         return device.findObject(obj.toUiSelector()).waitUntilGone(timeout);
     }

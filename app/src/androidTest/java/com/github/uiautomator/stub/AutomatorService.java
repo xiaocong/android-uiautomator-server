@@ -33,10 +33,25 @@ public interface AutomatorService {
     final static int ERROR_CODE_BASE = -32000;
 
     /**
+     * Deprecated APIs
+     * boolean hasWatchedOnWindowsChange();
+     * void runWatchersOnWindowsChange(boolean enabled); # Auto click permission popups, This will slow uiautomator speed
+     */
+
+
+    /**
      * It's to play a section music to test
+     *
      * @return
      */
     boolean playSound(String path);
+
+    /**
+     * Capture toast or not
+     *
+     * @param enabled enable it of disable it
+     */
+    void setToastListener(boolean enabled);
 
     /**
      * It's to test if the service is alive.
@@ -44,18 +59,6 @@ public interface AutomatorService {
      * @return 'pong'
      */
     String ping();
-
-    /**
-     * Auto click permission popups
-     *
-     * @param enabled to enable runWatches on windowChanged
-     */
-    void runWatchersOnWindowsChange(boolean enabled);
-
-    /**
-     * get watched status
-     */
-    boolean hasWatchedOnWindowsChange();
 
     /**
      * show toast text in seconds

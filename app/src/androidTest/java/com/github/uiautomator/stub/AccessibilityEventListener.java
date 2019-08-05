@@ -42,25 +42,15 @@ public class AccessibilityEventListener implements UiAutomation.OnAccessibilityE
     public void onAccessibilityEvent(final AccessibilityEvent event) {
         if (event.getPackageName() == null) {
             return;
-        }
-        if ((event.getEventType() & (AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED | AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED)) != 0) {
-            if (triggerWatchers) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        synchronized (watchers) {
-                            device.runWatchers();
-                        }
-                    }
-                }, "Watchers").start();
-            }
         } else if (event.getEventType() == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
             Parcelable parcelable = event.getParcelableData();
             if (!(parcelable instanceof Notification)) { // without Notification is Toast
                 String packageName = event.getPackageName().toString();
-                this.toastTime = System.currentTimeMillis();
-                toastMessage = "" + event.getText().get(0);
-                Log.d("Toast:" + toastMessage + " Pkg:" + packageName + " Time:" + toastTime);
+                if (event.getText().size() > 0) {
+                    this.toastTime = System.currentTimeMillis();
+                    this.toastMessage = "" + event.getText().get(0);
+                    Log.d("Toast:" + toastMessage + " Pkg:" + packageName + " Time:" + toastTime);
+                }
             }
         }
     }
