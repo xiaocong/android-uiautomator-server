@@ -121,6 +121,7 @@ public class Stub {
 
     private void startMonitorService(Context context) {
         Intent intent = new Intent("com.github.uiautomator.ACTION_START");
+        intent.setPackage("com.github.uiautomator"); // fix error: Service Intent must be explicit
         context.startService(intent);
     }
 
@@ -133,6 +134,7 @@ public class Stub {
 
     private void stopMonitorService(Context context) {
         Intent intent = new Intent("com.github.uiautomator.ACTION_STOP");
+        intent.setPackage("com.github.uiautomator");
         context.startService(intent);
     }
 
