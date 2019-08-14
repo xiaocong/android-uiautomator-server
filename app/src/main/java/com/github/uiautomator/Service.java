@@ -58,7 +58,7 @@ public class Service extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        while(true) {
+        while (true) {
             try {
                 Thread.sleep(10 * 1000);
                 final String url = "http://127.0.0.1:7912/ping";
@@ -96,7 +96,7 @@ public class Service extends IntentService {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private String createNotificationChannel(String channelId, String channelName){
+    private String createNotificationChannel(String channelId, String channelName) {
         NotificationChannel chan = new NotificationChannel(channelId,
                 channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
