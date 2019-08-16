@@ -15,7 +15,7 @@ public class BatteryMonitor extends AbstractMonitor {
     private static final String TAG = "UIABatteryMonitor";
 
     private static final String USB_STATE_CHANGE = "android.hardware.usb.action.USB_STATE";
-    private BroadcastReceiver receiver = null;
+    public BroadcastReceiver receiver = null;
 
     public BatteryMonitor(Context context, HttpPostNotifier notifier) {
         super(context, notifier);
@@ -23,7 +23,7 @@ public class BatteryMonitor extends AbstractMonitor {
 
     @Override
     public void register() {
-        Log.i(TAG, "Battery monitor starting");
+        Log.i(TAG, "Register BatteryMonitor");
 
         this.receiver = new BroadcastReceiver() {
             private int level;
@@ -43,9 +43,11 @@ public class BatteryMonitor extends AbstractMonitor {
     @Override
     public void unregister() {
         if (receiver != null) {
+            Log.i(TAG, "battery unregistered");
             context.unregisterReceiver(receiver);
         }
     }
+
 
     private void report(HttpPostNotifier notifier, Intent intent) {
         Integer level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);

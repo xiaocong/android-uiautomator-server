@@ -129,8 +129,9 @@ public class Service extends IntentService {
         startForeground(NOTIFICATION_ID, notification);
 
         HttpPostNotifier notifier = new HttpPostNotifier("http://127.0.0.1:7912");
-        addMonitor(new BatteryMonitor(this, notifier));
-        addMonitor(new RotationMonitor(this, notifier));
+        Context context = getApplicationContext();
+        addMonitor(new BatteryMonitor(context, notifier));
+        addMonitor(new RotationMonitor(context, notifier));
         addMonitor(new WifiMonitor(this, notifier));
     }
 
@@ -144,8 +145,9 @@ public class Service extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "Stopping service");
-        stopForeground(true);
         removeAllMonitor();
+        Log.i(TAG, "unregister all watchers");
+        stopForeground(true);
     }
 
     @Override
@@ -176,6 +178,7 @@ public class Service extends IntentService {
 
     private void removeAllMonitor() {
         for (AbstractMonitor monitor : monitors) {
+            Log.i(TAG, "Unregister: " + monitor.toString());
             monitor.unregister();
         }
     }

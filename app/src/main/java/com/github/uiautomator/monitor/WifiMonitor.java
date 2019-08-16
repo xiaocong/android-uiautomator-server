@@ -48,7 +48,7 @@ public class WifiMonitor extends AbstractMonitor {
                     if (info != null) {
                         //如果当前的网络连接成功并且网络连接可用
                         if (NetworkInfo.State.CONNECTED == info.getState() && info.isAvailable()) {
-                            WifiManager wifi = (WifiManager)((Service) context).getSystemService(Context.WIFI_SERVICE);
+                            WifiManager wifi = (WifiManager) ((Service) context).getSystemService(Context.WIFI_SERVICE);
                             WifiInfo wInfo = wifi.getConnectionInfo();
                             report(notifier, new WifiInfos(true, wInfo.getSSID()).toString());
                         }
@@ -78,12 +78,12 @@ public class WifiMonitor extends AbstractMonitor {
         notifier.Notify("/info/wifi", content);
     }
 
-    class WifiInfos{
+    class WifiInfos {
 
         private boolean wifiStatus = false;
         private String ssid = "";
 
-        public WifiInfos(boolean wifiStatus, String ssid){
+        public WifiInfos(boolean wifiStatus, String ssid) {
             this.wifiStatus = wifiStatus;
             this.ssid = ssid;
         }

@@ -110,7 +110,6 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         Intent serviceIntent = new Intent(this, Service.class);
-        startService(serviceIntent);
         bindService(serviceIntent, connection, BIND_IMPORTANT | BIND_AUTO_CREATE);
 
         tvAgentStatus = findViewById(R.id.atx_agent_status);
@@ -119,7 +118,6 @@ public class MainActivity extends Activity {
         btnFinish.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                unbindService(connection);
                 stopService(new Intent(MainActivity.this, Service.class));
                 finish();
             }
@@ -211,9 +209,6 @@ public class MainActivity extends Activity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-//                Looper.prepare();
-//                Toast.makeText(MainActivity.this, "Uiautomator stopped", Toast.LENGTH_SHORT).show();
-//                Looper.loop();
                 checkUiautomatorStatus(null);
             }
         });
