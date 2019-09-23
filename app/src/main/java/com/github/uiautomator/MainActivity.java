@@ -68,22 +68,6 @@ public class MainActivity extends Activity {
     private boolean isWindowShown = false;
     private FloatView floatView;
 
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.i(TAG, "service connected");
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            Log.i(TAG, "service disconnected");
-
-            // restart service
-            Intent intent = new Intent(MainActivity.this, Service.class);
-            startService(intent);
-        }
-    };
-
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             Log.d(TAG, "message what " + msg.what);
@@ -108,9 +92,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Intent serviceIntent = new Intent(this, Service.class);
-        bindService(serviceIntent, connection, BIND_IMPORTANT | BIND_AUTO_CREATE);
 
         tvAgentStatus = findViewById(R.id.atx_agent_status);
 
@@ -375,7 +356,6 @@ public class MainActivity extends Activity {
         super.onDestroy();
         // must unbind service, otherwise it will leak memory
         // connection no need to set it to null
-        unbindService(connection);
         Log.i(TAG, "unbind service");
     }
 }

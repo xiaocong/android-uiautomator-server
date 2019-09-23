@@ -33,7 +33,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class Service extends IntentService {
+public class Service extends android.app.Service {
     public static final String ACTION_START = "com.github.uiautomator.ACTION_START";
     public static final String ACTION_STOP = "com.github.uiautomator.ACTION_STOP";
 
@@ -43,56 +43,11 @@ public class Service extends IntentService {
     private NotificationCompat.Builder builder;
     private List<AbstractMonitor> monitors = new ArrayList<>();
 
-    /**
-     * Creates an IntentService.  Invoked by your subclass's constructor.
-     */
-    public Service() {
-        super("MonitorService");
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
         // We don't support binding to this service
         return null;
-    }
-
-    @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
-        while (true) {
-            try {
-                Thread.sleep(10 * 1000);
-                final String url = "http://127.0.0.1:7912/ping";
-                OkhttpManager.getSingleton().post(url, new JSONObject().toString(), new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        WifiManager wifiManager = (WifiManager) Service.this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                        int ip = wifiManager.getConnectionInfo().getIpAddress();
-                        String ipStr = (ip & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + ((ip >> 24) & 0xFF);
-                        String str = getString(R.string.monitor_service_text) + " on " + ipStr;
-                        str += getString(R.string.agent_die);
-                        setNotificationContentText(str);
-                        Log.e(TAG, "call url:" + url + " is failed, and exception:" + e);
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String result = response.body().string();
-                        if (result.equals("pong")) {
-                            WifiManager wifiManager = (WifiManager) Service.this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                            int ip = wifiManager.getConnectionInfo().getIpAddress();
-                            String ipStr = (ip & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + ((ip >> 24) & 0xFF);
-                            String str = getString(R.string.monitor_service_text) + " on " + ipStr;
-                            str += getString(R.string.agent_live);
-                            setNotificationContentText(str);
-                        }
-                        Log.i(TAG, result);
-                    }
-                });
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                Log.e(TAG, e.getMessage());
-            }
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -152,8 +107,9 @@ public class Service extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "On StartCommand");
         super.onStartCommand(intent, flags, startId);
+
+        Log.i(TAG, "On StartCommand");
         String action = intent.getAction();
 
         if (ACTION_START.equals(action)) {
