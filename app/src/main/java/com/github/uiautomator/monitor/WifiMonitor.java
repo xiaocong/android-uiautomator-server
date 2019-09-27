@@ -57,7 +57,7 @@ public class WifiMonitor extends AbstractMonitor {
                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 int ip = wifiManager.getConnectionInfo().getIpAddress();
                 String ipStr = (ip & 0xFF) + "." + ((ip >> 8) & 0xFF) + "." + ((ip >> 16) & 0xFF) + "." + ((ip >> 24) & 0xFF);
-                ((Service) context).setNotificationContentText(context.getString(R.string.monitor_service_text) + " on " + ipStr);
+                ((Service) context).setNotificationContentText(context.getString(R.string.monitor_service_text) + " " + ipStr);
             }
         };
 

@@ -162,13 +162,14 @@ public class MainActivity extends Activity {
     }
 
     public void showFloatWindow(View view) {
-        boolean floatEnabled = FloatWindowManager.getInstance().checkFloatPermission(getApplicationContext());
+
+        boolean floatEnabled = FloatWindowManager.getInstance().checkFloatPermission(MainActivity.this);
         if (!floatEnabled) {
             Log.i(TAG, "float permission not checked");
             return;
         }
         if (floatView == null) {
-            floatView = new FloatView(getApplicationContext());
+            floatView = new FloatView(MainActivity.this);
         }
         floatView.show();
     }

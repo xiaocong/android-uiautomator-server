@@ -28,7 +28,7 @@
     <string name="action_settings">Settings</string>
     <string name="monitor_service_ticker">UIAutomator service started</string>
     <string name="monitor_service_title">UIAutomator</string>
-    <string name="monitor_service_text">Stupid service</string>
+    <string name="monitor_service_text">IP</string>
     <string name="agent_die">:agent is die</string>
     <string name="agent_live">:agent is live</string>
     <string name="fast_input_label">FastInputIME</string>
