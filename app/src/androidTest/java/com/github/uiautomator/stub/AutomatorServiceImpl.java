@@ -253,16 +253,23 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public String dumpWindowHierarchy(boolean compressed) {
         device.setCompressedLayoutHeirarchy(compressed);
+        ByteArrayOutputStream os = null;
         try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            os = new ByteArrayOutputStream();
             AccessibilityNodeInfoDumper.dumpWindowHierarchy(device, os);
 //            device.dumpWindowHierarchy(os);
-            os.close();
+
             return os.toString("UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.d("dump Window Hierarchy got IOException " + e);
+        }finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
         }
 
         return null;
