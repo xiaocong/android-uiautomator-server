@@ -1,5 +1,7 @@
 package com.github.uiautomator.monitor;
 
+import com.github.uiautomator.util.OkhttpManager;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -16,12 +18,12 @@ import okhttp3.Response;
 
 public class HttpPostNotifier {
     private String reportUrl;
-    private OkHttpClient client;
+    private OkhttpManager okhttpManager;
 
     public HttpPostNotifier(String reportUrl) {
         // reportUrl eg: http://127.0.0.1:7912
         this.reportUrl = reportUrl;
-        this.client = new OkHttpClient();
+        this.okhttpManager = OkhttpManager.getSingleton();
     }
 
     public void Notify(String baseUrl, String content) {
@@ -35,7 +37,7 @@ public class HttpPostNotifier {
                 .url(reportUrl + baseUrl)
                 .post(body)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
+        okhttpManager.newCall(request, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();

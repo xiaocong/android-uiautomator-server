@@ -4,30 +4,22 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Color;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.text.format.Formatter;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -35,7 +27,11 @@ import android.widget.Toast;
 
 import com.android.permission.FloatWindowManager;
 import com.github.uiautomator.util.MemoryManager;
+import com.github.uiautomator.util.OkhttpManager;
 import com.github.uiautomator.util.Permissons4App;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -45,11 +41,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import com.android.permission.FloatWindowManager;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MainActivity extends Activity {
     private final String TAG = "ATXMainActivity";
@@ -67,6 +58,8 @@ public class MainActivity extends Activity {
     private WindowManager windowManager = null;
     private boolean isWindowShown = false;
     private FloatView floatView;
+
+    private OkhttpManager okhttpManager = OkhttpManager.getSingleton();
 
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -179,13 +172,11 @@ public class MainActivity extends Activity {
                 .url(ATX_AGENT_URL + "/uiautomator")
                 .delete()
                 .build();
-        new OkHttpClient().newCall(request).enqueue(new Callback() {
+        okhttpManager.newCall(request,new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                Looper.prepare();
-                Toast.makeText(MainActivity.this, "Uiautomator already stopped ", Toast.LENGTH_SHORT).show();
-                Looper.loop();
+                uiToaster("Uiautomator already stopped ");
                 checkUiautomatorStatus(null);
             }
 
@@ -201,20 +192,25 @@ public class MainActivity extends Activity {
                 .url(ATX_AGENT_URL + "/uiautomator")
                 .post(RequestBody.create(null, new byte[0]))
                 .build();
-        new OkHttpClient().newCall(request).enqueue(new Callback() {
+        okhttpManager.newCall(request, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                Looper.prepare();
-                Toast.makeText(MainActivity.this, "Uiautomator not starting", Toast.LENGTH_SHORT).show();
-                Looper.loop();
+                uiToaster("Uiautomator not starting");
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Looper.prepare();
-                Toast.makeText(MainActivity.this, "Uiautomator started", Toast.LENGTH_SHORT).show();
-                Looper.loop();
+                uiToaster("Uiautomator started");
+            }
+        });
+    }
+
+    private void uiToaster(final String msg) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, msg , Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -251,21 +247,18 @@ public class MainActivity extends Activity {
                 .url(ATX_AGENT_URL + "/stop")
                 .get()
                 .build();
-        new OkHttpClient().newCall(request).enqueue(new Callback() {
+        okhttpManager.newCall(request, new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                Looper.prepare();
-                Toast.makeText(MainActivity.this, "atx-agent already stopped", Toast.LENGTH_SHORT).show();
-                Looper.loop();
+                uiToaster("atx-agent already stopped ");
             }
 
             @Override
             public void onResponse(Call call, Response response) {
-                Looper.prepare();
-                Toast.makeText(MainActivity.this, "atx-agent stopped", Toast.LENGTH_SHORT).show();
-                Looper.loop();
+
+                uiToaster("atx-agent stopped ");
             }
         });
     }
@@ -275,7 +268,7 @@ public class MainActivity extends Activity {
                 .url(ATX_AGENT_URL + "/ping")
                 .get()
                 .build();
-        new OkHttpClient().newCall(request).enqueue(new Callback() {
+        okhttpManager.newCall(request, new Callback() {
             Message msg = new Message();
 
             @Override
@@ -297,7 +290,7 @@ public class MainActivity extends Activity {
                 .url(ATX_AGENT_URL + "/uiautomator")
                 .get()
                 .build();
-        new OkHttpClient().newCall(request).enqueue(new Callback() {
+        okhttpManager.newCall(request, new Callback() {
             Message msg = new Message();
 
             @Override
