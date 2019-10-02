@@ -22,17 +22,19 @@ public class BatteryMonitor extends AbstractMonitor {
     }
 
     @Override
-    public void register() {
-        Log.i(TAG, "Register BatteryMonitor");
-
+    public void init() {
+        Log.i(TAG, "Battery monitor init");
         this.receiver = new BroadcastReceiver() {
-            private int level;
-
             @Override
             public void onReceive(Context context, Intent intent) {
                 report(notifier, intent);
             }
         };
+    }
+
+    @Override
+    public void register() {
+        Log.i(TAG, "Register BatteryMonitor");
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_BATTERY_CHANGED);

@@ -26,8 +26,8 @@ public class WifiMonitor extends AbstractMonitor {
     }
 
     @Override
-    public void register() {
-        Log.i(TAG, "Wifi monitor starting");
+    public void init() {
+        Log.i(TAG, "Wifi monitor init");
         this.receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -60,6 +60,11 @@ public class WifiMonitor extends AbstractMonitor {
                 ((Service) context).setNotificationContentText(context.getString(R.string.monitor_service_text) + " " + ipStr);
             }
         };
+    }
+
+    @Override
+    public void register() {
+        Log.i(TAG, "Wifi monitor starting");
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);

@@ -13,9 +13,17 @@ abstract public class AbstractMonitor {
     public AbstractMonitor(Context context, HttpPostNotifier notifier) {
         this.context = context;
         this.notifier = notifier;
+        init();
+        try {
+            unregister();
+        }catch (IllegalArgumentException  e){
+            //ignore
+        }
 
         this.register();
     }
+
+    abstract public void init();
 
     abstract public void register();
 
