@@ -200,7 +200,7 @@ public interface AutomatorService {
      * @param conditions If all UiObject in the conditions match, the watcher should be triggered.
      * @param keys All keys will be pressed in sequence.
      */
-    void registerPressKeyskWatcher(String name, Selector[] conditions, String[] keys);
+    void registerPressKeysWatcher(String name, Selector[] conditions, String[] keys);
 
     /**
      * Removes a previously registered UiWatcher.

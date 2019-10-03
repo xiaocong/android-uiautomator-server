@@ -343,7 +343,7 @@ public class AutomatorServiceImpl implements AutomatorService {
      * @param keys       All keys will be pressed in sequence.
      */
     @Override
-    public void registerPressKeyskWatcher(String name, Selector[] conditions, String[] keys) {
+    public void registerPressKeysWatcher(String name, Selector[] conditions, String[] keys) {
         synchronized (watchers) {
             if (watchers.contains(name)) {
                 device.removeWatcher(name);
