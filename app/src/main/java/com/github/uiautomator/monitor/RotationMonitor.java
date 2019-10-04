@@ -22,11 +22,9 @@ public class RotationMonitor extends AbstractMonitor {
     }
 
     @Override
-    public void register() {
-        Log.i(TAG, "Rotation monitor starting");
-
+    public void init() {
+        Log.i(TAG, "Rotation monitor init");
         this.windowService = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        report(); // need to notify for the first time
 
         receiver = new BroadcastReceiver() {
             @Override
@@ -34,6 +32,13 @@ public class RotationMonitor extends AbstractMonitor {
                 report();
             }
         };
+    }
+
+    @Override
+    public void register() {
+        Log.i(TAG, "Rotation monitor starting");
+        report(); // need to notify for the first time
+
         // FIXME(ssx): when change from 90 degree to 270 degree. no broadcast received
         context.registerReceiver(receiver, new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
     }
