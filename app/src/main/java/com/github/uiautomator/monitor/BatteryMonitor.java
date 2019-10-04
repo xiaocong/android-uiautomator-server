@@ -54,6 +54,6 @@ public class BatteryMonitor extends AbstractMonitor {
     private void report(HttpPostNotifier notifier, Intent intent) {
         Integer level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
         Log.d(TAG, "notify battery changed. current level " + level);
-        notifier.Notify("/info/battery", "");
+        notifier.Notify("/info/battery", String.valueOf(level));
     }
 }
