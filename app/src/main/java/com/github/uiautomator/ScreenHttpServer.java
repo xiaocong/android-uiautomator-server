@@ -1,6 +1,7 @@
 package com.github.uiautomator;
 
 import android.annotation.TargetApi;
+import android.app.Instrumentation;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.media.MediaCodec;
@@ -9,6 +10,7 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 

@@ -23,6 +23,7 @@
 
 package com.github.uiautomator.stub;
 
+import android.app.Instrumentation;
 import android.app.UiAutomation;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -75,18 +76,23 @@ public class AutomatorServiceImpl implements AutomatorService {
 
     private UiDevice device;
     private UiAutomation uiAutomation;
+    private Instrumentation mInstrumentation;
+    private TouchController touchController;
     ClipboardManager clipboard;
 
     public AutomatorServiceImpl() {
-        this.uiAutomation = InstrumentationRegistry.getInstrumentation().getUiAutomation();
-        this.device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+        mInstrumentation = InstrumentationRegistry.getInstrumentation();
+        uiAutomation = mInstrumentation.getUiAutomation();
+        device = UiDevice.getInstance(mInstrumentation);
+        touchController = new TouchController(mInstrumentation);
+
         handler.post(new Runnable() {
             @Override
             public void run() {
                 AutomatorServiceImpl.this.clipboard = (ClipboardManager) InstrumentationRegistry.getTargetContext().getSystemService(Context.CLIPBOARD_SERVICE);
             }
         });
-         // play music when loaded
+        // play music when loaded
         soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
             @Override
             public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
@@ -232,13 +238,16 @@ public class AutomatorServiceImpl implements AutomatorService {
     // Multi touch is a little complicated
     @Override
     public boolean injectInputEvent(int action, float x, float y, int metaState) {
-        MotionEvent e = MotionEvent.obtain(SystemClock.uptimeMillis(),
-                SystemClock.uptimeMillis(),
-                action, x, y, metaState);
-        e.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        boolean b = uiAutomation.injectInputEvent(e, true);
-        e.recycle();
-        return b;
+        switch (action) {
+            case MotionEvent.ACTION_DOWN: // 0
+                return touchController.touchDown(x, y);
+            case MotionEvent.ACTION_MOVE: // 2
+                return touchController.touchMove(x, y);
+            case MotionEvent.ACTION_UP: // 1
+                return touchController.touchUp(x, y);
+            default:
+                return false;
+        }
     }
 
     /**
@@ -272,7 +281,7 @@ public class AutomatorServiceImpl implements AutomatorService {
             return os.toString("UTF-8");
         } catch (IOException e) {
             Log.d("dump Window Hierarchy got IOException " + e);
-        }finally {
+        } finally {
             if (os != null) {
                 try {
                     os.close();
