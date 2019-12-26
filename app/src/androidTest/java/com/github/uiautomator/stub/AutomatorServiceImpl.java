@@ -28,12 +28,12 @@ import android.app.UiAutomation;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
-import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.Configurator;
 import android.support.test.uiautomator.Direction;
@@ -46,9 +46,9 @@ import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiScrollable;
 import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
-import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+
 
 import com.github.uiautomator.ToastHelper;
 import com.github.uiautomator.stub.watcher.ClickUiObjectWatcher;
@@ -56,8 +56,8 @@ import com.github.uiautomator.stub.watcher.PressKeysWatcher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -111,6 +111,10 @@ public class AutomatorServiceImpl implements AutomatorService {
         uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(device, watchers));
     }
 
+    private UiAutomation getUiAutomation() {
+        return uiAutomation;
+    }
+
     /**
      * It's to play a section music to test
      *
@@ -130,9 +134,9 @@ public class AutomatorServiceImpl implements AutomatorService {
         if (enabled) {
             // default uiAutomation serviceInfo.eventTypes is -1
             // this might means watch all eventTypes
-            uiAutomation.setOnAccessibilityEventListener(new AccessibilityEventListener(device, watchers));
+            getUiAutomation().setOnAccessibilityEventListener(new AccessibilityEventListener(device, watchers));
         } else {
-            uiAutomation.setOnAccessibilityEventListener(null);
+            getUiAutomation().setOnAccessibilityEventListener(null);
         }
     }
 
@@ -272,22 +276,19 @@ public class AutomatorServiceImpl implements AutomatorService {
     @Override
     public String dumpWindowHierarchy(boolean compressed) {
         device.setCompressedLayoutHeirarchy(compressed);
-        ByteArrayOutputStream os = null;
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            os = new ByteArrayOutputStream();
+            // Original code: device.dumpWindowHierarchy(os);
+            // The bellow code fix xml encode error
             AccessibilityNodeInfoDumper.dumpWindowHierarchy(device, os);
-//            device.dumpWindowHierarchy(os);
-
             return os.toString("UTF-8");
         } catch (IOException e) {
-            Log.d("dump Window Hierarchy got IOException " + e);
+            Log.d("dumpWindowHierarchy got IOException: " + e);
         } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    //ignore
-                }
+            try {
+                os.close();
+            } catch (IOException e) {
+                // ignore
             }
         }
 
@@ -309,6 +310,31 @@ public class AutomatorServiceImpl implements AutomatorService {
         device.takeScreenshot(f, scale, quality);
         if (f.exists()) return f.getAbsolutePath();
         return null;
+    }
+
+    @Override
+    public String takeScreenshot(float scale, int quality) throws NotImplementedException {
+        Bitmap screenshot = getUiAutomation().takeScreenshot();
+        if (screenshot == null) {
+            return null;
+        }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            screenshot.compress(Bitmap.CompressFormat.JPEG, quality, bos);
+            bos.flush();
+            return Base64.getEncoder().encodeToString(bos.toByteArray());
+        } catch (IOException ioe) {
+            Log.e("takeScreenshot error: " + ioe);
+            return null;
+        } finally {
+            try {
+                bos.close();
+            } catch (IOException ioe) {
+                // Ignore
+            }
+            screenshot.recycle();
+        }
     }
 
     /**

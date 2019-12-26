@@ -180,6 +180,17 @@ public interface AutomatorService {
     String takeScreenshot(String filename, float scale, int quality) throws NotImplementedException;
 
     /**
+     * Take a screenshot of current window and store it as JPEG The screenshot is adjusted per screen rotation
+     *
+     * @param scale
+     * @param quality
+     * @return base64 encoded image data
+     * @throws NotImplementedException
+     */
+    @JsonRpcErrors({@JsonRpcError(exception = NotImplementedException.class, code = ERROR_CODE_BASE - 3)})
+    public String takeScreenshot(float scale, int quality) throws NotImplementedException;
+
+    /**
      * Disables the sensors and freezes the device rotation at its current rotation state, or enable it.
      *
      * @param freeze true to freeze the rotation, false to unfreeze the rotation.
@@ -1016,13 +1027,15 @@ public interface AutomatorService {
 
     /**
      * set Clipboard
+     *
      * @param label User-visible label for the clip data.
-     * @param text The actual text in the clip.
+     * @param text  The actual text in the clip.
      */
     void setClipboard(String label, String text);
 
     /**
      * get Clipboard data
+     *
      * @return Clipboard data or null
      */
     String getClipboard();
