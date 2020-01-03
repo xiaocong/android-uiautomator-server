@@ -85,6 +85,11 @@ public class FloatView extends FrameLayout {
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR
                 | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON; // 保持屏幕常亮
+
+        // Set to not touchable
+        //params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        //params.flags &= (~WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+
         int mType;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
@@ -94,8 +99,10 @@ public class FloatView extends FrameLayout {
         params.type = mType;
         params.format = PixelFormat.RGBA_8888;
         params.gravity = Gravity.LEFT | Gravity.TOP;
-        params.x = screenWidth - dp2px(context, 100);
-        params.y = screenHeight - dp2px(context, 171);
+        params.width = screenWidth / 10;
+        params.height = screenWidth / 10;
+        params.x = screenWidth - sideGap() - params.width;
+        params.y = screenHeight / 3 * 2;
         params.alpha = 0.5f;
         this.setParams(params);
         windowManager.addView(this, params);
@@ -152,6 +159,10 @@ public class FloatView extends FrameLayout {
         return true;
     }
 
+    private int sideGap() {
+        return dp2px(5);
+    }
+
     private void anchorToSide() {
         isAnchoring = true;
         Point size = new Point();
@@ -164,32 +175,25 @@ public class FloatView extends FrameLayout {
         int xDistance = 0;
         int yDistance = 0;
 
-        int dp_25 = dp2px(15);
+        int gap = sideGap();
 
-        //1
-        if (middleX <= dp_25 + getWidth() / 2) {
-            xDistance = dp_25 - mParams.x;
-        }
-        //2
-        else if (middleX <= screenWidth / 2) {
-            xDistance = dp_25 - mParams.x;
-        }
-        //3
-        else if (middleX >= screenWidth - getWidth() / 2 - dp_25) {
-            xDistance = screenWidth - mParams.x - getWidth() - dp_25;
-        }
-        //4
-        else {
-            xDistance = screenWidth - mParams.x - getWidth() - dp_25;
+        if (middleX <= gap + getWidth() / 2) {
+            xDistance = gap - mParams.x;
+        } else if (middleX <= screenWidth / 2) {
+            xDistance = gap - mParams.x;
+        } else if (middleX >= screenWidth - getWidth() / 2 - gap) {
+            xDistance = screenWidth - mParams.x - getWidth() - gap;
+        } else {
+            xDistance = screenWidth - mParams.x - getWidth() - gap;
         }
 
         //1
-        if (mParams.y < dp_25) {
-            yDistance = dp_25 - mParams.y;
+        if (mParams.y < gap) {
+            yDistance = gap - mParams.y;
         }
         //2
-        else if (mParams.y + getHeight() + dp_25 >= screenHeight) {
-            yDistance = screenHeight - dp_25 - mParams.y - getHeight();
+        else if (mParams.y + getHeight() + gap >= screenHeight) {
+            yDistance = screenHeight - gap - mParams.y - getHeight();
         }
         Log.d(TAG, "xDistance  " + xDistance + "   yDistance" + yDistance);
 

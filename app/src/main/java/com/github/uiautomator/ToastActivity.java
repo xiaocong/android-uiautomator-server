@@ -8,7 +8,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class ToastActivity extends Activity {
-    final static String TAG = "hiddenActivity";
+    final static String TAG = "ToastActivity";
+    private static FloatView floatView;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -19,10 +21,30 @@ public class ToastActivity extends Activity {
 
         String message = intent.getStringExtra("message");
         if (message != null && !"".equals(message)) {
-            Toast.makeText(this, "uiautomator say: " + message, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "openatx: " + message, Toast.LENGTH_SHORT).show();
+        }
+
+        String showFloat = intent.getStringExtra("showFloatWindow");
+        Log.i(TAG, "showFloat: " + showFloat);
+        if ("true".equals(showFloat)) {
+            getFloatView().show();
+        } else if ("false".equals(showFloat)) {
+            getFloatView().hide();
         }
 
         moveTaskToBack(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    private FloatView getFloatView() {
+        if (floatView == null) {
+            floatView = new FloatView(ToastActivity.this);
+        }
+        return floatView;
     }
 
     @Override

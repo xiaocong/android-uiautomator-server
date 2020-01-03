@@ -66,6 +66,18 @@ For example:
 adb  shell am broadcast -a send.mock -e lat 15.3 -e lon 99
 ```
 
+## Show toast
+
+```
+adb shell am start -n com.github.uiautomator/.ToastActivity -e message hello
+```
+
+## Float window
+
+```
+adb shell am start -n com.github.uiautomator/.ToastActivity -e showFloatWindow true # show
+adb shell am start -n com.github.uiautomator/.ToastActivity -e showFloatWindow false # hide
+```
 
 # How to use
 
