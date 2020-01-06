@@ -18,12 +18,38 @@ $ ./gradlew build
 $ ./gradlew packageDebugAndroidTest
 ```
 
-- Run the jsonrcp server on Android device
+- Run the jsonrpc server on Android device
 
 ```bash
 $ ./gradlew cC
 $ adb forward tcp:9008 tcp:9008 # tcp forward
 ```
+
+If debug apk already installed, There is no need to use gradle.
+
+simply run the following command
+
+```
+adb forward tcp:9008 tcp:9008
+adb shell am instrument -w -r -e debug false -e class com.github.uiautomator.stub.Stub \
+    com.github.uiautomator.test/android.support.test.runner.AndroidJUnitRunner
+```
+
+# Run
+```bash
+$ curl -X POST -d '{"jsonrpc": "2.0", "id": "1f0f2655716023254ed2b57ba4198815", "method": "deviceInfo", "params": {}}' 'http://127.0.0.1:9008/jsonrpc/0'
+{'currentPackageName': 'com.smartisanos.launcher',
+ 'displayHeight': 1920,
+ 'displayRotation': 0,
+ 'displaySizeDpX': 360,
+ 'displaySizeDpY': 640,
+ 'displayWidth': 1080,
+ 'productName': 'surabaya',
+ 'screenOn': True,
+ 'sdkInt': 23,
+ 'naturalOrientation': True}
+```
+
 
 # The buildin input method
 **Fast input method**
@@ -79,10 +105,12 @@ adb shell am start -n com.github.uiautomator/.ToastActivity -e showFloatWindow t
 adb shell am start -n com.github.uiautomator/.ToastActivity -e showFloatWindow false # hide
 ```
 
-# How to use
+# How to use with Python
 
 ```python
-from uiautomator import device as d
+import uiautomator2 as u2
+
+d = u2.connect()
 
 d.screen.on()
 d(text="Settings").click()
