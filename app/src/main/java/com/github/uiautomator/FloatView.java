@@ -76,6 +76,7 @@ public class FloatView extends FrameLayout {
         windowManager.getDefaultDisplay().getSize(size);
         int screenWidth = size.x;
         int screenHeight = size.y;
+        int minWidthHeight = size.x > size.y ? size.y : size.x;
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.packageName = context.getPackageName();
@@ -99,8 +100,8 @@ public class FloatView extends FrameLayout {
         params.type = mType;
         params.format = PixelFormat.RGBA_8888;
         params.gravity = Gravity.LEFT | Gravity.TOP;
-        params.width = screenWidth / 10;
-        params.height = screenWidth / 10;
+        params.width = minWidthHeight / 10;
+        params.height = minWidthHeight / 10;
         params.x = screenWidth - sideGap() - params.width;
         params.y = screenHeight / 3 * 2;
         params.alpha = 0.5f;

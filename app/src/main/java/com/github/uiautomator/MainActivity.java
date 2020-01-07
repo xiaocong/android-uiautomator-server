@@ -29,6 +29,7 @@ import com.android.permission.FloatWindowManager;
 import com.github.uiautomator.util.MemoryManager;
 import com.github.uiautomator.util.OkhttpManager;
 import com.github.uiautomator.util.Permissons4App;
+import com.tendcloud.tenddata.TCAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,11 +81,23 @@ public class MainActivity extends Activity {
         }
     };
 
+    private void initTCAgent() {
+        TCAgent.LOG_ON = true;
+        // App ID: 在TalkingData创建应用后，进入数据报表页中，在“系统设置”-“编辑应用”页面里查看App ID。
+        // 渠道 ID: 是渠道标识符，可通过不同渠道单独追踪数据。
+        TCAgent.init(this, BuildConfig.buildTendId, BuildConfig.buildChannel);
+        // 如果已经在AndroidManifest.xml配置了App ID和渠道ID，调用TCAgent.init(this)即可；或与AndroidManifest.xml中的对应参数保持一致。
+        TCAgent.setReportUncaughtExceptions(true);
+        Log.i(TAG, "TCAgent init done");
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.initTCAgent();
 
         tvAgentStatus = findViewById(R.id.atx_agent_status);
 
@@ -172,7 +185,7 @@ public class MainActivity extends Activity {
                 .url(ATX_AGENT_URL + "/uiautomator")
                 .delete()
                 .build();
-        okhttpManager.newCall(request,new Callback() {
+        okhttpManager.newCall(request, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
@@ -210,7 +223,7 @@ public class MainActivity extends Activity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, msg , Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
             }
         });
     }
