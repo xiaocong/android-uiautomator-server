@@ -79,9 +79,10 @@ public class TouchController {
         coords.x = x;
         coords.y = y;
 
-        return MotionEvent.obtain(downTime, eventTime, action, 1,
+        MotionEvent event = MotionEvent.obtain(downTime, eventTime, action, 1,
                 new MotionEvent.PointerProperties[]{properties}, new MotionEvent.PointerCoords[]{coords},
                 0, 0, 1.0f, 1.0f, 0, 0, InputDevice.SOURCE_TOUCHSCREEN, 0);
+        return event;
     }
 
     public boolean performMultiPointerGesture(MotionEvent.PointerCoords[]... touches) {

@@ -86,6 +86,13 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
+
+    // fix try-with-resource warning
+    // ref: https://stackoverflow.com/questions/40408628/try-with-resources-requires-api-level-19-okhttp
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
