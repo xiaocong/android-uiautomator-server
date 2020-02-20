@@ -34,6 +34,7 @@ import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.uiautomator.Configurator;
 import android.support.test.uiautomator.Direction;
@@ -196,9 +197,25 @@ public class AutomatorServiceImpl implements AutomatorService {
      */
     @Override
     public boolean click(int x, int y) {
-        return device.click(x, y);
+        // The original implementation got bug here.
+        // when y >= getDiaplayHeight() return false, but getDisplayHeight() is not right in infinity display
+        //  return device.click(x, y);
+        if (x < 0 || y < 0){
+            return false;
+        }
+        touchController.touchDown(x, y);
+        SystemClock.sleep(100); // normally 100ms for click
+        return touchController.touchUp(x, y);
     }
 
+    public boolean click(int x, int y, long milliseconds) {
+        if (x < 0 || y < 0){
+            return false;
+        }
+        touchController.touchDown(x, y);
+        SystemClock.sleep(milliseconds);
+        return touchController.touchUp(x, y);
+    }
     /**
      * Performs a swipe from one coordinate to another coordinate. You can control the smoothness and speed of the swipe by specifying the number of steps. Each step execution is throttled to 5 milliseconds per step, so for a 100 steps, the swipe will take around 0.5 seconds to complete.
      *

@@ -105,6 +105,16 @@ public interface AutomatorService {
     boolean click(int x, int y);
 
     /**
+     * Perform a click at arbitrary coordinates specified by the user
+     *
+     * @param x
+     * @param y
+     * @param milliseconds
+     * @return
+     */
+    public boolean click(int x, int y, long milliseconds);
+
+    /**
      * Performs a swipe from one coordinate to another coordinate. You can control the smoothness and speed of the swipe by specifying the number of steps. Each step execution is throttled to 5 milliseconds per step, so for a 100 steps, the swipe will take around 0.5 seconds to complete.
      *
      * @param startX X-axis value for the starting coordinate
