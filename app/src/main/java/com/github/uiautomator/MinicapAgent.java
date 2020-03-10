@@ -7,6 +7,7 @@ import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.os.Process;
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.github.uiautomator.compat.WindowManagerWrapper;
 
@@ -15,7 +16,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,71 +26,18 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 
-public class ScrcpyAgent {
-    private static final String PROCESS_NAME = "scrcpy.cli";
+public class MinicapAgent extends Thread {
+    private static final String PROCESS_NAME = "minicap.cli";
     private static final String VERSION = "1.0";
-    private static final String SOCKET_NAME = "scrcpy";
+    private static final String DEFAULT_SOCKET_NAME = "minicapagent";
+    private static final String TAG = "minicap";
+
     final WindowManagerWrapper windowManager = new WindowManagerWrapper();
+    private int width;
+    private int height;
     private int rotation;
-    private Point size;
+    private String socketName;
 
-    public static void main(String[] args) {
-        /**
-         * Usage:
-         *     APKPATH=$(adb shell pm path com.github.uiautomator | cut -d: -f2)
-         *     adb shell CLASSPATH=$APKPATH exec app_process /system/bin com.github.uiautomator.ScrcpyAgent --help
-         */
-        setArgV0(PROCESS_NAME);
-
-        Options options = new Options();
-        options.addOption("v", "version", false, "show current version");
-        options.addOption("h", "help", false, "show this message");
-        options.addOption("i", true, "Change the name of of the abtract unix domain socket. (" + SOCKET_NAME + ")");
-        options.addOption("d", "dump", false, "dump info for debug");
-
-        CommandLineParser parser = new DefaultParser();
-        HelpFormatter formatter = new HelpFormatter();
-        CommandLine cmd;
-
-        try {
-            cmd = parser.parse(options, args);
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-            formatter.printHelp(PROCESS_NAME, options);
-            System.exit(1);
-            return;
-        }
-
-        if (cmd.hasOption("help")) {
-            formatter.printHelp(PROCESS_NAME, options);
-            return;
-        }
-        if (cmd.hasOption("version")) {
-            System.out.println(VERSION);
-            return;
-        }
-        if (cmd.hasOption("dump")) {
-            WindowManagerWrapper wm = new WindowManagerWrapper();
-            try {
-                Point size = wm.getDisplaySize();
-                System.out.println("Dump --.");
-                System.out.println("Display: " + size.x + "x" + size.y);
-                System.out.println("Rotation: " + wm.getRotation());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-
-        String socketName = cmd.getOptionValue("i");
-        if (socketName == null) {
-            socketName = SOCKET_NAME;
-        }
-        System.out.println("listen on localabstract:" + socketName);
-
-        ScrcpyAgent agent = new ScrcpyAgent();
-        agent.listenLocalSocket(socketName);
-    }
 
     private static void setArgV0(String text) {
         try {
@@ -105,49 +52,47 @@ public class ScrcpyAgent {
         }
     }
 
-    public ScrcpyAgent() {
-        rotation = windowManager.getRotation();
-        windowManager.watchRotation(new WindowManagerWrapper.RotationWatcher() {
-            @Override
-            public void onRotationChanged(int r) {
-                rotation = r;
-                System.out.println("Rotation:" + r);
-            }
+    public MinicapAgent(int width, int height, String socketName) {
+        this.width = width;
+        this.height = height;
+        this.rotation = windowManager.getRotation();
+        this.socketName = socketName;
+        windowManager.watchRotation(r -> {
+            rotation = r;
+            System.out.println("Rotation:" + r);
         });
-
-        try {
-            size = windowManager.getDisplaySize();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
-    private void listenLocalSocket(String socketName) {
-        try (LocalServerSocket serverSocket = new LocalServerSocket(socketName)) {
-            while (true) {
-                try (LocalSocket socket = serverSocket.accept()) {
-                    OutputStream output = socket.getOutputStream();
-                    rotation = windowManager.getRotation();
-                    Point size = windowManager.getDisplaySize();
-                    System.out.println("Display: " + size.x + "x" + size.y);
-                    System.out.println("Rotation: " + rotation);
-                    try {
-                        writeBanner(output);
-                        pipeImages(output);
-                    } catch (IOException e) {
-                        System.out.println("socket closed, wait for new request");
-                    }
+    private void manageClientConnection(LocalServerSocket serverSocket) {
+        while (true) {
+            System.out.printf("Listening on localabstract:%s\n", socketName);
+
+            // python3 -m adbutils.pidcat -t scrcpy
+            Log.i(TAG, String.format("Listening on %s", socketName));
+            try (LocalSocket socket = serverSocket.accept()) {
+                Log.d(TAG, "client connected");
+
+                OutputStream output = socket.getOutputStream();
+                rotation = windowManager.getRotation();
+                Point size = windowManager.getDisplaySize();
+                System.out.println("Display: " + size.x + "x" + size.y);
+                System.out.println("Rotation: " + rotation);
+                try {
+                    writeBanner(output);
+                    pipeImages(output);
+                } catch (Exception e) {
+                    System.out.println("socket closed, exception: " + e);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
     private void writeBanner(OutputStream stream) throws IOException {
         final byte BANNER_SIZE = 24;
         final byte version = 1;
-        final byte quirks = 2;
+        final byte quirks = 1; // QUIRK_DUMB
         int pid = Process.myPid();
 
         ByteBuffer b = ByteBuffer.allocate(BANNER_SIZE);
@@ -185,6 +130,7 @@ public class ScrcpyAgent {
                 ByteArrayOutputStream buf = new ByteArrayOutputStream();
                 bmp.compress(Bitmap.CompressFormat.JPEG, quality, buf);
                 byte[] jpegData = buf.toByteArray();
+
                 ByteBuffer b = ByteBuffer.allocate(4);
                 b.order(ByteOrder.LITTLE_ENDIAN);
                 b.putInt(jpegData.length);
@@ -193,7 +139,7 @@ public class ScrcpyAgent {
 
                 count++;
                 if (count == 30) {
-                    float fps = (float) count / (SystemClock.uptimeMillis() -calulateStartTime) * 1000;
+                    float fps = (float) count / (SystemClock.uptimeMillis() - calulateStartTime) * 1000;
                     System.out.println("FPS: " + fps);
                     calulateStartTime = SystemClock.uptimeMillis();
                     count = 0;
@@ -208,7 +154,7 @@ public class ScrcpyAgent {
         Class surfaceControl = Class.forName("android.view.SurfaceControl");
         Method screenshotMethod = surfaceControl.getDeclaredMethod("screenshot", Integer.TYPE, Integer.TYPE);
         try {
-            Bitmap bmp = (Bitmap) screenshotMethod.invoke(null, new Object[]{size.x, size.y});
+            Bitmap bmp = (Bitmap) screenshotMethod.invoke(null, new Object[]{width, height});
             if (rotation == 0) {
                 return bmp;
             }
@@ -222,4 +168,42 @@ public class ScrcpyAgent {
         }
     }
 
+    public static void main(String[] args) {
+        /**
+         * Usage:
+         *     APKPATH=$(adb shell pm path com.github.uiautomator | cut -d: -f2)
+         *     adb shell CLASSPATH=$APKPATH exec app_process /system/bin com.github.uiautomator.MinicapAgent --help
+         */
+        setArgV0(PROCESS_NAME);
+
+        WindowManagerWrapper wm = new WindowManagerWrapper();
+        try {
+            System.out.println("Dump --.");
+            System.out.println("Rotation: " + wm.getRotation());
+            Point size = wm.getDisplaySize();
+            if (size != null) {
+                System.out.println("Display: " + size.x + "x" + size.y);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Point size = wm.getDisplaySize();
+        if (size == null) {
+            System.err.println("Unable to get screen resolution");
+            System.exit(1);
+        }
+
+        MinicapAgent agent = new MinicapAgent(size.x, size.y, DEFAULT_SOCKET_NAME);
+        agent.run();
+    }
+
+    @Override
+    public void run() {
+        try (LocalServerSocket serverSocket = new LocalServerSocket(socketName)) {
+            manageClientConnection(serverSocket);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

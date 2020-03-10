@@ -9,14 +9,12 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.view.Display;
 import android.view.InputDevice;
 import android.view.InputEvent;
 import android.view.MotionEvent;
 
 import com.github.uiautomator.compat.InputManagerWrapper;
 import com.github.uiautomator.compat.WindowManagerWrapper;
-import com.github.uiautomator.util.InternalApi;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -24,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +36,7 @@ public class MinitouchAgent extends Thread {
     private static final int DEFAULT_MAX_PRESSURE = 0;
     private final int width;
     private final int height;
+    private String socketName;
     private LocalServerSocket serverSocket;
 
     private MotionEvent.PointerProperties[] pointerProperties = new MotionEvent.PointerProperties[2];
@@ -54,35 +52,6 @@ public class MinitouchAgent extends Thread {
         int lastX;
         int lastY;
         int action;
-    }
-
-    /**
-     * Get the width and height of the display by getting the DisplayInfo through reflection
-     * Using the android.hardware.display.DisplayManagerGlobal but there might be other ways.
-     *
-     * @return a Point whose x is the width and y the height of the screen
-     */
-    static Point getScreenSize() {
-        Object displayManager = InternalApi.getSingleton("android.hardware.display.DisplayManagerGlobal");
-        try {
-            Object displayInfo = displayManager.getClass().getMethod("getDisplayInfo", int.class)
-                    .invoke(displayManager, Display.DEFAULT_DISPLAY);
-            if (displayInfo != null) {
-                Class<?> cls = displayInfo.getClass();
-                int width = cls.getDeclaredField("logicalWidth").getInt(displayInfo);
-                int height = cls.getDeclaredField("logicalHeight").getInt(displayInfo);
-                return new Point(width, height);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private void injectEvent(final InputEvent event) {
@@ -176,7 +145,8 @@ public class MinitouchAgent extends Thread {
      */
     private void manageClientConnection() {
         while (true) {
-            Log.i(TAG, String.format("Listening on %s", SOCKET));
+            System.out.println("Listening on localabstract:" + socketName);
+            Log.i(TAG, String.format("Listening on localabstract:%s", socketName));
             LocalSocket clientSocket;
             try {
                 clientSocket = serverSocket.accept();
@@ -258,10 +228,11 @@ public class MinitouchAgent extends Thread {
         }
     }
 
-    public MinitouchAgent(int width, int height, Handler handler) {
+    public MinitouchAgent(int width, int height, Handler handler, String socketName) {
         this.width = width;
         this.height = height;
         this.handler = handler;
+        this.socketName = socketName;
         inputManager = new InputManagerWrapper();
         windowManager = new WindowManagerWrapper();
         MotionEvent.PointerProperties pointerProps0 = new MotionEvent.PointerProperties();
@@ -286,9 +257,6 @@ public class MinitouchAgent extends Thread {
 
         events[0] = new PointerEvent();
         events[1] = new PointerEvent();
-
-        int rotation = windowManager.getRotation();
-        System.out.println("Rotation: " + rotation);
     }
 
     /**
@@ -298,11 +266,11 @@ public class MinitouchAgent extends Thread {
         //To create a Handler our main thread has to prepare the Looper
         Looper.prepare();
         Handler handler = new Handler();
-        Point size = getScreenSize();
+        Point size = new WindowManagerWrapper().getDisplaySize();
         System.out.println("Screen size: " + size.x + ", " + size.y);
 
         if (size != null) {
-            MinitouchAgent m = new MinitouchAgent(size.x, size.y, handler);
+            MinitouchAgent m = new MinitouchAgent(size.x, size.y, handler, "minitouchagent");
             m.start();
             Looper.loop();
         } else {

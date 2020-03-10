@@ -4,6 +4,7 @@ import android.graphics.Point;
 import android.os.IBinder;
 import android.os.IInterface;
 import android.os.RemoteException;
+import android.view.Display;
 import android.view.IRotationWatcher;
 
 import com.github.uiautomator.util.InternalApi;
@@ -43,26 +44,33 @@ public class WindowManagerWrapper {
         rotationInjector.thawRotation();
     }
 
-    public Point getDisplaySize() throws Exception {
-        Method getServiceMethod = Class.forName("android.os.ServiceManager").getDeclaredMethod("getService", String.class);
-        IBinder binder = (IBinder)getServiceMethod.invoke(null, "display");
-
-        Method asInterfaceMethod = Class.forName("android.hardware.display.IDisplayManager$Stub").getMethod("asInterface", IBinder.class);
-        IInterface manager = (IInterface) asInterfaceMethod.invoke(null, binder);
-
-        Object displayInfo = manager.getClass().getMethod("getDisplayInfo", int.class).invoke(manager, 0);
-        Class<?> cls = displayInfo.getClass();
-
-        int width = cls.getDeclaredField("logicalWidth").getInt(displayInfo);
-        int height = cls.getDeclaredField("logicalHeight").getInt(displayInfo);
-        int rotation = cls.getDeclaredField("rotation").getInt(displayInfo);
-        // width and height already take the rotation into account
-        if (rotation % 2 == 1) {
-            int tmp = width;
-            width = height;
-            height = tmp;
+    public Point getDisplaySize() {
+        Object displayManager = InternalApi.getSingleton("android.hardware.display.DisplayManagerGlobal");
+        try {
+            Object displayInfo = displayManager.getClass().getMethod("getDisplayInfo", int.class)
+                    .invoke(displayManager, Display.DEFAULT_DISPLAY);
+            if (displayInfo != null) {
+                Class<?> cls = displayInfo.getClass();
+                int width = cls.getDeclaredField("logicalWidth").getInt(displayInfo);
+                int height = cls.getDeclaredField("logicalHeight").getInt(displayInfo);
+                int rotation = cls.getDeclaredField("rotation").getInt(displayInfo);
+                if (rotation % 2 == 1) {
+                    width ^= height;
+                    height ^= width;
+                    width ^= height;
+                }
+                return new Point(width, height);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
         }
-        return new Point(width, height);
+        return null;
     }
 
     // It's not clear why we're relying on reflection instead of using

@@ -9,6 +9,7 @@ import android.view.WindowManager;
 
 /**
  * Created by hzsunshx on 2017/11/15.
+ * Deprecated, use RotationAgent to watch rotation.
  */
 
 public class RotationMonitor extends AbstractMonitor {

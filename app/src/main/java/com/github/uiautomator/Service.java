@@ -86,7 +86,6 @@ public class Service extends android.app.Service {
         HttpPostNotifier notifier = new HttpPostNotifier("http://127.0.0.1:7912");
         Context context = getApplicationContext();
         addMonitor(new BatteryMonitor(context, notifier));
-        addMonitor(new RotationMonitor(context, notifier));
         addMonitor(new WifiMonitor(this, notifier));
     }
 
