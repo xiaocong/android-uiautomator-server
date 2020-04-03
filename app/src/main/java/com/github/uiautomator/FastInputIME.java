@@ -43,7 +43,6 @@ public class FastInputIME extends InputMethodService {
     protected OkHttpClient httpClient = new OkHttpClient();
     protected static final int INPUT_EDIT = 1;
     Socket socketClient;
-    WhatsInputThread inputThread;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -85,65 +84,9 @@ public class FastInputIME extends InputMethodService {
         return keyboardView;
     }
 
-    class WhatsInputThread extends Thread {
-        private Socket socketClient;
-
-        public void stopThread() {
-            try {
-                if (this.socketClient != null) {
-                    this.socketClient.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run() {
-            try {
-                socketClient = new Socket("127.0.0.1", 7912);
-                Writer writer = new OutputStreamWriter(socketClient.getOutputStream());
-                writer.write("CONNECT /whatsinput HTTP/1.1\r\nHost: FastInputIME\r\n\r\n");
-                writer.flush();
-                Log.i(TAG, "/whatsinput connected");
-                BufferedReader reader = new BufferedReader(new InputStreamReader(socketClient.getInputStream()));
-                while (!Thread.currentThread().isInterrupted()) {
-                    String line = reader.readLine();
-                    if (line == null || "".equals(line)) {
-                        Log.i(TAG, "Read line empty, maybe disconnected");
-                        break;
-                    }
-                    if (line.charAt(0) == 'I') {
-                        line = line.substring(1);
-                        Log.i(TAG, "Raw data: " + line);
-                        String text = new String(Base64.decode(line, Base64.DEFAULT), "UTF-8");
-                        Log.i(TAG, "Real data: " + text);
-
-                        Bundle data = new Bundle();
-                        data.putString("text", text);
-                        Message message = new Message();
-                        message.what = INPUT_EDIT;
-                        message.setData(data);
-                        handler.sendMessage(message);
-                    } else {
-                        break;
-                    }
-                }
-
-                socketClient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                Log.i(TAG, "/whatsinput disconnected");
-            }
-        }
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
-        inputThread = new WhatsInputThread();
-        inputThread.start();
     }
 
     @Override
@@ -153,23 +96,6 @@ public class FastInputIME extends InputMethodService {
         if (mReceiver != null) {
             unregisterReceiver(mReceiver);
         }
-        inputThread.stopThread();
-    }
-
-    @Override
-    public void onStartInputView(EditorInfo info, boolean restarting) {
-        super.onStartInputView(info, restarting);
-        String text = getText();
-        makeToast("StartInputView: text -- " + text);
-        sendRequestToATXAgent("I" + text);
-    }
-
-    @Override
-    public void onFinishInputView(boolean finishingInput) {
-        super.onFinishInputView(finishingInput);
-        // send message
-        makeToast("FinishInputView");
-        sendRequestToATXAgent("F");
     }
 
     @Override
@@ -345,25 +271,6 @@ public class FastInputIME extends InputMethodService {
 
     private void makeToast(String msg) {
 //        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    private void sendRequestToATXAgent(String text) {
-        RequestBody body = RequestBody.create(MediaType.parse("text/plain; charset=utf-8"), text);
-        Request request = new Request.Builder()
-                .url("http://127.0.0.1:7912/whatsinput")
-                .post(body)
-                .build();
-        httpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Log.i(TAG, "StartInputView text send to atx-agent");
-            }
-        });
     }
 
     public String randomString(int length) {
