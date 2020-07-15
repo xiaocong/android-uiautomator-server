@@ -49,6 +49,7 @@ public class MainActivity extends Activity {
     private TextView textViewIP;
     private TextView tvAgentStatus;
     private TextView tvAutomatorStatus;
+    private TextView tvAutomatorMode;
     private TextView tvServiceMessage;
 
     private WindowManager windowManager = null;
@@ -60,15 +61,22 @@ public class MainActivity extends Activity {
     private static final class TextViewSetter implements Runnable {
         private final TextView v;
         private final String what;
+        private final int color;
 
-        TextViewSetter(TextView v, String what) {
+        TextViewSetter(TextView v, String what, int color) {
             this.v = v;
             this.what = what;
+            this.color = color;
+        }
+
+        TextViewSetter(TextView v, String what) {
+            this(v, what, Color.BLACK);
         }
 
         @Override
         public void run() {
             v.setText(what);
+            v.setTextColor(color);
         }
     }
 
@@ -93,6 +101,7 @@ public class MainActivity extends Activity {
 
         tvAgentStatus = findViewById(R.id.atx_agent_status);
         tvAutomatorStatus = findViewById(R.id.uiautomator_status);
+        tvAutomatorMode = findViewById(R.id.uiautomator_mode);
         tvServiceMessage = findViewById(R.id.serviceMessage);
 
         Button btnFinish = findViewById(R.id.btn_finish);
@@ -352,15 +361,23 @@ public class MainActivity extends Activity {
             @Override
             public void onResponse(Call call, Response response) {
                 try {
+                    if (response.body() == null || !response.isSuccessful()) {
+                        this.onFailure(call, new IOException("UIAutomator not responding!"));
+                        return;
+                    }
                     String responseData = response.body().string();
                     JSONObject obj = new JSONObject(responseData);
                     boolean running = obj.getBoolean("running");
-                    if (running) {
-                        runOnUiThread(new TextViewSetter(tvAutomatorStatus, "UIAutomator Running"));
-                    } else {
-                        runOnUiThread(new TextViewSetter(tvAutomatorStatus, "UIAutomator Stopped"));
-                    }
+                    String status = running ? "UIAutomator Running" : "UIAutomator Stopped";
+                    runOnUiThread(new TextViewSetter(tvAutomatorStatus, status));
                     runOnUiThread(new TextViewSetter(tvServiceMessage, responseData));
+                    try {
+                        Class.forName("com.github.uiautomator.stub.Stub");
+                        runOnUiThread(new TextViewSetter(tvAutomatorMode, "正常服务模式"));
+                    } catch (ClassNotFoundException e) {
+                        // TODO 应在onResume check后弹框强制退出
+                        runOnUiThread(new TextViewSetter(tvAutomatorMode, "无法提供服务 非am instrument启动", Color.RED));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                     runOnUiThread(new TextViewSetter(tvServiceMessage, e.toString()));
