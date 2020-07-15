@@ -113,6 +113,7 @@ public class Service extends android.app.Service {
 
         if (ACTION_START.equals(action)) {
             Log.i(TAG, "Receive start-service action, but ignore it");
+            startActivity(new Intent(this, MainActivity.class));
         } else if (ACTION_STOP.equals(action)) {
             stopSelf();
         }
