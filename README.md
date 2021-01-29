@@ -32,7 +32,7 @@ simply run the following command
 ```
 adb forward tcp:9008 tcp:9008
 adb shell am instrument -w -r -e debug false -e class com.github.uiautomator.stub.Stub \
-    com.github.uiautomator.test/android.support.test.runner.AndroidJUnitRunner
+    com.github.uiautomator.test/androidx.test.runner.AndroidJUnitRunner
 ```
 
 # Run
@@ -136,7 +136,7 @@ If you have any idea, please email codeskyblue@gmail.com or [submit tickets](htt
 - [nanohttpd](https://github.com/NanoHttpd/nanohttpd)
 - [jsonrpc4j](https://github.com/briandilley/jsonrpc4j)
 - [jackson](https://github.com/FasterXML/jackson)
-- [com.android.support.test.uiautomator](https://mvnrepository.com/artifact/com.android.support.test.uiautomator/uiautomator-v18)
+- [androidx.test.uiautomator](https://mvnrepository.com/artifact/androidx.test.uiautomator/uiautomator-v18)
 
 # Added features
 - [x] support unicode input
@@ -144,7 +144,7 @@ If you have any idea, please email codeskyblue@gmail.com or [submit tickets](htt
 # Resources
 - [Google UiAutomator Tutorial](https://developer.android.com/training/testing/ui-testing/uiautomator-testing?hl=zh-cn)
 - [Google UiAutomator API](https://developer.android.com/reference/android/support/test/uiautomator/package-summary?hl=zh-cn)
-- [Maven repository of uiautomator-v18](https://mvnrepository.com/artifact/com.android.support.test.uiautomator/uiautomator-v18)
+- [Maven repository of uiautomator-v18](https://mvnrepository.com/artifact/androidx.test.uiautomator/uiautomator-v18)
 
 # Thanks to
 - [xiaocong](https://github.com/xiaocong)

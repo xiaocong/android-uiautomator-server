@@ -24,8 +24,8 @@
 package com.github.uiautomator.stub;
 
 import android.os.RemoteException;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.uiautomator.UiDevice;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.uiautomator.UiDevice;
 
 public class DeviceInfo {
     private String _currentPackageName;

@@ -24,7 +24,7 @@
 package com.github.uiautomator.stub;
 
 import android.os.RemoteException;
-import android.support.test.uiautomator.UiObjectNotFoundException;
+import androidx.test.uiautomator.UiObjectNotFoundException;
 
 import com.googlecode.jsonrpc4j.JsonRpcError;
 import com.googlecode.jsonrpc4j.JsonRpcErrors;
