@@ -3,8 +3,8 @@ package com.github.uiautomator.stub;
 import android.app.UiAutomation;
 import android.graphics.Rect;
 import android.os.Build;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.uiautomator.UiDevice;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.uiautomator.UiDevice;
 import android.util.Log;
 import android.util.Xml;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -24,7 +24,7 @@ import java.util.Set;
 
 
 // Note:
-// Here is a copy of android.support.test.uiautomator.AccessibilitiNodeInfoDumper source code
+// Here is a copy of androidx.test.uiautomator.AccessibilitiNodeInfoDumper source code
 // in order to fix dump hierarchy error
 //
 // Sync to new code: https://android.googlesource.com/platform/frameworks/testing/+/master/uiautomator/library/core-src/com/android/uiautomator/core/AccessibilityNodeInfoDumper.java

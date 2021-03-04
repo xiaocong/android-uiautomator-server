@@ -23,7 +23,7 @@
 
 package com.github.uiautomator.stub;
 
-import android.support.test.uiautomator.Configurator;
+import androidx.test.uiautomator.Configurator;
 
 /**
  * Created by xiaocong@gmail.com on 12/26/13.

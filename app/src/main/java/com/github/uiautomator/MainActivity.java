@@ -12,8 +12,8 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +27,6 @@ import com.android.permission.FloatWindowManager;
 import com.github.uiautomator.util.MemoryManager;
 import com.github.uiautomator.util.OkhttpManager;
 import com.github.uiautomator.util.Permissons4App;
-import com.tendcloud.tenddata.TCAgent;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,24 +79,11 @@ public class MainActivity extends Activity {
         }
     }
 
-
-    private void initTCAgent() {
-        TCAgent.LOG_ON = true;
-        // App ID: 在TalkingData创建应用后，进入数据报表页中，在“系统设置”-“编辑应用”页面里查看App ID。
-        // 渠道 ID: 是渠道标识符，可通过不同渠道单独追踪数据。
-        TCAgent.init(this, BuildConfig.buildTendId, BuildConfig.buildChannel);
-        // 如果已经在AndroidManifest.xml配置了App ID和渠道ID，调用TCAgent.init(this)即可；或与AndroidManifest.xml中的对应参数保持一致。
-        TCAgent.setReportUncaughtExceptions(true);
-        Log.i(TAG, "TCAgent init done");
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        this.initTCAgent();
 
         tvAgentStatus = findViewById(R.id.atx_agent_status);
         tvAutomatorStatus = findViewById(R.id.uiautomator_status);
