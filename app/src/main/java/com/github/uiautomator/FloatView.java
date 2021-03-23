@@ -88,8 +88,8 @@ public class FloatView extends FrameLayout {
                 | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON; // 保持屏幕常亮
 
         // Set to not touchable
-        //params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-        //params.flags &= (~WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+        params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        params.flags &= (~WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
         int mType;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -100,11 +100,11 @@ public class FloatView extends FrameLayout {
         params.type = mType;
         params.format = PixelFormat.RGBA_8888;
         params.gravity = Gravity.LEFT | Gravity.TOP;
-        params.width = minWidthHeight / 10;
-        params.height = minWidthHeight / 10;
+        params.width = minWidthHeight / 20;
+        params.height = minWidthHeight / 20;
         params.x = screenWidth - sideGap() - params.width;
         params.y = screenHeight / 3 * 2;
-        params.alpha = 0.5f;
+        params.alpha = 0.2f;
         this.setParams(params);
         windowManager.addView(this, params);
     }
