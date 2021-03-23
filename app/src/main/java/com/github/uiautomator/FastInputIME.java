@@ -1,9 +1,12 @@
 package com.github.uiautomator;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.inputmethodservice.InputMethodService;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -63,20 +66,6 @@ public class FastInputIME extends InputMethodService {
     public View onCreateInputView() {
         KeyboardView keyboardView = (KeyboardView) getLayoutInflater().inflate(R.layout.keyboard, null);
 
-        if (mReceiver == null) {
-            IntentFilter filter = new IntentFilter();
-            filter.addAction("ADB_INPUT_TEXT");
-            filter.addAction("ADB_INPUT_KEYCODE");
-            filter.addAction("ADB_CLEAR_TEXT");
-            filter.addAction("ADB_SET_TEXT"); // Equals to: Clear then Input
-            filter.addAction("ADB_EDITOR_CODE");
-            // TODO: filter.addAction("ADB_INPUT_CHARS");
-
-            // NONEED: filter.addAction(USB_STATE_CHANGE);
-            mReceiver = new InputMessageReceiver();
-            registerReceiver(mReceiver, filter);
-        }
-
         Keyboard keyboard = new Keyboard(this, R.xml.keyboard);
         keyboardView.setKeyboard(keyboard);
         keyboardView.setOnKeyboardActionListener(new MyKeyboardActionListener());
@@ -87,6 +76,22 @@ public class FastInputIME extends InputMethodService {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i(TAG, "Input created");
+
+        if (mReceiver == null) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("ADB_INPUT_TEXT");
+            filter.addAction("ADB_INPUT_KEYCODE");
+            filter.addAction("ADB_CLEAR_TEXT");
+            filter.addAction("ADB_SET_TEXT"); // Equals to: Clear then Input
+            filter.addAction("ADB_EDITOR_CODE");
+            filter.addAction("ADB_GET_CLIPBOARD");
+            // TODO: filter.addAction("ADB_INPUT_CHARS");
+
+            // NONEED: filter.addAction(USB_STATE_CHANGE);
+            mReceiver = new InputMessageReceiver();
+            registerReceiver(mReceiver, filter);
+        }
     }
 
     @Override
@@ -104,6 +109,26 @@ public class FastInputIME extends InputMethodService {
     }
 
     public class InputMessageReceiver extends BroadcastReceiver {
+        private String charSequenceToString(CharSequence input) {
+            return input == null ? "" : input.toString();
+        }
+        private String getClipboardText(Context context) {
+            final ClipboardManager cm = (ClipboardManager) context
+                    .getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cm == null) {
+                Log.e(TAG, "Cannot get an instance of ClipboardManager");
+                return null;
+            }
+            if (!cm.hasPrimaryClip()) {
+                return "";
+            }
+            final ClipData cd = cm.getPrimaryClip();
+            if (cd == null || cd.getItemCount() == 0) {
+                return "";
+            }
+            return charSequenceToString(cd.getItemAt(0).coerceToText(context));
+        }
+
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -113,6 +138,7 @@ public class FastInputIME extends InputMethodService {
             if (ic == null) {
                 return;
             }
+            Log.i(TAG, action);
             switch (action) {
                 case "ADB_INPUT_TEXT":
                     /* test method
@@ -156,6 +182,29 @@ public class FastInputIME extends InputMethodService {
                     code = intent.getIntExtra("code", -1);
                     if (code != -1) {
                         ic.performEditorAction(code);
+                    }
+                    break;
+                case "ADB_GET_CLIPBOARD":
+                    Log.i(TAG, "Getting current clipboard content");
+                    final String clipboardContent = getClipboardText(context);
+                    if (clipboardContent == null) {
+                        setResultCode(Activity.RESULT_CANCELED);
+                        setResultData("");
+                        return;
+                    }
+
+                    try {
+                        // TODO: Use StandardCharsets.UTF_8 after the minimum supported API version
+                        // TODO: is bumped above 18
+                        //noinspection CharsetObjectCanBeUsed
+                        String clipboardContentBase64 = Base64.encodeToString(
+                                clipboardContent.getBytes("UTF-8"), Base64.DEFAULT);
+                        setResultCode(Activity.RESULT_OK);
+                        setResultData(clipboardContentBase64);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                        setResultCode(Activity.RESULT_CANCELED);
+                        setResultData("");
                     }
                     break;
             }
