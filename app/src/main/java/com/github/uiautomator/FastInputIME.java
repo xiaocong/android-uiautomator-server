@@ -190,21 +190,20 @@ public class FastInputIME extends InputMethodService {
                     if (clipboardContent == null) {
                         setResultCode(Activity.RESULT_CANCELED);
                         setResultData("");
-                        return;
-                    }
-
-                    try {
-                        // TODO: Use StandardCharsets.UTF_8 after the minimum supported API version
-                        // TODO: is bumped above 18
-                        //noinspection CharsetObjectCanBeUsed
-                        String clipboardContentBase64 = Base64.encodeToString(
-                                clipboardContent.getBytes("UTF-8"), Base64.DEFAULT);
-                        setResultCode(Activity.RESULT_OK);
-                        setResultData(clipboardContentBase64);
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                        setResultCode(Activity.RESULT_CANCELED);
-                        setResultData("");
+                    } else {
+                        try {
+                            // TODO: Use StandardCharsets.UTF_8 after the minimum supported API version
+                            // TODO: is bumped above 18
+                            //noinspection CharsetObjectCanBeUsed
+                            String clipboardContentBase64 = Base64.encodeToString(
+                                    clipboardContent.getBytes("UTF-8"), Base64.NO_WRAP);
+                            setResultCode(Activity.RESULT_OK);
+                            setResultData(clipboardContentBase64);
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                            setResultCode(Activity.RESULT_CANCELED);
+                            setResultData("");
+                        }
                     }
                     break;
             }

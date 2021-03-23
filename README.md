@@ -64,15 +64,29 @@ Send to FastInputIME with broadcast
 
 ```bash
 # Append text to input field
-adb shell am broadcast -a ADB_INPUT_TEXT --es text SGVsbG8g5L2g5aW9
+$ adb shell am broadcast -a ADB_INPUT_TEXT --es text SGVsbG8g5L2g5aW9
+
 # Clear text
-adb shell am broadcast -a ADB_CLEAR_TEXT
+$ adb shell am broadcast -a ADB_CLEAR_TEXT
+
 # Clear text before append text
-adb shell am broadcast -a ADB_SET_TEXT --es text SGVsbG8g5L2g5aW9
+$ adb shell am broadcast -a ADB_SET_TEXT --es text SGVsbG8g5L2g5aW9
+
 # Send keycode, eg: ENTER
-adb shell am broadcast -a ADB_INPUT_KEYCODE --ei code 66
+$ adb shell am broadcast -a ADB_INPUT_KEYCODE --ei code 66
+
 # Send Editor code
-adb shell am broadcast -a ADB_EDITOR_CODE --ei code 2 # IME_ACTION_GO
+$ adb shell am broadcast -a ADB_EDITOR_CODE --ei code 2 # IME_ACTION_GO
+
+# Get clipboard (without data)
+$ adb shell am broadcast -a ADB_GET_CLIPBOARD
+Broadcasting: Intent { act=ADB_GET_CLIPBOARD flg=0x400000 }
+Broadcast completed: result=0
+
+# Get clipboard (with data, base64 encoded)
+$ adb shell am broadcast -a ADB_GET_CLIPBOARD
+Broadcasting: Intent { act=ADB_GET_CLIPBOARD flg=0x400000 }
+Broadcast completed: result=-1, data="5LqG6Kej5Lyg57uf5paH5YyW"
 ```
 
 - [Editor Code](https://developer.android.com/reference/android/view/inputmethod/EditorInfo)
@@ -139,12 +153,18 @@ If you have any idea, please email codeskyblue@gmail.com or [submit tickets](htt
 - [androidx.test.uiautomator](https://mvnrepository.com/artifact/androidx.test.uiautomator/uiautomator-v18)
 
 # Added features
+
 - [x] support unicode input
 
 # Resources
 - [Google UiAutomator Tutorial](https://developer.android.com/training/testing/ui-testing/uiautomator-testing?hl=zh-cn)
 - [Google UiAutomator API](https://developer.android.com/reference/android/support/test/uiautomator/package-summary?hl=zh-cn)
 - [Maven repository of uiautomator-v18](https://mvnrepository.com/artifact/androidx.test.uiautomator/uiautomator-v18)
+
+Clipboard, Thanks to @fplust
+
+- https://github.com/majido/clipper
+- https://github.com/appium/io.appium.settings/blob/759d2febbc95a6832eb74fa0a4a56c5975dc694d/app/src/main/java/io/appium/settings/receivers/ClipboardReceiver.java#L30
 
 # Thanks to
 - [xiaocong](https://github.com/xiaocong)
